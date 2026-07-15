@@ -347,10 +347,115 @@ function IAConversation.resolveLocalizedModText(textDe, textEn, textFallback)
 	IAprintDebug("resolveLocalizedModText", "textEn: "..textEn, nil, nil, nil)
 	IAprintDebug("resolveLocalizedModText", "textFallback: "..textFallback, nil, nil, nil)
 	IAprintDebug("resolveLocalizedModText", "getDisplayLanguageCode: "..getDisplayLanguageCode(), nil, nil, nil)
+	local result
 	if getDisplayLanguageCode() == "de" then
-		return (textDe ~= "") and textDe or textFallback
+		result = (textDe ~= "") and textDe or textFallback
+	else
+		result = (textEn ~= "") and textEn or textFallback
 	end
-	return (textEn ~= "") and textEn or textFallback
+	return IAConversation._sanitizeDisplayText(result)
+end
+
+--- Decode the Unicode codepoint from the first byte of a UTF-8 sequence in s.
+-- Returns codepoint (decimal number), byteLength. Returns nil, 1 on invalid lead byte.
+local function _iaUtf8CodepointAt(s, start)
+	local b = string.byte(s, start)
+	if b == nil then return nil, 0 end
+	if b < 0x80 then return b, 1 end
+	if b < 0xC0 then return nil, 1 end
+	if b < 0xE0 then
+		local b2 = string.byte(s, start + 1)
+		if b2 == nil then return nil, 1 end
+		return ((b - 0xC0) * 64) + (b2 - 0x80), 2
+	end
+	if b < 0xF0 then
+		local b2 = string.byte(s, start + 1)
+		local b3 = string.byte(s, start + 2)
+		if b2 == nil or b3 == nil then return nil, 1 end
+		return ((b - 0xE0) * 4096) + ((b2 - 0x80) * 64) + (b3 - 0x80), 3
+	end
+	if b < 0xF8 then
+		local b2 = string.byte(s, start + 1)
+		local b3 = string.byte(s, start + 2)
+		local b4 = string.byte(s, start + 3)
+		if b2 == nil or b3 == nil or b4 == nil then return nil, 1 end
+		return ((b - 0xF0) * 262144) + ((b2 - 0x80) * 4096) + ((b3 - 0x80) * 64) + (b4 - 0x80), 4
+	end
+	return nil, 1
+end
+
+--- Table of { utf8Bytes, asciiReplacement, label } — ordered so longer patterns match first.
+local IA_CONVERSATION_SANITIZE_RULES = {
+	{ "\226\128\152", "'",  "U+2018 LEFT SINGLE QUOTATION MARK" },
+	{ "\226\128\153", "'",  "U+2019 RIGHT SINGLE QUOTATION MARK" },
+	{ "\226\128\156", "\"", "U+201C LEFT DOUBLE QUOTATION MARK" },
+	{ "\226\128\157", "\"", "U+201D RIGHT DOUBLE QUOTATION MARK" },
+	{ "\226\128\148", "--", "U+2014 EM DASH" },
+	{ "\226\128\147", "-",  "U+2013 EN DASH" },
+	{ "\226\128\166", "...","U+2026 HORIZONTAL ELLIPSIS" },
+	{ "\226\128\145", "-",  "U+2011 NON-BREAKING HYPHEN" },
+}
+
+--- Replace Unicode typographic characters with ASCII equivalents for font compatibility.
+-- The game's bitmap texture fonts only support a limited character set (ASCII + Latin-1).
+-- Smart quotes, em dashes, ellipses, and other typographic characters from AI-generated
+-- conversation text cause "Character 'XXXX' not found in texture font" warnings and
+-- display as missing glyphs. This normalizes them to safe ASCII at the last step before
+-- the engine renders the text.
+-- When IANeighbours.debug is true, each substitution is logged with the codepoint,
+-- hex representation, replacement, and surrounding text context.
+-- @param text string
+-- @return string
+function IAConversation._sanitizeDisplayText(text)
+	if text == nil or text == "" then
+		return text or ""
+	end
+
+	-- Debug pass: scan for non-ASCII characters and report what will be replaced
+	if IANeighbours ~= nil and IANeighbours.debug then
+		local i = 1
+		local len = #text
+		while i <= len do
+			local cp, clen = _iaUtf8CodepointAt(text, i)
+			if cp == nil then
+				i = i + 1
+			elseif cp < 128 then
+				i = i + 1
+			else
+				-- Look up whether this is a known typographic character
+				local matchedLabel = nil
+				local matchedReplacement = nil
+				for _, rule in ipairs(IA_CONVERSATION_SANITIZE_RULES) do
+					if string.sub(text, i, i + #rule[1] - 1) == rule[1] then
+						matchedLabel = rule[3]
+						matchedReplacement = rule[2]
+						clen = #rule[1]
+						break
+					end
+				end
+				if matchedLabel ~= nil then
+					local hex = string.format("U+%04X", cp)
+					local ctxStart = math.max(1, i - 12)
+					local ctxEnd = math.min(len, i + clen + 12)
+					local context = string.sub(text, ctxStart, ctxEnd)
+					print("--- IAConversation._sanitizeDisplayText: replacing codepoint " .. tostring(cp) .. " (" .. hex .. " / " .. matchedLabel .. ") → '" .. matchedReplacement .. "'  near: \"" .. context .. "\"")
+				end
+				i = i + math.max(clen, 1)
+			end
+		end
+	end
+
+	-- Apply all replacements
+	for _, rule in ipairs(IA_CONVERSATION_SANITIZE_RULES) do
+		text = string.gsub(text, rule[1], rule[2])
+	end
+
+	-- Catch-all: strip any remaining multi-byte UTF-8 sequences beyond Latin-1 (U+0080–U+00FF).
+	-- These are 3+ byte sequences (codepoints > U+00FF) that the bitmap font cannot render.
+	-- Latin-1 characters (2-byte sequences C2 80 – C3 BF) are preserved.
+	text = string.gsub(text, "[\224-\244][\128-\191][\128-\191]+", " ")
+
+	return text
 end
 
 --- Resolve display text for an entry: prefer text_de/text_en by game UI language, fallback to #text.

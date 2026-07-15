@@ -40,8 +40,11 @@ IAFieldOutcomeMission.MIN_INTERIOR_PROBE_SLOTS = 24
 IAFieldOutcomeMission.MAX_PROBES = 64
 IAFieldOutcomeMission.BORDER_INSET_MIN_M = 5
 IAFieldOutcomeMission.BORDER_INSET_MAX_M = 10
---- Fraction of probes that must match expected FieldState for the mission to be considered finished (0.0-1.0).
-IAFieldOutcomeMission.PROBE_COMPLETION_THRESHOLD = 0.9
+--- Fraction of probes that must match expected FieldState for the mission to be considered finished.
+--- Now read from IASettings (default 0.9 = 90%); user-configurable in game settings.
+function IAFieldOutcomeMission.getProbeCompletionThreshold()
+	return (IASettings.getFieldworkCompletionThreshold() or 90) / 100
+end
 
 -- Persisted on outbound fieldOutcomeMission rows (#<key>); order drives save + restore.
 -- When MissionManager refuses startMission (e.g. another contract still PREPARING), entries are retried from processDeferredOutboundRestoreStarts.
@@ -1353,7 +1356,7 @@ function IAFieldOutcomeMission:iaSyncProbeEvaluation()
 		{
 			maxMissLogLines = maxMissLogLines,
 			mismatchAnnot = IAFieldOutcomeMission.iaProbeMismatchAnnotators(),
-			probeThreshold = IAFieldOutcomeMission.PROBE_COMPLETION_THRESHOLD,
+			probeThreshold = IAFieldOutcomeMission.getProbeCompletionThreshold(),
 		}
 	)
 	local matched = res.matched

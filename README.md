@@ -1,6 +1,6 @@
 # Fields of Stories – Roleplay
 
-**Living Characters in Farming Simulator 25**
+**Living Characters in Farming Simulator 25** — Version 1.0.0.3
 
 Fields of Stories expands Farming Simulator with a dynamic neighborhood of currently **13 virtual characters** who live and work independently in your world and interact with you. Each character has an individual daily routine and tasks. You meet characters randomly at the gas station, in the field, at the dealer, or anywhere across the map. Have conversations, build relationships, and support them when they need help.
 
@@ -8,6 +8,7 @@ YouTube: [https://www.youtube.com/@Fields-of-Stories](https://www.youtube.com/@F
 Website: [https://fields-of-stories.com](https://fields-of-stories.com)
 
 > **BETA note:** Please check the roadmap and the features that are still planned. Report bugs and feature requests via GitHub.
+> See the [Changelog](#changelog) for what's new since the last release.
 
 ---
 
@@ -28,6 +29,7 @@ Website: [https://fields-of-stories.com](https://fields-of-stories.com)
 - [Setting Up Your Own Map](#setting-up-your-own-map)
 - [Other](#other)
 - [Roadmap](#roadmap)
+- [Changelog](#changelog)
 - [Support and Feedback](#support-and-feedback)
 
 ---
@@ -40,8 +42,10 @@ Website: [https://fields-of-stories.com](https://fields-of-stories.com)
 - **Random encounters in the game world:** characters move freely around the map, either at public places like the gas station, the park, the industrial area, or out in the field. (Roadmap: AutoDrive Compatibility)
 - **Spoken, natural conversations:** German & English, with individual voices, choice options, and random conversation topics. (Voice packs must be downloaded manually – see [Voice Pack](#voice-pack).)
 - **Phone calls:** You receive phone calls from the farmers when they need help. You can answer the call and help them or decline the call.
-- **Field contracts based on the farmers' workload:** The farmers need your help for specific tasks in their daily schedule. Sometimes, they can take care of it but if not, they will try to call you for help.
+- **Field contracts based on the farmers' workload:** The farmers need your help for specific tasks in their daily schedule. Sometimes, they can take care of it but if not, they will try to call you for help. Switch between realistic (phone) and classic (mission list) format in settings.
 - **Borrowing machines:** You can borrow a machine from the farmer's yard if you don't have the right equipment for the contract. You need to pick up and return them.
+- **Configurable gameplay:** Adjust contract call frequency, field limits, mission completion threshold, and contract format to your liking.
+- **Mod compatible:** Works with Manual Attach and Courseplay.
 
 ---
 
@@ -59,9 +63,12 @@ Website: [https://fields-of-stories.com](https://fields-of-stories.com)
 ## Game Settings
 
 
-| Game Setting                 | Description                                                                                       |
-| ---------------------------- | ------------------------------------------------------------------------------------------------- |
-| Contract phone calls per day | Maximum number of contract phone calls per in-game day across all neighbours. (1,2,3,4,Unlimited) |
+| Game Setting                  | Description                                                                                                                          |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Contract phone calls per day  | Maximum number of contract phone calls per in-game day across all neighbours. (1, 2, 3, 4, Unlimited)                                |
+| Contract format               | Choose between **Realistic** (phone-based, as described above) or **Classic** (standard mission list).                               |
+| Max fields per contract call  | Limit how many fields a farmer offers in a single contract call to keep the mission list manageable.                                 |
+| Mission completion threshold  | What percentage of the field must reach the target state before the contract is marked complete (default 90%). Lower values = easier to finish; higher = more thorough work required. |
 
 
 ---
@@ -152,6 +159,8 @@ This is the quickest way to see at a glance who you already know well and who yo
 
 Farmers sometimes have more fieldwork than they can manage and will call you for help. These offers are real, paid jobs on their fields. They may give you a whole series of fields to complete.
 
+> **Contract format:** In the game settings you can switch between **Realistic** (phone-based calls as described here) and **Classic** (standard mission list). The classic format makes all available contracts visible in the mission menu at all times.
+
 **The call:**
 
 1. A farmer can call you during the day (roughly between 08:00 and 15:00). You hear a ring and see a call notice.
@@ -160,9 +169,11 @@ Farmers sometimes have more fieldwork than they can manage and will call you for
 
 **Choosing the work:** in the phone conversation you can usually accept the entire field area or just the first half, and you can choose whether to use your own equipment or borrow the neighbour's machines. This requires that the farmer can spare his machines. Of course you can also simply decline the request.
 
-**Without borrowing:** you complete the contract with your own machines. The work is paid per hectare and is done as soon as the field reaches the required state (progress is currently not calculated evenly). These contracts are always requested by phone and will be visible in the usual mission menu only after accepting.
+**Without borrowing:** you complete the contract with your own machines. The work is paid per hectare and is done as soon as the field reaches the required state. By default, 90% of the field's probe points must match the target state to count as complete (configurable in game settings). These contracts are always requested by phone and will be visible in the usual mission menu only after accepting.
 
 **With borrowing:** the neighbour lends you exactly the implements needed (weights and the tractor are not lent out, however). Where needed, borrowed machines start already filled with seed, spray, fertilizer, manure or slurry, which can be refilled at the neighbour's farm when required. Borrowing means slightly less pay than using your own equipment.
+
+**Field limit per call:** to keep your mission list manageable, you can set a maximum number of fields offered per contract call in the game settings.
 
 > **Important:** a contract with borrowed equipment stays at 99 percent until you drive every borrowed machine back to the neighbour's farm and detach it there. Only then is the contract considered complete. If you borrow the equipment, you will find a marker on the map showing where the machines can be picked up and returned.
 
@@ -319,7 +330,9 @@ If you cannot find a spot for every machine, that is not a problem — depending
 
 **Conversations:** Conversations are based on the current situation and the character's behaviour (e.g. suspicious, friendly, etc.). They contain real vehicle and work information, like regular outages of Skoda cars, hydraulic parts of a tractor, etc.
 
-**Missions:** In later versions, the current conversations will be expanded with missions that you can accept as a player. There are already conversations hinting at this, but they currently don't trigger any missions yet.
+**Mod compatibility:** Fields of Stories is compatible with Manual Attach and Courseplay. Performance issues when running alongside Courseplay have been resolved.
+
+**Story missions:** In later versions, the current conversations will be expanded with story missions that you can accept as a player. There are already conversations hinting at this, but they currently don't trigger any story missions yet. Fieldwork contracts (see above) are already fully functional.
 
 ---
 
@@ -339,6 +352,36 @@ If you cannot find a spot for every machine, that is not a problem — depending
 - Small missions & random events.
 - Story mode with long-term story arcs.
 - Free-form communication.
+
+---
+
+## Changelog
+
+### 1.0.0.3 (July 15, 2026)
+
+**New settings & gameplay options:**
+- **Classic or realistic contract format:** Switch between the classic mission list and the realistic phone-based contract system in the game settings.
+- **Configurable field limit for contract calls:** Set a maximum number of fields offered per contract call to keep your mission list manageable.
+- **Adjustable mission completion threshold:** Configure what percentage of probe points on a field must reach the target state for the contract to be marked complete (default 90%, range 60–100%).
+
+**Bugfixes:**
+- Vehicles with attached implements no longer spawn at vehicle-only locations.
+- NPC behavior is now safe at high time scales (> 360×): every situation stays active for at least 2 real-time minutes, and phone calls reliably arrive even above 100× speed.
+- NPCs now account for real playtime alongside in-game time when deciding how long to stay at a place.
+- "Unavailable" no longer appears on the map for characters currently working in the field.
+- Outdated vehicles are now cleaned up automatically, and also when clicking "Remove Mod Data."
+- Field ownership now correctly displays the character's name (especially in the mission tab).
+- Fixed an issue where characters could be invisible while conversations were still possible.
+- Removed unreachable locations on standard maps.
+- Added compatibility with the Manual Attach mod.
+- Resolved performance issues when used together with Courseplay.
+- All missing translations added.
+
+### 1.0.0.1 (June 27, 2026)
+
+- Recently acquired fields are no longer used by NPC farmers.
+- Fields are no longer auto-adjusted to NPC-supported crops.
+- Fieldwork mission completion uses a 10% threshold for progress.
 
 ---
 

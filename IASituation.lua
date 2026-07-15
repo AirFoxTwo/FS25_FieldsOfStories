@@ -222,7 +222,14 @@ function IASituation:initialize()
 	-- Set startedAt using getCurrentGameHours when scenario is initialized
 	if self.startedAt == nil then
 		self.startedAt = getCurrentGameHours()
-	end 
+	end
+
+	-- Minimum real-time guard: situations must exist for at least 2 real minutes
+	-- before game-time expiration can apply. This prevents mass-expiration when the
+	-- player exits fast-forward (timeScale > 500).
+	if self.createdWallClockSec == nil then
+		self.createdWallClockSec = IANeighbours._wallClockSec or 0
+	end
 	
 	self.initialized = true
 	self:setSituationAttributeOnIANeighbourVehicles()
@@ -430,6 +437,18 @@ end
 -- When ignorePlayerDistance is false, an otherwise-expired situation is not considered expired while the player is nearby.
 -- @return boolean - true if expired, false otherwise
 function IASituation:isExpired()
+	-- Minimum real-time guard: situations must exist for at least 2 real minutes
+	-- before game-time expiration can apply. This prevents mass-expiration when the
+	-- player exits fast-forward (timeScale > 500) where weeks of game-time elapsed
+	-- in seconds of real time.
+	local realSeconds = nil
+	if self.createdWallClockSec ~= nil and IANeighbours._wallClockSec ~= nil then
+		realSeconds = IANeighbours._wallClockSec - self.createdWallClockSec
+		if realSeconds < 120 then
+			return false
+		end
+	end
+
 	-- If startedAt is not set, cannot check expiration
 	if self.startedAt == nil then
 		return false
@@ -447,6 +466,15 @@ function IASituation:isExpired()
 		-- Add the per-situation random jitter (0..59 min) so expirations (and regenerations) are staggered.
 		local maxDurationHours = self.config.maxDuration + ((self.expireRandomOffsetMinutes or 0) / 60)
 		timeExpired = (elapsedHours >= maxDurationHours)
+
+		-- Realtime max expiration: situation also expires when real time exceeds
+		-- (maxDuration * 12) minutes, regardless of game-time progress.
+		if not timeExpired and realSeconds ~= nil and self.config.maxDuration ~= nil then
+			local realMaxSeconds = self.config.maxDuration * 12 * 60
+			if realSeconds >= realMaxSeconds then
+				timeExpired = true
+			end
+		end
 	end
 
 	if not timeExpired then
@@ -487,6 +515,11 @@ end
 function IASituation:delete()
 	if not self.initialized then
 		return
+	end
+
+	-- [FOS_TEST] instrumentation: situation is ending
+	if IATestRunner ~= nil and type(IATestRunner.onSituationComplete) == "function" then
+		IATestRunner.onSituationComplete(self, "delete")
 	end
 
 	-- Stop AI / remove job first so field ownership and FieldUpdateTask run in a stable state
@@ -846,7 +879,11 @@ function IASituation:managePositioning()
 			self:safePcall("loadStep2 updateNPCName false", function() self.neighbour:updateNPCName(false) end)
 			self:safePcall("loadStep2 updateNPCSpot", function() self.neighbour:updateNPCSpot() end)
 		else
-			self:safePcall("loadStep2 updateNPCName true", function() self.neighbour:updateNPCName(true) end)
+			if self.jobType ~= nil then
+				self:safePcall("loadStep2 updateNPCName false-2", function() self.neighbour:updateNPCName(false) end)		
+			else
+				self:safePcall("loadStep2 updateNPCName true", function() self.neighbour:updateNPCName(true) end)		
+			end
 		end
 		--self.neighbour:updateNPCSpot()
 		
@@ -996,6 +1033,10 @@ function IASituation:managePositioning()
 		end
 
 		self.loadStep = 5
+		-- [FOS_TEST] instrumentation: AI-active state reached
+		if IATestRunner ~= nil and type(IATestRunner.onSituationLoadStepChanged) == "function" then
+			IATestRunner.onSituationLoadStepChanged(self, 5)
+		end
 		return true
 	end
 	if self.loadStep == 5 then
@@ -1359,9 +1400,9 @@ function IASituation:applyVehicleCharacterStyle()
 end
 
 -- True if encounter should use stop/resume (restart job when player leaves); false to use block/pause (aiBlock, aiContinue).
--- Use stop when jobType is CULTIVATE or HARVEST; otherwise use block.
+-- Use stop when jobType is CULTIVATE, HARROW, HARVEST, or PLOW; otherwise use block.
 function IASituation:checkAIStopOrBlock()
-	if self.jobType == IAFieldwork.JobType.CULTIVATE or self.jobType == IAFieldwork.JobType.HARVEST or self.jobType == IAFieldwork.JobType.PLOW then
+	if self.jobType == IAFieldwork.JobType.CULTIVATE or self.jobType == IAFieldwork.JobType.HARVEST or self.jobType == IAFieldwork.JobType.PLOW or self.jobType == IAFieldwork.JobType.HARROW then
 		return true
 	end
 	return false
@@ -1823,7 +1864,7 @@ function IASituation:blockFarmland()
 		self._preBlockFarmlandFieldStateOwnerFarmId = self.farmland.field.fieldState.ownerFarmId
 		g_farmlandManager:setLandOwnership(self.farmland.id, self.vehicle.farmId)
 		self.farmland:setOwnerFarmId( self.vehicle.farmId)
-		self.farmland.npcIndex = self.vehicle.farmId
+		-- NPC index is managed by IANeighbours:updateFarmlands() on the 5-second cycle.
 		--self.farmland.showOnFarmlandsScreen = false
 		self.farmland.field.fieldState.ownerFarmId = self.vehicle.farmId
 	end
@@ -1840,7 +1881,7 @@ function IASituation:unblockFarmland()
 		local restoreFieldStateFarmId = self._preBlockFarmlandFieldStateOwnerFarmId or 0
 		g_farmlandManager:setLandOwnership(self.farmland.id, restoreFarmId)
 		self.farmland:setOwnerFarmId(restoreFarmId)
-		self.farmland.npcIndex = restoreFarmId
+		-- NPC index is managed by IANeighbours:updateFarmlands() on the 5-second cycle.
 		--self.farmland.showOnFarmlandsScreen = true
 		self.farmland.field.fieldState.ownerFarmId = restoreFieldStateFarmId
 		-- Clear saved state to avoid stale values on next use

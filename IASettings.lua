@@ -28,7 +28,42 @@ IASettings.CONTRACT_CALLS_PER_DAY_LABELS = {
 }
 IASettings.CONTRACT_CALLS_PER_DAY_DEFAULT_INDEX = 3  -- "2 per day"
 
+IASettings.MISSION_OFFER_MODE_VALUES = { "classic", "realistic" }
+IASettings.MISSION_OFFER_MODE_LABELS = {
+	"ia_settings_missionOfferMode_classic",
+	"ia_settings_missionOfferMode_realistic",
+}
+IASettings.MISSION_OFFER_MODE_DEFAULT_INDEX = 2   -- realistic
+
+IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_CAPS = { 1, 2, 3, 4, 5, -1 }
+IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_LABELS = {
+	"ia_settings_contractMaxFieldsPerNeighbour_1",
+	"ia_settings_contractMaxFieldsPerNeighbour_2",
+	"ia_settings_contractMaxFieldsPerNeighbour_3",
+	"ia_settings_contractMaxFieldsPerNeighbour_4",
+	"ia_settings_contractMaxFieldsPerNeighbour_5",
+	"ia_settings_contractMaxFieldsPerNeighbour_unlimited",
+}
+IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_DEFAULT_INDEX = 3  -- "3"
+
+IASettings.FIELDWORK_COMPLETION_THRESHOLD_VALUES = { 60, 65, 70, 75, 80, 85, 90, 95, 100 }
+IASettings.FIELDWORK_COMPLETION_THRESHOLD_LABELS = {
+	"ia_settings_fieldworkCompletionThreshold_60",
+	"ia_settings_fieldworkCompletionThreshold_65",
+	"ia_settings_fieldworkCompletionThreshold_70",
+	"ia_settings_fieldworkCompletionThreshold_75",
+	"ia_settings_fieldworkCompletionThreshold_80",
+	"ia_settings_fieldworkCompletionThreshold_85",
+	"ia_settings_fieldworkCompletionThreshold_90",
+	"ia_settings_fieldworkCompletionThreshold_95",
+	"ia_settings_fieldworkCompletionThreshold_100",
+}
+IASettings.FIELDWORK_COMPLETION_THRESHOLD_DEFAULT_INDEX = 7  -- "90%"
+
 IASettings.contractCallsPerDayIndex = IASettings.CONTRACT_CALLS_PER_DAY_DEFAULT_INDEX
+IASettings.missionOfferModeIndex = IASettings.MISSION_OFFER_MODE_DEFAULT_INDEX
+IASettings.contractMaxFieldsPerNeighbourIndex = IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_DEFAULT_INDEX
+IASettings.fieldworkCompletionThresholdIndex = IASettings.FIELDWORK_COMPLETION_THRESHOLD_DEFAULT_INDEX
 IASettings._initialized = false
 IASettings._uiRegistered = false
 
@@ -41,6 +76,33 @@ local function clampIndex(v)
 	v = tonumber(v) or IASettings.CONTRACT_CALLS_PER_DAY_DEFAULT_INDEX
 	if v < 1 or v > n then
 		v = IASettings.CONTRACT_CALLS_PER_DAY_DEFAULT_INDEX
+	end
+	return math.floor(v)
+end
+
+local function clampModeIndex(v)
+	local n = #IASettings.MISSION_OFFER_MODE_VALUES
+	v = tonumber(v) or IASettings.MISSION_OFFER_MODE_DEFAULT_INDEX
+	if v < 1 or v > n then
+		v = IASettings.MISSION_OFFER_MODE_DEFAULT_INDEX
+	end
+	return math.floor(v)
+end
+
+local function clampMaxFieldsIndex(v)
+	local n = #IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_CAPS
+	v = tonumber(v) or IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_DEFAULT_INDEX
+	if v < 1 or v > n then
+		v = IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_DEFAULT_INDEX
+	end
+	return math.floor(v)
+end
+
+local function clampFieldworkCompletionThresholdIndex(v)
+	local n = #IASettings.FIELDWORK_COMPLETION_THRESHOLD_VALUES
+	v = tonumber(v) or IASettings.FIELDWORK_COMPLETION_THRESHOLD_DEFAULT_INDEX
+	if v < 1 or v > n then
+		v = IASettings.FIELDWORK_COMPLETION_THRESHOLD_DEFAULT_INDEX
 	end
 	return math.floor(v)
 end
@@ -74,6 +136,24 @@ end
 --- @return number cap (0..N) or -1 for unlimited.
 function IASettings.getContractCallsPerDayCap()
 	return IASettings.CONTRACT_CALLS_PER_DAY_CAPS[clampIndex(IASettings.contractCallsPerDayIndex)]
+end
+
+function IASettings.isMissionOfferModeClassic()
+	return IASettings.MISSION_OFFER_MODE_VALUES[clampModeIndex(IASettings.missionOfferModeIndex)] == "classic"
+end
+
+function IASettings.getMissionOfferMode()
+	return IASettings.MISSION_OFFER_MODE_VALUES[clampModeIndex(IASettings.missionOfferModeIndex)]
+end
+
+--- @return number cap (1..N) or -1 for unlimited.
+function IASettings.getContractMaxFieldsPerNeighbour()
+	return IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_CAPS[clampMaxFieldsIndex(IASettings.contractMaxFieldsPerNeighbourIndex)]
+end
+
+--- @return number fieldwork completion threshold percentage (60-100).
+function IASettings.getFieldworkCompletionThreshold()
+	return IASettings.FIELDWORK_COMPLETION_THRESHOLD_VALUES[clampFieldworkCompletionThresholdIndex(IASettings.fieldworkCompletionThresholdIndex)]
 end
 
 --- @return boolean true if a new contract call ring is still allowed today.
@@ -112,6 +192,18 @@ function IASettings.load()
 			if idx ~= nil then
 				IASettings.contractCallsPerDayIndex = clampIndex(idx)
 			end
+			local modeIdx = getXMLInt(xml, "IASettings.missionOfferMode#index")
+			if modeIdx ~= nil then
+				IASettings.missionOfferModeIndex = clampModeIndex(modeIdx)
+			end
+			local maxFieldsIdx = getXMLInt(xml, "IASettings.contractMaxFieldsPerNeighbour#index")
+			if maxFieldsIdx ~= nil then
+				IASettings.contractMaxFieldsPerNeighbourIndex = clampMaxFieldsIndex(maxFieldsIdx)
+			end
+			local fieldworkThresholdIdx = getXMLInt(xml, "IASettings.fieldworkCompletionThreshold#index")
+			if fieldworkThresholdIdx ~= nil then
+				IASettings.fieldworkCompletionThresholdIndex = clampFieldworkCompletionThresholdIndex(fieldworkThresholdIdx)
+			end
 			delete(xml)
 		end
 	end
@@ -124,6 +216,15 @@ function IASettings.save()
 	if xml == nil or xml == 0 then return end
 	setXMLInt(xml, "IASettings.contractCallsPerDay#index", IASettings.contractCallsPerDayIndex)
 	setXMLInt(xml, "IASettings.contractCallsPerDay#cap", IASettings.getContractCallsPerDayCap())
+	IASettings.missionOfferModeIndex = clampModeIndex(IASettings.missionOfferModeIndex)
+	setXMLInt(xml, "IASettings.missionOfferMode#index", IASettings.missionOfferModeIndex)
+	setXMLString(xml, "IASettings.missionOfferMode#value", IASettings.getMissionOfferMode())
+	IASettings.contractMaxFieldsPerNeighbourIndex = clampMaxFieldsIndex(IASettings.contractMaxFieldsPerNeighbourIndex)
+	setXMLInt(xml, "IASettings.contractMaxFieldsPerNeighbour#index", IASettings.contractMaxFieldsPerNeighbourIndex)
+	setXMLInt(xml, "IASettings.contractMaxFieldsPerNeighbour#cap", IASettings.getContractMaxFieldsPerNeighbour())
+	IASettings.fieldworkCompletionThresholdIndex = clampFieldworkCompletionThresholdIndex(IASettings.fieldworkCompletionThresholdIndex)
+	setXMLInt(xml, "IASettings.fieldworkCompletionThreshold#index", IASettings.fieldworkCompletionThresholdIndex)
+	setXMLInt(xml, "IASettings.fieldworkCompletionThreshold#percent", IASettings.getFieldworkCompletionThreshold())
 	saveXMLFile(xml)
 	delete(xml)
 end
@@ -186,9 +287,42 @@ local function applyContractCallsPerDayToUI()
 	end
 end
 
+local function applyMissionOfferModeToUI()
+	if IASettings._uiMissionModeOption ~= nil then
+		IASettings._uiMissionModeOption:setState(clampModeIndex(IASettings.missionOfferModeIndex))
+	end
+end
+
+local function applyContractMaxFieldsPerNeighbourToUI()
+	if IASettings._uiMaxFieldsOption ~= nil then
+		IASettings._uiMaxFieldsOption:setState(clampMaxFieldsIndex(IASettings.contractMaxFieldsPerNeighbourIndex))
+	end
+end
+
+local function applyFieldworkCompletionThresholdToUI()
+	if IASettings._uiFieldworkThresholdOption ~= nil then
+		IASettings._uiFieldworkThresholdOption:setState(clampFieldworkCompletionThresholdIndex(IASettings.fieldworkCompletionThresholdIndex))
+	end
+end
+
 --- MultiTextOptionElement callback: invoked with `IASettings` as `self`.\n
 function IASettings.onContractCallsPerDayChanged(self, newState)
 	IASettings.contractCallsPerDayIndex = clampIndex(newState)
+	IASettings.save()
+end
+
+function IASettings.onMissionOfferModeChanged(self, newState)
+	IASettings.missionOfferModeIndex = clampModeIndex(newState)
+	IASettings.save()
+end
+
+function IASettings.onContractMaxFieldsPerNeighbourChanged(self, newState)
+	IASettings.contractMaxFieldsPerNeighbourIndex = clampMaxFieldsIndex(newState)
+	IASettings.save()
+end
+
+function IASettings.onFieldworkCompletionThresholdChanged(self, newState)
+	IASettings.fieldworkCompletionThresholdIndex = clampFieldworkCompletionThresholdIndex(newState)
 	IASettings.save()
 end
 
@@ -231,6 +365,31 @@ local function buildChoiceControl(settingsPage)
 	IASettings._uiOption = option
 end
 
+local function buildMaxFieldsControl(settingsPage)
+	local box = settingsPage.multiVolumeVoiceBox:clone(settingsPage.gameSettingsLayout)
+	recursivelyAssignFocusIds(box)
+	box.id = "ia_settings_contractMaxFieldsPerNeighbourBox"
+
+	local option = box.elements[1]
+	option.id = "ia_settings_contractMaxFieldsPerNeighbour"
+	option.target = IASettings
+	option:setCallback("onClickCallback", "onContractMaxFieldsPerNeighbourChanged")
+	option:setDisabled(false)
+
+	local texts = {}
+	for _, key in ipairs(IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_LABELS) do
+		table.insert(texts, g_i18n:getText(key))
+	end
+	option:setTexts(texts)
+
+	box.elements[2]:setText(g_i18n:getText("ia_settings_contractMaxFieldsPerNeighbour_title"))
+	option.elements[1]:setText(g_i18n:getText("ia_settings_contractMaxFieldsPerNeighbour_info"))
+
+	table.insert(settingsPage.controlsList, box)
+	IASettings._uiMaxFieldsBox = box
+	IASettings._uiMaxFieldsOption = option
+end
+
 --- Idempotent; safe to call from every InGameMenu.onMenuOpened.\n
 function IASettings.registerInGameMenuSettings()
 	if IASettings._uiRegistered then
@@ -249,13 +408,70 @@ function IASettings.registerInGameMenuSettings()
 	IASettings._uiSection = buildSectionHeader(settingsPage)
 	buildChoiceControl(settingsPage)
 
+	-- Mission Offer Mode choice control
+	local modeBox = settingsPage.multiVolumeVoiceBox:clone(settingsPage.gameSettingsLayout)
+	recursivelyAssignFocusIds(modeBox)
+	modeBox.id = "ia_settings_missionOfferModeBox"
+
+	local modeOption = modeBox.elements[1]
+	modeOption.id = "ia_settings_missionOfferMode"
+	modeOption.target = IASettings
+	modeOption:setCallback("onClickCallback", "onMissionOfferModeChanged")
+	modeOption:setDisabled(false)
+
+	local modeTexts = {}
+	for _, key in ipairs(IASettings.MISSION_OFFER_MODE_LABELS) do
+		table.insert(modeTexts, g_i18n:getText(key))
+	end
+	modeOption:setTexts(modeTexts)
+
+	modeBox.elements[2]:setText(g_i18n:getText("ia_settings_missionOfferMode_title"))
+	modeOption.elements[1]:setText(g_i18n:getText("ia_settings_missionOfferMode_info"))
+
+	table.insert(settingsPage.controlsList, modeBox)
+	IASettings._uiMissionModeBox = modeBox
+	IASettings._uiMissionModeOption = modeOption
+
+	-- Contract Max Fields Per Neighbour choice control
+	buildMaxFieldsControl(settingsPage)
+
+	-- Fieldwork Completion Threshold choice control
+	local thresholdBox = settingsPage.multiVolumeVoiceBox:clone(settingsPage.gameSettingsLayout)
+	recursivelyAssignFocusIds(thresholdBox)
+	thresholdBox.id = "ia_settings_fieldworkCompletionThresholdBox"
+
+	local thresholdOption = thresholdBox.elements[1]
+	thresholdOption.id = "ia_settings_fieldworkCompletionThreshold"
+	thresholdOption.target = IASettings
+	thresholdOption:setCallback("onClickCallback", "onFieldworkCompletionThresholdChanged")
+	thresholdOption:setDisabled(false)
+
+	local thresholdTexts = {}
+	for _, key in ipairs(IASettings.FIELDWORK_COMPLETION_THRESHOLD_LABELS) do
+		table.insert(thresholdTexts, g_i18n:getText(key))
+	end
+	thresholdOption:setTexts(thresholdTexts)
+
+	thresholdBox.elements[2]:setText(g_i18n:getText("ia_settings_fieldworkCompletionThreshold_title"))
+	thresholdOption.elements[1]:setText(g_i18n:getText("ia_settings_fieldworkCompletionThreshold_info"))
+
+	table.insert(settingsPage.controlsList, thresholdBox)
+	IASettings._uiFieldworkThresholdBox = thresholdBox
+	IASettings._uiFieldworkThresholdOption = thresholdOption
+
 	-- Re-apply value (and re-validate against UI) whenever the frame re-opens.
 	InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(
 		InGameMenuSettingsFrame.onFrameOpen, applyContractCallsPerDayToUI)
+	InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(
+		InGameMenuSettingsFrame.onFrameOpen, applyMissionOfferModeToUI)
+	InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(
+		InGameMenuSettingsFrame.onFrameOpen, applyContractMaxFieldsPerNeighbourToUI)
+	InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(
+		InGameMenuSettingsFrame.onFrameOpen, applyFieldworkCompletionThresholdToUI)
 
 	-- Register our cloned controls with the FocusManager when a GUI gets shown.
 	FocusManager.setGui = Utils.appendedFunction(FocusManager.setGui, function(_, _)
-		for _, ctrl in ipairs({ IASettings._uiSection, IASettings._uiBox }) do
+		for _, ctrl in ipairs({ IASettings._uiSection, IASettings._uiBox, IASettings._uiMissionModeBox, IASettings._uiMaxFieldsBox, IASettings._uiFieldworkThresholdBox }) do
 			if ctrl ~= nil
 				and (ctrl.focusId == nil
 					or not FocusManager.currentFocusData.idToElementMapping[ctrl.focusId])
@@ -269,6 +485,9 @@ function IASettings.registerInGameMenuSettings()
 	end)
 
 	applyContractCallsPerDayToUI()
+	applyMissionOfferModeToUI()
+	applyContractMaxFieldsPerNeighbourToUI()
+	applyFieldworkCompletionThresholdToUI()
 	settingsPage.gameSettingsLayout:invalidateLayout()
 	IASettings._uiRegistered = true
 end

@@ -157,6 +157,7 @@
             <text name="gui_mapinit_place_type_industry" text="Industrie"/>
             <text name="gui_mapinit_place_type_workshop" text="Werkstatt"/>
             <text name="gui_mapinit_place_type_shed" text="Halle"/>
+            <text name="gui_mapinit_place_type_fieldwork" text="Feldarbeit"/>
             <text name="input_IAMapInitDialog" text="Fields of Stories Menü"/>
             <text name="input_IAI3DReferencesDebug" text="Fields of Stories - Debug-Punkte an allen i3d-Referenz-Knoten anzeigen"/>
             <text name="input_IADumpUserAttributes" text="Fields of Stories - User-Attribute der Karten-Knoten ins Log schreiben"/>
@@ -181,6 +182,18 @@
             <text name="gui_mapinit_notify_nudge_vehicle_no_vehicle" text="Setz dich ins Fahrzeug, um das zu nutzen."/>
             <text name="gui_mapinit_notify_nudge_vehicle_ai" text="Fahrzeug-KI stoppen, bevor du verschiebst."/>
             <text name="gui_mapinit_notify_nudge_vehicle_failed" text="Fahrzeug konnte nicht verschoben werden: %s"/>
+            <text name="gui_mapinit_reset_character" text="Charakter zurücksetzen"/>
+            <text name="gui_mapinit_delete_character" text="Charakter löschen"/>
+            <text name="gui_mapinit_remove_homeplaces" text="Wohnorte entfernen"/>
+            <text name="gui_mapinit_detail_name" text="Name"/>
+            <text name="gui_mapinit_detail_job" text="Beruf"/>
+            <text name="gui_mapinit_detail_role" text="Rolle"/>
+            <text name="gui_mapinit_detail_relationship" text="Beziehung"/>
+            <text name="gui_mapinit_detail_relationship_fmt" text="%s (Level %d, %d / %d Pkt.)"/>
+            <text name="gui_mapinit_detail_vehicles" text="Fahrzeuge"/>
+            <text name="gui_mapinit_detail_current_situation" text="Aktuelle Situation"/>
+            <text name="gui_mapinit_detail_schedule" text="Geplante Feldarbeit für heute"/>
+            <text name="gui_mapinit_detail_at_place_fmt" text="bei %s"/>
             <text name="ingame_relationship_improved" text="Beziehung zu %s verbessert (+%s Punkte)"/>
             <text name="ingame_relationship_levelup" text="Beziehungslevel mit %s erhöht (Level %s)"/>
             <text name="ingame_relationship_decreased" text="Beziehung zu %s hat sich verschlechtert (-%s Punkte)"/>
@@ -235,6 +248,30 @@
             <text name="ia_settings_contractCallsPerDay_3" text="3"/>
             <text name="ia_settings_contractCallsPerDay_4" text="4"/>
             <text name="ia_settings_contractCallsPerDay_unlimited" text="Unbegrenzt"/>
-            <text name="gui_language" text="de"/>
+            <text name="ia_settings_missionOfferMode_title"   text="Auftragsangebot-Modus"/>
+            <text name="ia_settings_missionOfferMode_info"    text="Classic: Standard-Aufträge bleiben auf der Karte, keine Auftrags-Anrufe. Realistic: nur Nachbarschafts-Anrufe, Standard-Aufträge entfernt."/>
+            <text name="ia_settings_missionOfferMode_classic"  text="Classic"/>
+            <text name="ia_settings_missionOfferMode_realistic" text="Realistic"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_title" text="Auftragsfelder pro Nachbar"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_info" text="Maximale Anzahl an Feldern, die ein Nachbar pro Tag als Aufträge auslagern kann."/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_1" text="1"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_2" text="2"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_3" text="3"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_4" text="4"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_5" text="5"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_unlimited" text="Unbegrenzt"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_title" text="Abschlussschwelle Feldarbeit"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_info" text="Prozentsatz der Feldmesspunkte, die dem erwarteten Zustand entsprechen müssen, damit ein Feldarbeitsauftrag als abgeschlossen gilt."/>
+            <text name="ia_settings_fieldworkCompletionThreshold_60" text="60 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_65" text="65 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_70" text="70 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_75" text="75 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_80" text="80 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_85" text="85 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_90" text="90 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_95" text="95 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_100" text="100 %"/>
+            <text name="ia_npc_unavailable"          text=" (Nicht verfügbar)"/>
+            <text name="gui_language"                text="de"/>
 	</texts>
 </l10n>

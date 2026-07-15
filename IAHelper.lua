@@ -122,6 +122,11 @@ function IAprintDebug(methodName, message, neighbour, vehicle, situation)
 		parts[#parts + 1] = " - " .. tostring(message)
 	end
 	print(table.concat(parts))
+
+	-- [FOS_TEST] bridge: feed into structured test log when a test is running
+	if IATestRunner ~= nil and type(IATestRunner.emitDebug) == "function" then
+		IATestRunner.emitDebug(methodName, message, neighbour, vehicle, situation)
+	end
 end
 
 --- Run fn in pcall; on Lua error print when debug is enabled (IANeighbours.debug by default).
@@ -3213,4 +3218,257 @@ function IAHelper_profileWrap(label, fn)
 		local startSec = IAHelper_frameTimerStart()
 		return IAHelper_frameTimerEndPassthrough(startSec, label, fn(...))
 	end
+end
+
+-- ============================================================================
+-- Combine auger pipe (spout) folding
+-- The auger spout is driven by the Pipe specialization (vehicle.spec_pipe), NOT
+-- by the generic Foldable spec. For this combine the dump shows:
+--   foldMinState = 1 (pipe in / folded), foldMaxState = 2 (pipe out),
+--   animation.name = "pipeAnim", foldMinTime = 0, foldMaxTime = 1.
+-- So "folded in" = foldMinState, animation snapped to foldMinTime.
+-- ============================================================================
+
+--- Snap a vehicle's pipe animation to the time matching the given pipe state.
+--- Handles cases where foldMinTime / foldMaxTime differ from the defaults, and
+--- multi-section pipes with their own animation tracks (one call per vehicle).
+--- @param vehicle table game vehicle (any object with setAnimationTime)
+--- @param spec table spec_pipe from the vehicle
+--- @param state number the pipe state that was just set (foldMinState or foldMaxState)
+function IAHelper_snapPipeAnimation(vehicle, spec, state)
+	if vehicle == nil or spec == nil then
+		return
+	end
+	if type(vehicle.setAnimationTime) ~= "function" then
+		return
+	end
+
+	-- When foldMinTime == foldMaxTime, the animation is clip-based (not a time blend).
+	-- setAnimationTime has no visible effect in this case — the caller should handle
+	-- visual update by calling setPipeState without instant flag instead.
+	if spec.foldMinTime ~= nil and spec.foldMaxTime ~= nil
+		and math.abs(spec.foldMinTime - spec.foldMaxTime) < 0.001 then
+		return
+	end
+
+	-- Determine the animation time corresponding to the given state.
+	local targetTime
+	if state == spec.foldMinState then
+		targetTime = spec.foldMinTime
+	elseif state == spec.foldMaxState then
+		targetTime = spec.foldMaxTime
+	else
+		-- Interpolate between min and max for intermediate states (rare, but safe).
+		local minS = spec.foldMinState or 0
+		local maxS = spec.foldMaxState or 1
+		local minT = spec.foldMinTime or 0
+		local maxT = spec.foldMaxTime or 1
+		local rangeS = maxS - minS
+		if rangeS ~= 0 then
+			targetTime = minT + (state - minS) / rangeS * (maxT - minT)
+		else
+			targetTime = minT
+		end
+	end
+	if targetTime == nil then
+		targetTime = (state == spec.foldMinState) and (spec.foldMinTime or 0) or (spec.foldMaxTime or 1)
+	end
+
+	-- Snap the primary pipe animation on this vehicle.
+	if spec.animation ~= nil and spec.animation.name ~= nil then
+		pcall(function()
+			vehicle:setAnimationTime(spec.animation.name, targetTime, true)
+		end)
+	end
+
+	-- Some vehicles have a second pipe animation for a multi-section auger
+	-- (e.g. John Deere S7.800). Try common secondary animation names.
+	-- The game's Pipe spec only exposes the primary animation in spec.animation,
+	-- but a secondary track may be registered under a different name.
+	local secondaryNames = {
+		"pipeAnim2",
+		"foldPipe2",
+		"pipeAnim1",
+		"foldPipe1",
+		"pipeFold1",
+		"pipeFold2",
+		spec.animation ~= nil and spec.animation.name ~= nil and spec.animation.name .. "2",
+	}
+	local seen = {}
+	if spec.animation ~= nil and spec.animation.name ~= nil then
+		seen[string.lower(spec.animation.name)] = true
+	end
+	for _, name in ipairs(secondaryNames) do
+		if name ~= nil and not seen[string.lower(name)] then
+			seen[string.lower(name)] = true
+			pcall(function()
+				vehicle:setAnimationTime(name, targetTime, true)
+			end)
+		end
+	end
+end
+
+--- Internal: set a combine pipe to a specific state, handling clip-based vs time-blend
+--- animations, S7 reversed clip direction, and child vehicle pipes (e.g. S7.800 multi-section).
+--- @param vehicle table the GIANTS vehicle object (must carry spec_pipe)
+--- @param targetState number the target pipe state
+--- @return boolean ok true if the pipe state was applied
+--- @return string msg human-readable result / reason
+local function iaHelperSetPipeState(vehicle, targetState)
+	if vehicle == nil then
+		return false, "vehicle is nil"
+	end
+	local spec = vehicle.spec_pipe
+	if spec == nil then
+		return false, "no spec_pipe (vehicle has no movable pipe)"
+	end
+	if type(vehicle.setPipeState) ~= "function" then
+		return false, "setPipeState not available on vehicle"
+	end
+
+	-- For clip-based animations (foldMinTime == foldMaxTime), setPipeState with instant=true
+	-- sets the functional state but does NOT trigger the visual animation. We need to call
+	-- setPipeState without instant so the game actually plays the animation clip.
+	-- Some vehicles (S7.800) have their animation clip direction reversed relative to the
+	-- state mapping, so we play the clip in BOTH directions (opposite→target) to ensure
+	-- the visual ends up in the correct position regardless of clip orientation.
+	if spec.foldMinTime ~= nil and spec.foldMaxTime ~= nil
+		and math.abs(spec.foldMinTime - spec.foldMaxTime) < 0.001 then
+		local okFunc, errFunc = pcall(function()
+			vehicle:setPipeState(targetState, true)
+		end)
+		if not okFunc then
+			return false, "setPipeState error: " .. tostring(errFunc)
+		end
+		local oppositeState = (targetState == spec.foldMinState) and spec.foldMaxState or spec.foldMinState
+		pcall(function() vehicle:setPipeState(oppositeState, false) end)
+		pcall(function() vehicle:setPipeState(targetState, false) end)
+	else
+		local ok, err = pcall(function()
+			vehicle:setPipeState(targetState, true)
+		end)
+		if not ok then
+			return false, "setPipeState error: " .. tostring(err)
+		end
+		IAHelper_snapPipeAnimation(vehicle, spec, targetState)
+	end
+
+	-- Handle multi-section combines (e.g. John Deere S7.800) with child vehicle pipes.
+	if type(vehicle.getChildVehicles) == "function" then
+		local okGet, children = pcall(function() return vehicle:getChildVehicles() end)
+		if okGet and children and type(children) == "table" then
+			for _, child in pairs(children) do
+				if child and child.spec_pipe and type(child.setPipeState) == "function" then
+					pcall(function() child:setPipeState(targetState, true) end)
+					IAHelper_snapPipeAnimation(child, child.spec_pipe, targetState)
+				end
+			end
+		end
+	end
+
+	return true, string.format("pipe set to state %d", targetState)
+end
+
+--- Fold a combine's auger pipe (spout) fully in. Mirrors tryFold intent for the Pipe spec.
+--- Sets the pipe to its folded-in state and snaps the pipe animation instantly (no slow
+--- unfold visible on spawn / parking).
+--- @param vehicle table the GIANTS vehicle object (must carry spec_pipe)
+--- @return boolean ok true if the pipe state was applied
+--- @return string msg human-readable result / reason
+function IAHelper_foldCombinePipeIn(vehicle)
+	if vehicle == nil then
+		return false, "vehicle is nil"
+	end
+	local spec = vehicle.spec_pipe
+	if spec == nil then
+		return false, "no spec_pipe (vehicle has no movable pipe)"
+	end
+
+	-- John Deere S7 has reversed pipe direction, so fold uses the max state.
+	local isS7 = type(vehicle.getFullName) == "function"
+		and (vehicle:getFullName():upper():find("S7") ~= nil
+			or vehicle:getFullName():upper():find("JOHN DEERE") ~= nil)
+	local targetState = isS7 and (spec.foldMaxState or 2) or (spec.foldMinState or 1)
+
+	local ok, msg = iaHelperSetPipeState(vehicle, targetState)
+	return ok, ok and (msg .. " (folded in)") or msg
+end
+
+--- Unfold a combine's auger pipe (spout) fully out. Inverse of IAHelper_foldCombinePipeIn.
+--- Sets the pipe to its unfolded/out state and snaps the pipe animation instantly.
+--- @param vehicle table the GIANTS vehicle object (must carry spec_pipe)
+--- @return boolean ok true if the pipe state was applied
+--- @return string msg human-readable result / reason
+function IAHelper_unfoldCombinePipeOut(vehicle)
+	if vehicle == nil then
+		return false, "vehicle is nil"
+	end
+	local spec = vehicle.spec_pipe
+	if spec == nil then
+		return false, "no spec_pipe (vehicle has no movable pipe)"
+	end
+
+	-- John Deere S7 has reversed pipe direction, so unfold uses the min state.
+	local isS7 = type(vehicle.getFullName) == "function"
+		and (vehicle:getFullName():upper():find("S7") ~= nil
+			or vehicle:getFullName():upper():find("JOHN DEERE") ~= nil)
+	local targetState = isS7 and (spec.foldMinState or 1) or (spec.foldMaxState or 2)
+
+	local ok, msg = iaHelperSetPipeState(vehicle, targetState)
+	return ok, ok and (msg .. " (unfolded out)") or msg
+end
+
+--- Find the nearest vehicle that has a movable pipe (combine auger) to a world position.
+--- Used by the temporary console command; the production fold logic takes the vehicle directly.
+--- @param refX number reference world X
+--- @param refY number reference world Y
+--- @param refZ number reference world Z
+--- @return table|nil vehicle nearest vehicle carrying spec_pipe (nil if none)
+--- @return number|nil distSq squared distance to that vehicle
+function IAHelper_findNearestVehicleWithPipe(refX, refY, refZ)
+	if refX == nil or refY == nil or refZ == nil then
+		return nil, nil
+	end
+	if g_currentMission == nil or g_currentMission.vehicleSystem == nil or g_currentMission.vehicleSystem.vehicles == nil then
+		return nil, nil
+	end
+
+	local nearest, nearestDistSq = nil, nil
+	for _, vehicle in pairs(g_currentMission.vehicleSystem.vehicles) do
+		if vehicle ~= nil and vehicle.spec_pipe ~= nil and vehicle.rootNode ~= nil then
+			local x, y, z = getWorldTranslation(vehicle.rootNode)
+			if x ~= nil then
+				local dx, dy, dz = x - refX, y - refY, z - refZ
+				local dSq = dx * dx + dy * dy + dz * dz
+				if nearestDistSq == nil or dSq < nearestDistSq then
+					nearestDistSq = dSq
+					nearest = vehicle
+				end
+			end
+		end
+	end
+
+	return nearest, nearestDistSq
+end
+
+--- Registers an NPC object in the engine's npcManager.
+--- Encapsulates direct g_npcManager access.
+---@param npc NPC the NPC engine object
+---@param npcIndex number the index to register at
+---@return boolean success
+function IAHelper_registerNpcInManager(npc, npcIndex)
+	if npc == nil then
+		IAprintDebug("IAHelper_registerNpcInManager", "npc is nil for index " .. tostring(npcIndex))
+		return false
+	end
+	if g_npcManager == nil or g_npcManager.npcs == nil then
+		IAprintDebug("IAHelper_registerNpcInManager", "g_npcManager or g_npcManager.npcs is nil")
+		return false
+	end
+	if g_npcManager.npcs[npcIndex] ~= nil then
+		IAprintDebug("IAHelper_registerNpcInManager", "NPC slot " .. npcIndex .. " already occupied, overwriting")
+	end
+	g_npcManager.npcs[npcIndex] = npc
+	IAprintDebug("IAHelper_registerNpcInManager", "Registered NPC at index " .. npcIndex)
+	return true
 end

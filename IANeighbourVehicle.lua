@@ -984,6 +984,13 @@ function IANeighbourVehicle:mech_prepareForTeleport()
 	if self.vehicle == nil then
 		return
 	end
+	-- Combine auger pipes are on the main vehicle's Pipe spec, so fold them before
+	-- the attachment-only transport preparation below can return early.
+	if type(IAHelper_foldCombinePipeIn) == "function" then
+		pcall(function()
+			IAHelper_foldCombinePipeIn(self.vehicle)
+		end)
+	end
 	if self:shouldBeUnfoldedWhenUnattached() then
 		if type(self.tryUnfold) == "function" then
 			pcall(function()
@@ -1202,6 +1209,15 @@ function IANeighbourVehicle:tryFold(foldKind)
 	local foldKindStr = foldKind or "?"
 	if gv == nil then
 		return false
+	end
+	-- Combine auger pipe (spout): always fold it in. This is driven by the Pipe spec
+	-- (spec_pipe), not Foldable, so it must run before the attachment-only check below
+	-- (combines are excluded from the Foldable path). Safe no-op for vehicles without a pipe.
+	if type(IAHelper_foldCombinePipeIn) == "function" then
+		local okP, msgP = IAHelper_foldCombinePipeIn(gv)
+		if IANeighbours and IANeighbours.debug and okP then
+			print("--- IANeighbourVehicle:tryFold() - pipe folded in (" .. tostring(foldKindStr) .. ") " .. tostring(msgP) .. " name=" .. tostring(name))
+		end
 	end
 	-- Only fold attachments; exclude cars, tractors, combines
 	local vtype = (self.type ~= nil) and string.lower(tostring(self.type)) or ""
@@ -1538,7 +1554,18 @@ function IANeighbourVehicle:alignAndAttach(ia_vehicle)
 		self.positionZ = attachmentRootZ
 		self.rotation = ia_vehicle.rotation
 		self:handleChangePosition()
-		
+		-- [COMPAT] ManualAttach: prevent auto-detach of PTO/hoses on NPC attach
+		pcall(function()
+			if self.vehicle.spec_manualAttachPowerTakeOff then
+				self.vehicle.spec_manualAttachPowerTakeOff.isBlockingInitialPtoDetach = true
+			end
+		end)
+		pcall(function()
+			if self.vehicle.spec_manualAttachConnectionHoses then
+				local spec = self.vehicle.spec_manualAttachConnectionHoses
+				spec.isBlockingInitialHoseDetach = true
+			end
+		end)
 		ia_vehicle.vehicle:attachImplement(self.vehicle, attachmentJoint, vehicleAttachIndex, true, nil, nil, false)
 	end
 end
@@ -1558,6 +1585,18 @@ function IANeighbourVehicle:alignAndAttachFront(ia_vehicle)
 		self.rotation = ia_vehicle.rotation
 		self:handleChangePosition()
 		IAprintDebug("IANeighbourVehicle:alignAndAttachFront()", "AttachmentRoot Position: "..tostring(attachmentRootX)..", "..tostring(attachmentRootY)..", "..tostring(attachmentRootZ)..", "..tostring(self.rotation), self.neighbour, self, nil)
+		-- [COMPAT] ManualAttach: prevent auto-detach of PTO/hoses on NPC front attach
+		pcall(function()
+			if self.vehicle.spec_manualAttachPowerTakeOff then
+				self.vehicle.spec_manualAttachPowerTakeOff.isBlockingInitialPtoDetach = true
+			end
+		end)
+		pcall(function()
+			if self.vehicle.spec_manualAttachConnectionHoses then
+				local spec = self.vehicle.spec_manualAttachConnectionHoses
+				spec.isBlockingInitialHoseDetach = true
+			end
+		end)
 		ia_vehicle.vehicle:attachImplement(self.vehicle, attachmentJoint, vehicleAttachIndex, true, nil, nil, false)
 	end
 end

@@ -16,6 +16,34 @@ IABorrowAccess._yardHotspots = IABorrowAccess._yardHotspots or {}
 IABorrowAccess._yardPlaceRefCount = IABorrowAccess._yardPlaceRefCount or {}
 IABorrowAccess._iaYardPlaceKey = IABorrowAccess._iaYardPlaceKey or {}
 
+--- Performance: O(1) set of borrowed vehicle uniqueIds. hasPlayerBorrowAccess does
+--- a single table lookup instead of iterating all neighbours × vehicles via
+--- getIAForVehicle. Built from scratch after XML load and on unborrow;
+--- incrementally updated on borrow.
+IABorrowAccess._borrowedUniqueIds = {}
+
+function IABorrowAccess.markBorrowed(ia)
+	if ia ~= nil and ia.uniqueId ~= nil then
+		IABorrowAccess._borrowedUniqueIds[tostring(ia.uniqueId)] = true
+	end
+end
+
+--- Full rebuild from fleet state. Called after XML load and at end of unborrow.
+--- O(neighbours × vehicles) but runs rarely (load + unborrow transitions only).
+function IABorrowAccess.rebuildBorrowedIdSet()
+	IABorrowAccess._borrowedUniqueIds = {}
+	if IANeighbours == nil or IANeighbours.neighbours == nil then return end
+	for _, n in pairs(IANeighbours.neighbours) do
+		if n ~= nil and n.vehicles ~= nil then
+			for _, ia in pairs(n.vehicles) do
+				if ia ~= nil and ia.isBorrowedByPlayer == true and ia.uniqueId ~= nil then
+					IABorrowAccess._borrowedUniqueIds[tostring(ia.uniqueId)] = true
+				end
+			end
+		end
+	end
+end
+
 local function getRootVehicle(vehicle)
 	if vehicle == nil then
 		return nil
@@ -81,15 +109,13 @@ function IABorrowAccess.isFleetNpcVehicle(vehicle)
 end
 
 --- True when this game vehicle (or its fleet wrapper) is marked borrowed-by-player.
+-- Uses O(1) uniqueId set lookup — no iteration over neighbours/vehicles.
+-- Empty set (nothing borrowed): next() returns nil instantly.
 function IABorrowAccess.hasPlayerBorrowAccess(vehicle)
-	if not IABorrowAccess.isBorrowSystemActive() or vehicle == nil then
-		return false
-	end
-	local ia = IABorrowAccess.getIAForVehicle(vehicle)
-	if ia ~= nil and ia.isBorrowedByPlayer == true then
-		return true
-	end
-	return false
+	if not IABorrowAccess.isBorrowSystemActive() or vehicle == nil then return false end
+	if next(IABorrowAccess._borrowedUniqueIds) == nil then return false end
+	if vehicle.uniqueId == nil then return false end
+	return IABorrowAccess._borrowedUniqueIds[tostring(vehicle.uniqueId)] == true
 end
 
 function IABorrowAccess.shouldAllowCrossFarmAttach(attachable, farmId, attacherVehicle)
@@ -813,6 +839,7 @@ function IABorrowAccess.applyBorrowReturn(ia, neighbour)
 		"[BORROW-CANCEL] post-releaseBorrowYardMapHotspotForIA yardKey(after)=%s",
 		tostring(IABorrowAccess._iaYardPlaceKey ~= nil and IABorrowAccess._iaYardPlaceKey[tostring(ia.uniqueId or "")] or "nil")
 	), neighbour, ia, nil)
+	IABorrowAccess.rebuildBorrowedIdSet()
 end
 
 function IABorrowAccess.setBorrowedForGameVehicle(vehicle, borrowed)
@@ -860,6 +887,7 @@ function IABorrowAccess.setBorrowedForGameVehicle(vehicle, borrowed)
 
 	if borrowed then
 		ia.isBorrowedByPlayer = true
+		IABorrowAccess.markBorrowed(ia)
 		if IAEquipmentPresence ~= nil and IAEquipmentPresence.State ~= nil and IAEquipmentPresence.State.setDesiredBorrowed ~= nil then
 			IAEquipmentPresence.State.setDesiredBorrowed(ia)
 		end
@@ -867,6 +895,7 @@ function IABorrowAccess.setBorrowedForGameVehicle(vehicle, borrowed)
 	else
 		IAprintDebug("IABorrowAccess.setBorrowedForGameVehicle()", "[BORROW-CANCEL] flag transition true->false -> applyBorrowReturn", neighbour, ia, nil)
 		IABorrowAccess.applyBorrowReturn(ia, neighbour)
+		-- applyBorrowReturn calls rebuildBorrowedIdSet internally
 	end
 
 	--IABorrowAccess.persistBorrowStateToOutbound()

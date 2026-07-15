@@ -431,7 +431,7 @@ function IAMapInitDialogGUI.formatVehiclesList(neighbour)
 	return table.concat(lines, "\n")
 end
 
---- Format current situation info.
+--- Format current situation info in a user-friendly way.
 function IAMapInitDialogGUI.formatCurrentSituation(neighbour)
 	if neighbour == nil then
 		return "-"
@@ -443,52 +443,58 @@ function IAMapInitDialogGUI.formatCurrentSituation(neighbour)
 	end
 	local sid = (s ~= nil and s.id ~= nil) and s.id or id
 	local disp = IAMapInitDialogGUI.getSituationDisplayNameById(sid)
-	local header = string.format("%s: %s", iaSafeText(sid), iaSafeText(disp))
-	local vehicleLines = {}
-	local placeLine = nil
+
+	-- Localized format string for place label
+	local iaAtPlaceFmt = (g_i18n and g_i18n.getText) and g_i18n:getText("gui_mapinit_detail_at_place_fmt") or nil
+	if iaAtPlaceFmt == nil or iaAtPlaceFmt == "" or iaAtPlaceFmt == "gui_mapinit_detail_at_place_fmt" then
+		iaAtPlaceFmt = "at %s"
+	end
+
+	-- Collect human-readable parts
+	local parts = {}
+	parts[#parts + 1] = disp  -- e.g. "Harvest wheat"
+
 	if s ~= nil then
-		-- Place info (id + name) when available
+		-- Place info (name/type) when available
 		if s.place ~= nil then
-			local pid = (s.place.id ~= nil) and tostring(s.place.id) or "-"
 			local ptype = nil
 			if s.place.getSemanticType ~= nil then
 				local ok, sem = pcall(s.place.getSemanticType, s.place)
-				if ok then
-					ptype = sem
-				end
+				if ok then ptype = sem end
 			end
 			if ptype == nil or tostring(ptype) == "" then
 				ptype = s.place.type
 			end
-			placeLine = string.format("- Place: %s: %s", iaSafeText(pid), iaSafeText(ptype))
+			if ptype ~= nil and tostring(ptype) ~= "" then
+				-- Translate place type
+				local l10nKey = "gui_mapinit_place_type_" .. tostring(ptype)
+				local placeLabel = (g_i18n and g_i18n.getText) and g_i18n:getText(l10nKey) or nil
+				if placeLabel == nil or placeLabel == "" or placeLabel == l10nKey then
+					placeLabel = tostring(ptype)
+				end
+				parts[#parts + 1] = string.format(iaAtPlaceFmt, placeLabel)
+			end
 		end
 
 		local function addVeh(prefix, iaVeh)
-			if iaVeh == nil then
-				return
+			if iaVeh == nil then return end
+			local lbl = IAMapInitDialogGUI.getDisplayNameForIaVehicle(iaVeh)
+			if lbl ~= nil and lbl ~= "" then
+				parts[#parts + 1] = prefix .. ": " .. lbl
 			end
-			local lbl = iaBasenameNoExt(iaVeh.xmlFilename) or iaVeh.type or iaVeh.category or iaVeh.uniqueId or iaVeh.externalId
-			vehicleLines[#vehicleLines + 1] = string.format("- %s: %s", prefix, iaSafeText(lbl))
 		end
 		addVeh("Vehicle", s.vehicle)
-		addVeh("Back", s.attachmentBack)
-		addVeh("Front", s.attachmentFront)
+		addVeh("Back attachment", s.attachmentBack)
+		addVeh("Front attachment", s.attachmentFront)
 	end
-	if placeLine ~= nil then
-		vehicleLines[#vehicleLines + 1] = placeLine
+
+	if #parts == 0 then
+		return disp
 	end
-	if #vehicleLines == 0 then
-		return header
-	end
-	return header .. "\n" .. table.concat(vehicleLines, "\n")
+	return table.concat(parts, "\n")
 end
 
---- Format the neighbour's planned fieldwork schedule for today (header + one line per row).
--- Status flag per row:
---   [CONTRACT] -> row is currently being offered as a phone contract
---   [PLAYER  ] -> row was accepted by the player (handled by a player field mission)
---   [AI      ] -> plain AI work (default; also the result of decline / 15:00 fallback / player cancel)
--- Rows are listed in schedule order (the order the neighbour AI walks via selectNewFieldwork).
+--- Format the neighbour's planned fieldwork schedule for today in a readable form.
 function IAMapInitDialogGUI.formatFieldworkSchedule(neighbour)
 	if neighbour == nil then
 		return "-"
@@ -501,7 +507,7 @@ function IAMapInitDialogGUI.formatFieldworkSchedule(neighbour)
 		and neighbour.fieldworkScheduleMonth ~= nil
 		and neighbour.fieldworkScheduleDayInPeriod ~= nil
 	then
-		headerParts[#headerParts + 1] = string.format("Day Y%s M%s D%s",
+		headerParts[#headerParts + 1] = string.format("Day %s-%s-%s",
 			tostring(neighbour.fieldworkScheduleYear),
 			tostring(neighbour.fieldworkScheduleMonth),
 			tostring(neighbour.fieldworkScheduleDayInPeriod))
@@ -509,23 +515,24 @@ function IAMapInitDialogGUI.formatFieldworkSchedule(neighbour)
 		headerParts[#headerParts + 1] = "Day -"
 	end
 	if neighbour.callPlayerHour ~= nil and neighbour.callPlayerMinute ~= nil then
-		headerParts[#headerParts + 1] = string.format("Call %02d:%02d",
+		headerParts[#headerParts + 1] = string.format("Call at %02d:%02d",
 			tonumber(neighbour.callPlayerHour) or 0,
 			tonumber(neighbour.callPlayerMinute) or 0)
 	else
-		headerParts[#headerParts + 1] = "Call -"
+		headerParts[#headerParts + 1] = "Call time -"
 	end
 	local openCount = tonumber(neighbour.contractCallRingOpensCount) or 0
 	local maxOpens = (IAGameLoopHelper ~= nil and IAGameLoopHelper.CONTRACT_CALL_MAX_RING_OPENS_PER_DAY) or 0
-	headerParts[#headerParts + 1] = string.format("rings %d/%d", openCount, maxOpens)
-	headerParts[#headerParts + 1] = "answered: " .. (neighbour.contractCallRingAnsweredToday == true and "yes" or "no")
-	local fallbackKey = (neighbour.contractFallbackToAiFiredForScheduleKey ~= nil and tostring(neighbour.contractFallbackToAiFiredForScheduleKey) ~= "") and "yes" or "no"
-	headerParts[#headerParts + 1] = "fallback-to-AI: " .. fallbackKey
-	lines[#lines + 1] = table.concat(headerParts, " | ")
+	headerParts[#headerParts + 1] = string.format("Rings: %d / %d", openCount, maxOpens)
+	local answered = neighbour.contractCallRingAnsweredToday == true
+	headerParts[#headerParts + 1] = answered and "Answered today" or "Not answered yet"
+	local fallbackKey = (neighbour.contractFallbackToAiFiredForScheduleKey ~= nil and tostring(neighbour.contractFallbackToAiFiredForScheduleKey) ~= "") and true or false
+	headerParts[#headerParts + 1] = fallbackKey and "AI fallback: yes" or "AI fallback: no"
+	lines[#lines + 1] = table.concat(headerParts, "  |  ")
 
 	local tasks = neighbour.fieldworkScheduleTasks
 	if tasks == nil or #tasks == 0 then
-		lines[#lines + 1] = "(no scheduled fieldwork)"
+		lines[#lines + 1] = "(No fieldwork planned for today)"
 		return table.concat(lines, "\n")
 	end
 
@@ -533,30 +540,31 @@ function IAMapInitDialogGUI.formatFieldworkSchedule(neighbour)
 		if row ~= nil then
 			local status
 			if row.acceptedByPlayer == true then
-				status = "[PLAYER  ]"
+				status = "Player"
 			elseif row.contractEnabled == true then
-				status = "[CONTRACT]"
+				status = "Contract"
 			else
-				status = "[AI      ]"
+				status = "AI"
 			end
 			local fid = row.farmlandId ~= nil and tostring(row.farmlandId) or "-"
 			local sid = row.situationId ~= nil and tostring(row.situationId) or "-"
 			local cfg = IAMapInitDialogGUI.getSituationConfigById(sid)
 			local intent = (cfg ~= nil and (cfg.intent or cfg.type)) or sid
-			local job = (cfg ~= nil and cfg.fieldwork ~= nil and tostring(cfg.fieldwork) ~= "") and tostring(cfg.fieldwork) or "-"
+			local job = (cfg ~= nil and cfg.fieldwork ~= nil and tostring(cfg.fieldwork) ~= "") and tostring(cfg.fieldwork) or nil
 
-			local parts = {
-				string.format("#%d %s farmland %s", i, status, fid),
-				string.format("sit %s (%s)", iaSafeText(intent), iaSafeText(sid)),
-				"job " .. iaSafeText(job),
-			}
+			local parts = { string.format("%d. [%s]", i, status) }
+			parts[#parts + 1] = iaSafeText(intent)
+			if job ~= nil then
+				parts[#parts + 1] = "(" .. iaSafeText(job) .. ")"
+			end
+			parts[#parts + 1] = "on field " .. fid
 			if row.seedFruitTypeIndex ~= nil then
 				local seedName = iaResolveFruitTypeName(row.seedFruitTypeIndex)
 				if seedName ~= nil and seedName ~= "" then
-					parts[#parts + 1] = "seed " .. iaSafeText(seedName)
+					parts[#parts + 1] = "- " .. iaSafeText(seedName)
 				end
 			end
-			lines[#lines + 1] = "- " .. table.concat(parts, " | ")
+			lines[#lines + 1] = table.concat(parts, " ")
 		end
 	end
 	return table.concat(lines, "\n")
@@ -777,9 +785,10 @@ function IAMapInitDialogGUI:updateCharacterDetailsUI()
 				el:setText(txt)
 			end
 		end
-		set("characterDetailName", "Name: -")
-		set("characterDetailJob", "Job: -")
-		set("characterDetailRole", "Role: -")
+		set("characterDetailName", "-")
+		set("characterDetailJob", "-")
+		set("characterDetailRole", "-")
+		set("characterDetailRelationship", "-")
 		set("characterDetailVehiclesList", "-")
 		set("characterDetailCurrentSituation", "-")
 		set("characterDetailSchedule", "-")
@@ -802,9 +811,21 @@ function IAMapInitDialogGUI:updateCharacterDetailsUI()
 			el:setText(txt)
 		end
 	end
-	set("characterDetailName", string.format("Name: %s (Character ID: %s)", iaSafeText(n.name), tostring(n.id)))
-	set("characterDetailJob", "Job: " .. iaSafeText(n.job))
-	set("characterDetailRole", string.format("Role: %s | Relationship Level: %s | Relationship Score: %s", iaSafeText(n.role), tostring(n.relationshipLevel), tostring(n.relationshipScore)))
+	set("characterDetailName", iaSafeText(n.name))
+	set("characterDetailJob", iaSafeText(n.job))
+	set("characterDetailRole", iaSafeText(n.role))
+
+	-- Relationship line: type, level, points combined in a readable format
+	local relDisplay = IAMapInitDialogGUI.getRelationshipDisplayText(n)
+	local level = tonumber(n.relationshipLevel) or 1
+	local score = tonumber(n.relationshipScore) or 0
+	local threshold = IAMapInitDialogGUI.getRelationshipThreshold(level)
+	local relFmt = (g_i18n ~= nil and g_i18n.getText ~= nil) and g_i18n:getText("gui_mapinit_detail_relationship_fmt") or nil
+	if relFmt == nil or relFmt == "" or relFmt == "gui_mapinit_detail_relationship_fmt" then
+		relFmt = "%s (Level %d, %d / %d pts)"
+	end
+	set("characterDetailRelationship", string.format(relFmt, relDisplay, level, score, threshold))
+
 	set("characterDetailVehiclesList", IAMapInitDialogGUI.formatVehiclesList(n))
 	set("characterDetailCurrentSituation", IAMapInitDialogGUI.formatCurrentSituation(n))
 	set("characterDetailSchedule", IAMapInitDialogGUI.formatFieldworkSchedule(n))

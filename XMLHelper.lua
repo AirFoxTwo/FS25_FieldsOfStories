@@ -934,8 +934,53 @@ function IAXMLHelper:loadNeighbourFromXML(xmlFile, neighbourKey, rootKey, deferI
 			farm_manager:createFarm("AIFarm "..farmId, 2, "admin", farmId)
 		end
 		
+		-- Pre-set styleAttributes from saved XML BEFORE initialize() starts async HumanModel spawn.
+		-- If onHumanModelBaseLoaded fires before updateFromXML runs, _mergeSpawnStyleParams()
+		-- would use hardcoded defaults (onepiece=5 → top=0, bottom=0) → NPC appears without clothes.
+		-- By setting styleAttributes here, the async spawn callback already sees saved clothing values.
+		if hathair ~= nil or glasses ~= nil or facegear ~= nil or onepiece ~= nil or bottom ~= nil or
+		   face ~= nil or top ~= nil or gloves ~= nil or headgear ~= nil or footwear ~= nil or
+		   hairStyle ~= nil or beard ~= nil then
+			local hasOnePiece = onepiece ~= nil and onepiece > 0
+			local topIdx = hasOnePiece and 0 or (top or 0)
+			local bottomIdx = hasOnePiece and 0 or (bottom or 0)
+			local topCol = hasOnePiece and 1 or (topColorIndex or 1)
+			local bottomCol = hasOnePiece and 1 or (bottomColorIndex or 1)
+			existingNeighbour.styleAttributes = {
+				hathair = (hathair ~= nil and hathair > 0) and hathair or 12,
+				glasses = glasses or 0,
+				glassesColorIndex = glassesColorIndex or 1,
+				facegear = facegear or 0,
+				facegearColorIndex = facegearColorIndex or 1,
+				onepiece = onepiece or 5,
+				onepieceColorIndex = onepieceColorIndex or 1,
+				bottom = bottomIdx,
+				bottomColorIndex = bottomCol,
+				face = face or 1,
+				faceColorIndex = faceColorIndex or 1,
+				top = topIdx,
+				topColorIndex = topCol,
+				gloves = gloves or 0,
+				glovesColorIndex = glovesColorIndex or 1,
+				headgear = headgear or 0,
+				headgearColorIndex = headgearColorIndex or 1,
+				footwear = footwear or 1,
+				footwearColorIndex = footwearColorIndex or 1,
+				hairStyle = hairStyle or 1,
+				hairStyleColorIndex = hairStyleColorIndex or 1,
+				beard = beard or 0,
+				beardColorIndex = beardColorIndex or 1,
+			}
+			IAprintDebug("IAXMLHelper:loadNeighbourFromXML", "SET styleAttributes BEFORE initialize id=" .. tostring(neighbourId) .. " name=" .. tostring(neighbourName) .. " onepiece=" .. tostring(onepiece) .. " top=" .. tostring(top) .. " bottom=" .. tostring(bottom) .. " footwear=" .. tostring(footwear))
+		else
+			IAprintDebug("IAXMLHelper:loadNeighbourFromXML", "NO styleAttributes from XML, will use defaults id=" .. tostring(neighbourId) .. " name=" .. tostring(neighbourName))
+		end
+		
 		if deferInitialize ~= true then
+			IAprintDebug("IAXMLHelper:loadNeighbourFromXML", "CALLING initialize() id=" .. tostring(neighbourId) .. " name=" .. tostring(neighbourName))
 			existingNeighbour:initialize()
+		else
+			IAprintDebug("IAXMLHelper:loadNeighbourFromXML", "DEFERRED initialize id=" .. tostring(neighbourId) .. " name=" .. tostring(neighbourName))
 		end
 
 		
@@ -1142,6 +1187,7 @@ function IAXMLHelper:loadNeighbourFromXML(xmlFile, neighbourKey, rootKey, deferI
 			end
 		end
 
+			IAprintDebug("IAXMLHelper:loadNeighbourFromXML", "LATE updateFromXML id=" .. tostring(neighbourId) .. " name=" .. tostring(neighbourName) .. " onepiece=" .. tostring(onepiece) .. " top=" .. tostring(top) .. " bottom=" .. tostring(bottom))
 		existingNeighbour:updateFromXML(enabled, positionX, positionY, positionZ, rotation, nil, farmId, situationId, hathair, glasses, glassesColorIndex, facegear, facegearColorIndex, onepiece, onepieceColorIndex, bottom, bottomColorIndex, face, faceColorIndex, top, topColorIndex, gloves, glovesColorIndex, headgear, headgearColorIndex, footwear, footwearColorIndex, hairStyle, hairStyleColorIndex, beard, beardColorIndex, characterVisibility)
 		
 
@@ -2000,10 +2046,8 @@ function IAXMLHelper:loadData()
 		if self.ianeighbours.debug then
 			print("--- IAXMLHelper:loadData() - Successfully loaded from outbound XML")
 		end
-		-- Neighbours consumed map homebase pending in tryAutoAssign during load; clear so nothing treats this as live state later (e.g. places bootstrap).
-		if self.ianeighbours ~= nil then
-			self.ianeighbours.mapConfigNeighbourHomebaseAssignments = nil
-		end
+		-- Merge map-config homebase + workplace assignments into neighbours (add-only: never removes outbound/savegame assignments).
+		self:mergeMapConfigNeighbourHomebaseAssignments()
 		self:applyMapConfigNeighbourWorkplaceAssignments()
 		if self.ianeighbours ~= nil and self.ianeighbours.reclassifyPlacesByPlayerFarmland ~= nil then
 			self.ianeighbours:reclassifyPlacesByPlayerFarmland()
@@ -2013,6 +2057,7 @@ function IAXMLHelper:loadData()
 				IAFieldOutcomeMission.tryApplyOutboundRestoreAfterLoad()
 			end)
 		end
+		self:removeOrphanedFarm99Vehicles()
 		return true
 	end
 	
@@ -2023,10 +2068,8 @@ function IAXMLHelper:loadData()
 	
 	local success = self:scenarioInitialize()
 	if success then
-		-- Same as outbound path: pending map homebases were applied in tryAutoAssign while loading neighbours.
-		if self.ianeighbours ~= nil then
-			self.ianeighbours.mapConfigNeighbourHomebaseAssignments = nil
-		end
+		-- Merge map-config homebase + workplace assignments into neighbours (add-only: never removes outbound/savegame assignments).
+		self:mergeMapConfigNeighbourHomebaseAssignments()
 		self:applyMapConfigNeighbourWorkplaceAssignments()
 	end
 	self:removeOrphanedFarm99Vehicles()
@@ -2074,45 +2117,50 @@ function IAXMLHelper:removeOrphanedFarm99Vehicles()
 	-- Find and remove vehicles with farmId 99 that are not in the neighbours
 	local removedVehicles = {}
 	if g_currentMission ~= nil and g_currentMission.vehicleSystem ~= nil and g_currentMission.vehicleSystem.vehicles ~= nil then
+		-- Copy the vehicle list before iterating to avoid undefined behavior when deleting inside the loop
+		local vehiclesCopy = {}
 		for _, vehicle in pairs(g_currentMission.vehicleSystem.vehicles) do
 			if vehicle ~= nil then
-				local uniqueId = vehicle:getUniqueId()
-				if uniqueId ~= nil then
-					-- Try to get ownerFarmId (method or property)
-					local ownerFarmId = nil
-					if vehicle.getOwnerFarmId ~= nil then
-						ownerFarmId = vehicle:getOwnerFarmId()
-					elseif vehicle.ownerFarmId ~= nil then
-						ownerFarmId = vehicle.ownerFarmId
-					end
-					if self.ianeighbours.debug then
-						print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - "..tostring(uniqueId).." ownerFarmId: "..tostring(ownerFarmId))
-						print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - "..tostring(uniqueId).." vehiclesInNeighbours: "..tostring(vehiclesInNeighbours[uniqueId]))
-					end
-					if ownerFarmId ~= nil and (ownerFarmId == 99) then
-						-- Check if this vehicle is not in the neighbours
-						if not vehiclesInNeighbours[uniqueId] then
-							table.insert(removedVehicles, {
-								uniqueId = uniqueId,
-								ownerFarmId = ownerFarmId
-							})
+				table.insert(vehiclesCopy, vehicle)
+			end
+		end
+		for _, vehicle in ipairs(vehiclesCopy) do
+			local uniqueId = vehicle:getUniqueId()
+			if uniqueId ~= nil then
+				-- Try to get ownerFarmId (method or property)
+				local ownerFarmId = nil
+				if vehicle.getOwnerFarmId ~= nil then
+					ownerFarmId = vehicle:getOwnerFarmId()
+				elseif vehicle.ownerFarmId ~= nil then
+					ownerFarmId = vehicle.ownerFarmId
+				end
+				if self.ianeighbours.debug then
+					print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - "..tostring(uniqueId).." ownerFarmId: "..tostring(ownerFarmId))
+					print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - "..tostring(uniqueId).." vehiclesInNeighbours: "..tostring(vehiclesInNeighbours[uniqueId]))
+				end
+				if ownerFarmId ~= nil and (ownerFarmId == 99) then
+					-- Check if this vehicle is not in the neighbours
+					if not vehiclesInNeighbours[uniqueId] then
+						table.insert(removedVehicles, {
+							uniqueId = uniqueId,
+							ownerFarmId = ownerFarmId
+						})
 
-							for _, job in pairs(g_currentMission.aiSystem.activeJobs) do
-								--if job.startedFarmId == 99 then
-									if self.ianeighbours.debug then
-										print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - Removing job: "..tostring(job.id))
-									end
-									--job:stop(AIMessageSuccessStoppedByUser.new())
-									--g_currentMission.aiSystem:removeJob(job)
-								--end
-							end
-							
-							--vehicle:setVisibility(false)
-							--vehicle:removeFromPhysics()
-							vehicle:delete(true)
-							if self.ianeighbours.debug then
-								print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - Removed orphaned farm 99 vehicle (isDeleted: "..tostring(vehicle.isDeleted).."): uniqueId="..tostring(uniqueId)..", ownerFarmId="..tostring(ownerFarmId))
-							end
+						for _, job in pairs(g_currentMission.aiSystem.activeJobs) do
+							--if job.startedFarmId == 99 then
+								if self.ianeighbours.debug then
+									print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - Removing job: "..tostring(job.id))
+								end
+								--job:stop(AIMessageSuccessStoppedByUser.new())
+								--g_currentMission.aiSystem:removeJob(job)
+							--end
+						end
+						
+						--vehicle:setVisibility(false)
+						--vehicle:removeFromPhysics()
+						vehicle:delete(true)
+						if self.ianeighbours.debug then
+							print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - Removed orphaned farm 99 vehicle (isDeleted: "..tostring(vehicle.isDeleted).."): uniqueId="..tostring(uniqueId)..", ownerFarmId="..tostring(ownerFarmId))
 						end
 					end
 				end
@@ -2120,9 +2168,7 @@ function IAXMLHelper:removeOrphanedFarm99Vehicles()
 		end
 		
 		if #removedVehicles > 0 then
-			if self.ianeighbours.debug then
-				print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - Removed "..tostring(#removedVehicles).." orphaned farm 99 vehicles")
-			end
+			print("--- IAXMLHelper:removeOrphanedFarm99Vehicles() - Removed "..tostring(#removedVehicles).." orphaned farm 99 vehicles")
 		end
 	end
 	
@@ -2630,13 +2676,59 @@ function IAXMLHelper:applyMapConfigNeighbourWorkplaceAssignments()
 	end
 	for _, neighbour in pairs(self.ianeighbours.neighbours) do
 		if neighbour ~= nil and neighbour.id ~= nil and assignments[neighbour.id] ~= nil then
-			neighbour.assignedWorkplacePlaceIds = assignments[neighbour.id]
-			if self.ianeighbours.debug then
-				print("--- IAXMLHelper:applyMapConfigNeighbourWorkplaceAssignments() - Applied "..tostring(#neighbour.assignedWorkplacePlaceIds).." workplace place(s) for neighbour id "..tostring(neighbour.id))
+			if neighbour.assignedWorkplacePlaceIds == nil then
+				neighbour.assignedWorkplacePlaceIds = {}
+			end
+			local existing = {}
+			for _, pid in ipairs(neighbour.assignedWorkplacePlaceIds) do
+				existing[pid] = true
+			end
+			local added = 0
+			for _, pid in ipairs(assignments[neighbour.id]) do
+				if not existing[pid] then
+					table.insert(neighbour.assignedWorkplacePlaceIds, pid)
+					existing[pid] = true
+					added = added + 1
+				end
+			end
+			if self.ianeighbours.debug and added > 0 then
+				print("--- IAXMLHelper:applyMapConfigNeighbourWorkplaceAssignments() - Merged "..tostring(added).." new workplace place(s) for neighbour id "..tostring(neighbour.id))
 			end
 		end
 	end
 	self.ianeighbours.mapConfigNeighbourWorkplaceAssignments = nil
+end
+
+--- Merge map-config homebase assignments into existing neighbours (add-only: never removes outbound/savegame assignments).
+-- Call after outbound XML load or scenarioInitialize to ensure map-XML-defined mandatory homebases are present.
+function IAXMLHelper:mergeMapConfigNeighbourHomebaseAssignments()
+	local assignments = self.ianeighbours.mapConfigNeighbourHomebaseAssignments
+	if assignments == nil or self.ianeighbours.neighbours == nil then
+		return
+	end
+	for _, neighbour in pairs(self.ianeighbours.neighbours) do
+		if neighbour ~= nil and neighbour.id ~= nil and assignments[neighbour.id] ~= nil then
+			if neighbour.assignedHomebasePlaceIds == nil then
+				neighbour.assignedHomebasePlaceIds = {}
+			end
+			local existing = {}
+			for _, pid in ipairs(neighbour.assignedHomebasePlaceIds) do
+				existing[pid] = true
+			end
+			local added = 0
+			for _, pid in ipairs(assignments[neighbour.id]) do
+				if not existing[pid] then
+					table.insert(neighbour.assignedHomebasePlaceIds, pid)
+					existing[pid] = true
+					added = added + 1
+				end
+			end
+			if self.ianeighbours.debug and added > 0 then
+				print("--- IAXMLHelper:mergeMapConfigNeighbourHomebaseAssignments() - Merged "..tostring(added).." new homebase place(s) for neighbour id "..tostring(neighbour.id))
+			end
+		end
+	end
+	self.ianeighbours.mapConfigNeighbourHomebaseAssignments = nil
 end
 
 --- Re-read neighbour homebase/workplace assignment lists from map config for one neighbour (after initial apply* cleared global tables).

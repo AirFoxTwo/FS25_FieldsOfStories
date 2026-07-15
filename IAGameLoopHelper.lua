@@ -40,6 +40,8 @@ IAGameLoopHelper.FIELDWORK_TYPE_PRIORITY = {
 -- Inbound contract rings per schedule day: first at callPlayerHour:Minute, then at least +1 in-game hour from the previous actual ring.
 IAGameLoopHelper.CONTRACT_CALL_MAX_RING_OPENS_PER_DAY = 3
 IAGameLoopHelper.CONTRACT_CALL_RETRY_MIN_INGAME_MINUTES = 60
+-- Maximum number of fields/farmlands a neighbour can outsource as contracts per day
+IAGameLoopHelper.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_PER_DAY = 3
 
 -- Create a new IAGameLoopHelper instance
 -- @param table ianeighboursInstance - Reference to IANeighbours instance
@@ -333,6 +335,10 @@ function IAGameLoopHelper:rebuildDailyFieldworkSchedule(neighbour)
 	neighbour.contractCallLastRingScheduleKey = nil
 	neighbour.contractCallLastRingTotalMinutes = nil
 
+	if IATestRunner ~= nil and type(IATestRunner.onScheduleRebuildBegin) == "function" then
+		IATestRunner.onScheduleRebuildBegin(neighbour)
+	end
+
 	--- Normalized fieldwork key for daily planning (stubble_cultivation → harrow; sow → seed).
 	local function fieldworkKeyForOutsource(cfg)
 		local jt = (cfg ~= nil and cfg.fieldwork) and string.lower(tostring(cfg.fieldwork)) or ""
@@ -495,6 +501,15 @@ function IAGameLoopHelper:rebuildDailyFieldworkSchedule(neighbour)
 		table.insert(ordered, c)
 	end
 
+	local contractFieldCount = 0
+	local maxContractFields = IAGameLoopHelper.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_PER_DAY
+	-- Read from player setting; -1 means unlimited (no cap).
+	if IASettings ~= nil and type(IASettings.getContractMaxFieldsPerNeighbour) == "function" then
+		local settingCap = IASettings.getContractMaxFieldsPerNeighbour()
+		if settingCap ~= nil then
+			maxContractFields = settingCap
+		end
+	end
 	for _, c in ipairs(ordered) do
 		local row = {
 			situationId = c.config.id,
@@ -504,7 +519,11 @@ function IAGameLoopHelper:rebuildDailyFieldworkSchedule(neighbour)
 			row.seedFruitTypeIndex = c.nextCropFruitTypeIndex
 		end
 		if rowIsContractForOutsource(c) then
-			row.contractEnabled = true
+			if maxContractFields < 0 or contractFieldCount < maxContractFields then
+				row.contractEnabled = true
+				contractFieldCount = contractFieldCount + 1
+			end
+			-- Remaining contract-eligible rows become plain AI work (no contractEnabled flag)
 		end
 		table.insert(neighbour.fieldworkScheduleTasks, row)
 	end
@@ -512,6 +531,10 @@ function IAGameLoopHelper:rebuildDailyFieldworkSchedule(neighbour)
 	-- Daily random call window (hour 8..14 inclusive, minute 0..59). Set once per game day (rebuild only runs on day change via ensureDailyFieldworkSchedule).
 	neighbour.callPlayerHour = math.random(8, 14)
 	neighbour.callPlayerMinute = math.random(0, 59)
+
+	if IATestRunner ~= nil and type(IATestRunner.onScheduleRebuildEnd) == "function" then
+		IATestRunner.onScheduleRebuildEnd(neighbour, outsourcedJobType)
+	end
 
 	if self.ianeighbours.debug then
 		local contractCount = 0
@@ -696,7 +719,7 @@ function IAGameLoopHelper:evaluateContractPlayerCallTrigger(neighbour)
 		return
 	end
 	local mi = g_currentMission.missionInfo
-	if mi == nil or mi.timeScale == nil or mi.timeScale > 100 then
+	if mi == nil or mi.timeScale == nil or mi.timeScale >= 500 then
 		return
 	end
 
@@ -735,6 +758,13 @@ function IAGameLoopHelper:evaluateContractPlayerCallTrigger(neighbour)
 		return
 	end
 
+	-- Classic mission offer mode: no phone call rings at all.
+	if IASettings ~= nil and type(IASettings.isMissionOfferModeClassic) == "function" then
+		if IASettings.isMissionOfferModeClassic() then
+			return
+		end
+	end
+
 	-- Global per-day cap (IASettings.contractCallsPerDay): blocks any further contract rings
 	-- across all neighbours today once the configured cap is reached. Per-neighbour retry slots
 	-- above still apply within that budget.
@@ -761,6 +791,20 @@ function IAGameLoopHelper:evaluateContractPlayerCallTrigger(neighbour)
 		if IASettings ~= nil and type(IASettings.recordContractCallTriggered) == "function" then
 			IASettings.recordContractCallTriggered()
 		end
+	elseif IATestRunner ~= nil and IATestRunner._testActive then
+		-- All guards passed (game time >= call window) but ring failed to show.
+		-- Emit diagnostic so we can tell why the trigger didn't produce a payload.
+		IATestRunner.emit("phone", "natural_ring_blocked", {
+			neighbour = neighbour.name,
+			reason = "onContractCallTimeTriggered returned false (all time/state guards passed)",
+			callHour = neighbour.callPlayerHour,
+			callMinute = neighbour.callPlayerMinute,
+			curHour = curH,
+			curMinute = curM,
+			opens = opens,
+			maxOpens = maxOpens,
+			hasActiveSituation = neighbour.activeSituation ~= nil,
+		})
 	end
 end
 
@@ -1286,7 +1330,7 @@ function IAGameLoopHelper:evaluateContractFallbackToAiAt1500(neighbour)
 		return
 	end
 	local mi = g_currentMission.missionInfo
-	if mi == nil or mi.timeScale == nil or mi.timeScale > 100 then
+	if mi == nil or mi.timeScale == nil or mi.timeScale >= 500 then
 		return
 	end
 	self:applyContractFallbackToAi(neighbour, "1500")
@@ -1810,7 +1854,7 @@ function IAGameLoopHelper:situationConfigPassesMinFrequency(config, neighbour, c
 	return false
 end
 
--- Daytime, minFrequency, and character role/job filters for one situation config (same rules as selectNewSituation).
+-- Daytime, minFrequency, character role/job, and months filters for one situation config (same rules as selectNewSituation).
 -- @param IASituationConfig config
 -- @param IANeighbour neighbour
 -- @return boolean
@@ -1823,9 +1867,10 @@ function IAGameLoopHelper:situationConfigPassesNeighbourFilters(config, neighbou
 	return self:situationConfigMatchesDaytime(config.daytime, currentDaytime)
 		and self:situationConfigPassesMinFrequency(config, neighbour, currentGameHours)
 		and self:doesSituationConfigMatchNeighbour(config, neighbour)
+		and iaSituationConfigMonthsMatchCurrent(config)
 end
 
--- Collect situation configs eligible for this neighbour right now (daytime, minFrequency, role/job filters),
+-- Collect situation configs eligible for this neighbour right now (daytime, minFrequency, role/job, months filters),
 -- split by occurrence (regular vs other). The result preserves XML order; the caller is expected to shuffle
 -- before iterating. Used by selectNewSituation (single random pick, regular > random) and by
 -- generateNewSituation (try each candidate until one builds; falls back to random when no regular config builds).
@@ -1973,6 +2018,22 @@ function IAGameLoopHelper:selectRandomPlaceForSituation(situationConfig, neighbo
 	end
 	local needsCombineSizedPlace = situationUsesCombineOrHarvesterMainVehicle(situationConfig)
 
+	--- True when the situation requires a specific attachment (has Attachment in vehicleTypes + non-empty attachmentCategories).
+	local function situationRequiresAttachmentPlace(config)
+		if config == nil or config.vehicleTypes == nil then
+			return false
+		end
+		local hasAttachmentVehicleType = false
+		for _, vType in ipairs(config.vehicleTypes) do
+			if vType ~= nil and string.lower(tostring(vType)) == "attachment" then
+				hasAttachmentVehicleType = true
+				break
+			end
+		end
+		return hasAttachmentVehicleType and (config.attachmentCategories ~= nil and #config.attachmentCategories > 0)
+	end
+	local needsAttachmentPlace = situationRequiresAttachmentPlace(situationConfig)
+
 	local allPlaces = self.ianeighbours.places
 	local idToPlace = {}
 	for _, p in ipairs(allPlaces) do
@@ -2107,6 +2168,10 @@ function IAGameLoopHelper:selectRandomPlaceForSituation(situationConfig, neighbo
 				if roleOk and needsCombineSizedPlace and not (place.withVehicle == true and place.withAttachment == true) then
 					if inn.debug then
 						print("--- IAGameLoopHelper:selectRandomPlaceForSituation() - Skipping place (id: " .. tostring(place.id) .. ", type: " .. tostring(place.type) .. "): need map place size vehicle+attachment for combine/harvester; has withVehicle=" .. tostring(place.withVehicle) .. " withAttachment=" .. tostring(place.withAttachment))
+					end
+				elseif roleOk and needsAttachmentPlace and not (place.withAttachment == true) then
+					if inn.debug then
+						print("--- IAGameLoopHelper:selectRandomPlaceForSituation() - Skipping place (id: " .. tostring(place.id) .. ", type: " .. tostring(place.type) .. "): situation requires attachment (" .. table.concat(situationConfig.attachmentCategories, ", ") .. ") but place has withAttachment=" .. tostring(place.withAttachment))
 					end
 				elseif roleOk then
 					if inn:isPlaceBlockedByOccupancy(place, nil) then
@@ -3049,6 +3114,9 @@ function IAGameLoopHelper:generateNewSituation(neighbour)
 		if relaxConfig ~= nil then
 			local firstResult = self:buildScenarioDataForConfig(neighbour, relaxConfig)
 			if firstResult ~= nil then
+				if IATestRunner ~= nil and type(IATestRunner.onSituationGenerated) == "function" then
+					IATestRunner.onSituationGenerated(neighbour, firstResult, "first_relax")
+				end
 				if self.ianeighbours.debug then
 					print("--- IAGameLoopHelper:generateNewSituation() - First situation for "..tostring(neighbour.name)..": fixed relax (id 4)")
 				end
@@ -3089,6 +3157,9 @@ function IAGameLoopHelper:generateNewSituation(neighbour)
 
 		local fieldworkData = self:selectNewFieldwork(neighbour)
 		if fieldworkData ~= nil then
+			if IATestRunner ~= nil and type(IATestRunner.onSituationGenerated) == "function" then
+				IATestRunner.onSituationGenerated(neighbour, fieldworkData, "fieldwork")
+			end
 			if self.ianeighbours.debug then
 				print("--- IAGameLoopHelper:generateNewSituation() - Found fieldwork data for farmer neighbour "..neighbour.name)
 			end
@@ -3155,6 +3226,9 @@ function IAGameLoopHelper:generateNewSituation(neighbour)
 		end
 		local r = tryBuildFromList(regularConfigs, "regular")
 		if r ~= nil then
+			if IATestRunner ~= nil and type(IATestRunner.onSituationGenerated) == "function" then
+				IATestRunner.onSituationGenerated(neighbour, r, "place_regular")
+			end
 			return r
 		end
 		if self.ianeighbours.debug then
@@ -3164,7 +3238,14 @@ function IAGameLoopHelper:generateNewSituation(neighbour)
 
 	local r = tryBuildFromList(randomConfigs, "random")
 	if r ~= nil then
+		if IATestRunner ~= nil and type(IATestRunner.onSituationGenerated) == "function" then
+			IATestRunner.onSituationGenerated(neighbour, r, "place_random")
+		end
 		return r
+	end
+
+	if IATestRunner ~= nil and type(IATestRunner.onSituationGenerated) == "function" then
+		IATestRunner.onSituationGenerated(neighbour, nil, "no_match")
 	end
 
 	if self.ianeighbours.debug then
@@ -3335,7 +3416,9 @@ function IAGameLoopHelper:generateForcedFieldworkSituation(neighbour)
 end
 
 -- Dev/console: build scenario data for a specific situation id.
--- Skips normal random-generation timing gates (daytime and minFrequency); still requires role/job, place, and vehicles.
+-- Forces initialization even when natural-path filters (daytime, minFrequency, months) would block it,
+-- but logs a console warning so you can see which checks would have prevented a natural spawn.
+-- Still requires role/job, place, and vehicles (hard gates).
 -- Fieldwork configs use open-fieldwork candidates; other configs use place-based buildScenarioDataForConfig.
 -- @param IANeighbour neighbour
 -- @param string|number situationId
@@ -3354,6 +3437,27 @@ function IAGameLoopHelper:generateForcedSituation(neighbour, situationId)
 	if config == nil then
 		return nil, "unknown situation id " .. tostring(situationId)
 	end
+
+	-- Collect natural-path warnings (daytime, minFrequency, months) for both paths.
+	local function collectNaturalFilterWarnings(cfg)
+		local warnings = {}
+		local currentDaytime = getCurrentDaytime()
+		local currentGameHours = getCurrentGameHours()
+		if not self:situationConfigMatchesDaytime(cfg.daytime, currentDaytime) then
+			table.insert(warnings, "daytime mismatch: config=" .. tostring(cfg.daytime) .. " current=" .. tostring(currentDaytime))
+		end
+		if not self:situationConfigPassesMinFrequency(cfg, neighbour, currentGameHours) then
+			table.insert(warnings, "minFrequency not met")
+		end
+		if not iaSituationConfigMonthsMatchCurrent(cfg) then
+			local currentMonth = getEnvironmentMonth1to12()
+			local monthStrs = {}
+			if cfg.months then for _, m in ipairs(cfg.months) do table.insert(monthStrs, tostring(m)) end end
+			table.insert(warnings, "months mismatch: config=[" .. table.concat(monthStrs, ",") .. "] current=" .. tostring(currentMonth))
+		end
+		return warnings
+	end
+
 	local isFieldwork = config.type ~= nil and string.lower(tostring(config.type)) == "fieldwork"
 	if isFieldwork then
 		local want = tostring(situationId)
@@ -3365,7 +3469,23 @@ function IAGameLoopHelper:generateForcedSituation(neighbour, situationId)
 			end
 		end
 		if #matching == 0 then
-			return nil, "fieldwork conditions not met (farmlands, field state, calendar, or role/job)"
+			local warnings = collectNaturalFilterWarnings(config)
+			if #warnings > 0 then
+				print("[iaForceSituation] WARNING: fieldwork situation " .. tostring(situationId) .. " would NOT be selected naturally for " .. tostring(neighbour.name) .. ":")
+				for _, w in ipairs(warnings) do
+					print("  - " .. w)
+				end
+			end
+			return nil, "fieldwork conditions not met (farmlands, field state, calendar, or role/job) — natural filters logged above"
+		end
+		-- Log warnings even when naturally eligible (informational)
+		local warnings = collectNaturalFilterWarnings(config)
+		if #warnings > 0 then
+			print("[iaForceSituation] INFO: fieldwork situation " .. tostring(situationId) .. " for " .. tostring(neighbour.name) .. " — natural filters would normally reject:")
+			for _, w in ipairs(warnings) do
+				print("  - " .. w)
+			end
+			print("  (forcing anyway via iaForceSituation)")
 		end
 		local pick = matching[math.random(1, #matching)]
 		local result = self:buildFieldworkScenarioFromOpenFieldwork(neighbour, pick)
@@ -3378,8 +3498,18 @@ function IAGameLoopHelper:generateForcedSituation(neighbour, situationId)
 		end
 		return result
 	end
+
+	-- Place-based path: role/job is a hard gate; daytime/minFrequency/months are soft (logged, then forced).
 	if not self:doesSituationConfigMatchNeighbour(config, neighbour) then
 		return nil, "situation filters not met (role/job)"
+	end
+	local warnings = collectNaturalFilterWarnings(config)
+	if #warnings > 0 then
+		print("[iaForceSituation] WARNING: place-based situation " .. tostring(situationId) .. " would NOT be selected naturally for " .. tostring(neighbour.name) .. ":")
+		for _, w in ipairs(warnings) do
+			print("  - " .. w)
+		end
+		print("  (forcing anyway via iaForceSituation)")
 	end
 	local result = self:buildScenarioDataForConfig(neighbour, config)
 	if result == nil then
@@ -3519,8 +3649,11 @@ function IAGameLoopHelper:selectNewFieldwork(neighbour)
 				if self.ianeighbours.debug then
 					print("--- IAGameLoopHelper:selectNewFieldwork() - Dropped invalid/stale schedule entry at idx "..tostring(idx).." for "..tostring(neighbour.name))
 				end
-			elseif entry.contractEnabled == true then
+			elseif entry.contractEnabled == true
+				and not (IASettings ~= nil and type(IASettings.isMissionOfferModeClassic) == "function" and IASettings.isMissionOfferModeClassic())
+			then
 				-- Contract row still pending player decision: block AI until accept/decline/15:00 fallback resolves it.
+				-- In classic mode this branch is skipped (no phone calls exist), so the row falls through to normal AI work.
 				if self.ianeighbours.debug then
 					print("--- IAGameLoopHelper:selectNewFieldwork() - Task at idx "..tostring(idx).." is contract-pending for " .. tostring(neighbour.name) .. ", waiting for accept/decline/15:00 fallback")
 				end

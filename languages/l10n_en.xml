@@ -157,6 +157,7 @@
             <text name="gui_mapinit_place_type_industry" text="Industry"/>
             <text name="gui_mapinit_place_type_workshop" text="Workshop"/>
             <text name="gui_mapinit_place_type_shed" text="Shed"/>
+            <text name="gui_mapinit_place_type_fieldwork" text="Fieldwork"/>
             <text name="input_IAMapInitDialog" text="Fields of Stories Menu"/>
             <text name="input_IAI3DReferencesDebug" text="Fields of Stories - Show debug points at all i3d reference nodes"/>
             <text name="input_IADumpUserAttributes" text="Fields of Stories - Dump user attributes of map nodes to log"/>
@@ -181,6 +182,18 @@
             <text name="gui_mapinit_notify_nudge_vehicle_no_vehicle" text="Get in a vehicle to use this."/>
             <text name="gui_mapinit_notify_nudge_vehicle_ai" text="Stop vehicle AI before nudging."/>
             <text name="gui_mapinit_notify_nudge_vehicle_failed" text="Could not move vehicle: %s"/>
+            <text name="gui_mapinit_reset_character" text="Reset character"/>
+            <text name="gui_mapinit_delete_character" text="Delete character"/>
+            <text name="gui_mapinit_remove_homeplaces" text="Remove home places"/>
+            <text name="gui_mapinit_detail_name" text="Name"/>
+            <text name="gui_mapinit_detail_job" text="Job"/>
+            <text name="gui_mapinit_detail_role" text="Role"/>
+            <text name="gui_mapinit_detail_relationship" text="Relationship"/>
+            <text name="gui_mapinit_detail_relationship_fmt" text="%s (Level %d, %d / %d pts)"/>
+            <text name="gui_mapinit_detail_vehicles" text="Vehicles"/>
+            <text name="gui_mapinit_detail_current_situation" text="Current situation"/>
+            <text name="gui_mapinit_detail_schedule" text="Planned fieldwork for today"/>
+            <text name="gui_mapinit_detail_at_place_fmt" text="at %s"/>
             <text name="ingame_relationship_improved" text="Relationship improved with %s (+%s Points)"/>
             <text name="ingame_relationship_levelup" text="Relationship level increased with %s (Level %s)"/>
             <text name="ingame_relationship_decreased" text="Relationship worsened with %s (-%s Points)"/>
@@ -235,6 +248,30 @@
             <text name="ia_settings_contractCallsPerDay_3" text="3"/>
             <text name="ia_settings_contractCallsPerDay_4" text="4"/>
             <text name="ia_settings_contractCallsPerDay_unlimited" text="Unlimited"/>
-            <text name="gui_language" text="en"/>
+            <text name="ia_settings_missionOfferMode_title"   text="Mission offer mode"/>
+            <text name="ia_settings_missionOfferMode_info"    text="Classic: vanilla missions stay on the map, no contract phone calls. Realistic: only neighbour contract calls, vanilla missions removed."/>
+            <text name="ia_settings_missionOfferMode_classic"  text="Classic"/>
+            <text name="ia_settings_missionOfferMode_realistic" text="Realistic"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_title" text="Contract fields per neighbour"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_info" text="Maximum number of fields/farmlands a neighbour can outsource as contracts per day."/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_1" text="1"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_2" text="2"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_3" text="3"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_4" text="4"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_5" text="5"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_unlimited" text="Unlimited"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_title" text="Fieldwork completion threshold"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_info" text="Percentage of field probes that must match the expected state for a fieldwork mission to be considered complete."/>
+            <text name="ia_settings_fieldworkCompletionThreshold_60" text="60%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_65" text="65%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_70" text="70%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_75" text="75%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_80" text="80%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_85" text="85%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_90" text="90%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_95" text="95%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_100" text="100%"/>
+            <text name="ia_npc_unavailable"          text=" (Unavailable)"/>
+            <text name="gui_language"                text="en"/>
 	</texts>
 </l10n>

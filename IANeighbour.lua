@@ -706,7 +706,9 @@ function IANeighbour:_mergeSpawnStyleParams()
 		beard = 0,
 		beardColorIndex = 1,
 	}
+	local usedDefaults = true
 	if self.styleAttributes ~= nil then
+		usedDefaults = false
 		for k, v in pairs(self.styleAttributes) do
 			p[k] = v
 		end
@@ -717,6 +719,7 @@ function IANeighbour:_mergeSpawnStyleParams()
 		p.topColorIndex = 1
 		p.bottomColorIndex = 1
 	end
+	IAprintDebug("_mergeSpawnStyleParams", "usedDefaults=" .. tostring(usedDefaults) .. " onepiece=" .. tostring(p.onepiece) .. " top=" .. tostring(p.top) .. " bottom=" .. tostring(p.bottom) .. " footwear=" .. tostring(p.footwear), self)
 	return p
 end
 
@@ -728,6 +731,7 @@ function IANeighbour:createNpcCompatStub()
 	stub.title = self.name
 	stub.playerGraphics = { style = nil }
 	stub.isActive = false
+	stub.lastUpdate = 0
 	stub.mapHotspot = nil
 	stub.spotRef = nil
 	function stub:setSpot(spot)
@@ -746,6 +750,7 @@ function IANeighbour:createNpcCompatStub()
 		end
 	end
 	function stub:update(_dt)
+		self.lastUpdate = g_currentMission.time
 	end
 	function stub:delete()
 	end
@@ -820,9 +825,12 @@ end
 function IANeighbour.onHumanModelBaseLoaded(obj, loadingState)
 	local self = obj
 	if self == nil or self.isDeleted then
+		IAprintDebug("onHumanModelBaseLoaded", "SKIP obj=nil or deleted")
 		return
 	end
+	IAprintDebug("onHumanModelBaseLoaded", "loadingState=" .. tostring(loadingState) .. " hasStyleAttributes=" .. tostring(self.styleAttributes ~= nil) .. " styleApplied=" .. tostring(self.styleApplied), self)
 	if loadingState ~= HumanModelLoadingState.OK then
+		IAprintDebug("onHumanModelBaseLoaded", "FAILED state=" .. tostring(loadingState), self)
 		if IANeighbours and IANeighbours.debug then
 			print("--- IANeighbour: HumanModel base load failed state=" .. tostring(loadingState))
 		end
@@ -831,13 +839,17 @@ function IANeighbour.onHumanModelBaseLoaded(obj, loadingState)
 	end
 	local model = self.humanModel
 	if model == nil then
+		IAprintDebug("onHumanModelBaseLoaded", "model=nil", self)
 		return
 	end
 	link(getRootNode(), model.rootNode)
 	self:syncHumanModelWorldPose()
-	if self.humanCharacter ~= nil then
-		self.humanCharacter:forceVisible()
-	end
+	-- Do NOT forceVisible here: the model has no style yet — loadFromStyleAsync
+	-- below is async. Showing now flashes an unstyled/base-default character for
+	-- up to ~800 ms until onHumanModelStyleLoaded completes.
+	-- Visibility happens in onHumanModelStyleLoaded (style ready) or via the
+	-- humanModelSubtreeShowDeferred path in update() (no-template fallback).
+	IAprintDebug("onHumanModelBaseLoaded", "linked+posed, deferring visibility", self)
 	local template = self:_styleTemplateForGender()
 	if template == nil or not template.isConfigurationLoaded then
 		if IANeighbours and IANeighbours.debug then
@@ -865,20 +877,40 @@ end
 function IANeighbour.onHumanModelStyleLoaded(obj, loadingState)
 	local self = obj
 	if self == nil or self.isDeleted or self.humanModel == nil then
+		IAprintDebug("onHumanModelStyleLoaded", "SKIP obj=nil/deleted/noModel")
 		return
 	end
-	if loadingState ~= HumanModelLoadingState.OK and IANeighbours and IANeighbours.debug then
-		print("--- IANeighbour: loadFromStyleAsync warning state=" .. tostring(loadingState))
+	IAprintDebug("onHumanModelStyleLoaded", "loadingState=" .. tostring(loadingState) .. " fullLoaded=" .. tostring(self.fullLoaded), self)
+	if loadingState ~= HumanModelLoadingState.OK then
+		-- loadingState=2: redundant style reload from update() while model busy.
+		-- Do NOT forceVisible — the real clothing meshes haven't loaded yet.
+		-- Just set styleApplied=true to block update() from triggering another reload.
+		if IANeighbours and IANeighbours.debug then
+			print("--- IANeighbour: loadFromStyleAsync warning state=" .. tostring(loadingState))
+		end
+		self.styleApplied = true
+		IAprintDebug("onHumanModelStyleLoaded", "state=" .. tostring(loadingState) .. " NOT OK, styleApplied=true, NOT forceVisible", self)
+		return
 	end
+	-- loadingState == OK: style meshes are fully loaded. Now safe to show.
+	IAprintDebug("onHumanModelStyleLoaded", "state=OK, forceVisible", self)
 	if self.humanCharacter ~= nil then
 		self.humanCharacter:forceVisible()
 	end
+	-- Hide immediately: the model must be force-visible for async style mesh
+	-- consistency, but the situation decides whether the NPC should actually be
+	-- rendered.  hideNPC moves the rootNode to Y=-10000 and sets isActive=false.
+	self:hideNPC()
 	self.humanModelStyleReady = true
+	-- Mark style as applied so a later updateFromXML → update() → updateStyle() path
+	-- (which sets styleAttributes again and triggers a redundant reload) returns early.
+	self.styleApplied = true
 	self:finishHumanModelIdleSetup()
 	self.humanModelSubtreeShowDeferred = true
 	if not self.fullLoaded then
 		self:finishLoading()
 	end
+	IAprintDebug("onHumanModelStyleLoaded", "DONE fullLoaded=" .. tostring(self.fullLoaded) .. " styleApplied=" .. tostring(self.styleApplied), self)
 end
 
 function IANeighbour.onHumanModelStyleReloaded(obj, loadingState)
@@ -894,6 +926,7 @@ function IANeighbour:reloadHumanModelStyleAsync()
 end
 
 function IANeighbour:beginHumanModelSpawn()
+	IAprintDebug("beginHumanModelSpawn", "hasStyleAttributes=" .. tostring(self.styleAttributes ~= nil), self)
 	self:disposeHumanModel()
 	if IANeighbours ~= nil then
 		IANeighbours.initPlayerStyleTemplates()
@@ -946,6 +979,7 @@ function IANeighbour:initialize()
 	end
 	
 	-- Spawn the vehicle
+	IAprintDebug("initialize", "hasStyleAttributes=" .. tostring(self.styleAttributes ~= nil) .. " gender=" .. tostring(self.gender), self)
 	if IANeighbours.debug then
 		print("--- IANeighbour:initialize() - Initializing neighbour: "..self.name)
 	end
@@ -1068,6 +1102,9 @@ function IANeighbour:update(dt,gameSeconds,game5Seconds)
 			if self.humanCharacter ~= nil and self.humanCharacter:getModel() ~= nil then
 				self.humanCharacter:forceVisible()
 			end
+			-- See onHumanModelStyleLoaded: force-visible for mesh consistency,
+			-- then immediately hide so the enforcement decides actual visibility.
+			self:hideNPC()
 		end
 		if self.standingIdleRetryHost ~= nil then
 			self.standingIdleRetryAccumS = (self.standingIdleRetryAccumS or 0) + dt / 1000
@@ -1088,6 +1125,7 @@ function IANeighbour:update(dt,gameSeconds,game5Seconds)
 		end
 		-- Apply style attributes once HumanModel style exists (skip live apply when reset until next savegame load)
 		if self.styleAttributes ~= nil and not self.suppressNpcStyleApplicationUntilSavegameLoad and self.resolvedPlayerStyle ~= nil then
+			IAprintDebug("update", "calling updateStyle (styleApplied=" .. tostring(self.styleApplied) .. ")", self)
 			self:updateStyle(
 				self.styleAttributes.hathair,
 				self.styleAttributes.glasses,
@@ -1132,9 +1170,23 @@ function IANeighbour:update(dt,gameSeconds,game5Seconds)
 			if self.activeSituation ~= nil then
 				--print("--- IANeighbour:update() "..self.name.." - Updating Situation: "..tostring(self.activeSituation.id))
 				self.activeSituation:update(dt,gameSeconds,game5Seconds)
-				-- Hide NPC when character is "no" or "in_car", unless situation overrides (NPC visible while AI paused at 0 for 5s)
-				if self.activeSituation.characterVisibility == "no" or self.activeSituation.characterVisibility == "in_car" then
-					if not self.activeSituation.npcVisibleWhilePaused then
+				-- Bidirectional NPC visibility enforcement: show or hide based on situation state.
+				-- Handles the race where showNPC() fails silently during async model loading
+				-- by retrying once the human model is ready.
+				if self.activeSituation ~= nil then
+					local vis = self.activeSituation.characterVisibility
+					local shouldBeVisible = (vis == "yes" or self.activeSituation.npcVisibleWhilePaused == true)
+					local isVisible = self:isNpcActuallyVisible()
+					if shouldBeVisible then
+						if not isVisible and self:isNpcReadyToShow() then
+							self:showNPC()
+						end
+					else
+						-- Always call hideNPC when the NPC should not be visible.
+						-- Loading calls forceVisible (async style mesh fix) which
+						-- makes the model visible; hideNPC puts it at Y=-10000.
+						-- managePositioning→updateNPCPosition moves it back every
+						-- ~5s, so we re-hide here. hideNPC is idempotent.
 						self:hideNPC()
 					end
 				end
@@ -1188,9 +1240,11 @@ function IANeighbour:update(dt,gameSeconds,game5Seconds)
 	local ih = self.ianeighbours
 	if ih ~= nil and ih.gameLoopHelper ~= nil then
 		-- Throttle contract evaluation stack: avoid per-frame schedule/field checks.
-		-- Runs at most every 30s per neighbour (dt is ms).
-		self._iaContractEvalTimerMs = (self._iaContractEvalTimerMs or 30000) + (dt or 0)
-		if self._iaContractEvalTimerMs >= 30000 then
+		-- Runs at most every 30s per neighbour (dt is ms). Reduced to 1s when a test
+		-- is active so waitForNaturalContractCall doesn't race with the 30s window.
+		local evalIntervalMs = (IATestRunner ~= nil and IATestRunner._testActive) and 1000 or 30000
+		self._iaContractEvalTimerMs = (self._iaContractEvalTimerMs or evalIntervalMs) + (dt or 0)
+		if self._iaContractEvalTimerMs >= evalIntervalMs then
 			self._iaContractEvalTimerMs = 0
 			if type(ih.gameLoopHelper.evaluateContractPlayerCallTrigger) == "function" then
 				ih.gameLoopHelper:evaluateContractPlayerCallTrigger(self)
@@ -1383,10 +1437,6 @@ end
 -- @param number dt - Delta time
 -- @param boolean game5Seconds - True on the once-per-~5s tick from IANeighbours:update
 function IANeighbour:handleActiveSituation(dt, game5Seconds)
-	if g_currentMission.missionInfo.timeScale > 500 then
-		--print("--- IANeighbour:handleActiveSituation() - TimeScale is greater than 500, skipping new situation creation")
-		return
-	end
 	-- First Run Check: Initialize situation loaded from XML if not yet initialized
 	if not self.situationInitialized then
 		if self.activeSituation ~= nil and not self.activeSituation.initialized then
@@ -1560,7 +1610,7 @@ end
 -- Uses generateForcedSituation (eligibility rules only; skips random pick, first-relax, and time-of-day farmer gating).
 -- @param string|number situationId
 -- @return boolean ok, string|nil errorMessage
-function IANeighbour:forceNewSituation(situationId)
+function IANeighbour:forceNewSituation(situationId, forceVisible)
 	if not self.enabled then
 		return false, "neighbour disabled"
 	end
@@ -1612,6 +1662,11 @@ function IANeighbour:forceNewSituation(situationId)
 	self.activeSituationId = scenario.config ~= nil and scenario.config.id or nil
 	self.situationInitialized = true
 	self.activeSituation:initialize()
+	-- Force NPC visibility if requested (used by test framework)
+	if forceVisible == true then
+		scenario.characterVisibility = "yes"
+		self:showNPC()
+	end
 	if self.ianeighbours ~= nil and self.ianeighbours.gameLoopHelper ~= nil then
 		self.ianeighbours.gameLoopHelper:spawnNonSituationVehiclesToHomebase(self, scenario)
 	end
@@ -1664,18 +1719,23 @@ function IANeighbour:showNPC()
 	local hm = self.humanCharacter ~= nil and self.humanCharacter:getModel() or self.humanModel
 	local style = self.resolvedPlayerStyle
 	if npc == nil or hm == nil or style == nil then
+		IAprintDebug("showNPC", "BLOCKED: npc="..tostring(npc).." hm="..tostring(hm).." style="..tostring(style), self)
 		return
 	end
 	if not self.humanModelStyleReady then
+		IAprintDebug("showNPC", "BLOCKED: humanModelStyleReady=false", self)
 		return
 	end
 	if not style.isConfigurationLoaded then
+		IAprintDebug("showNPC", "BLOCKED: isConfigurationLoaded=false", self)
 		return
 	end
 	if style.configs.face == nil or style.configs.face.selectedItemIndex == nil or style.configs.face.selectedItemIndex <= 0 then
+		IAprintDebug("showNPC", "BLOCKED: face config missing/invalid (face="..tostring(style.configs.face).." selIdx="..tostring(style.configs.face and style.configs.face.selectedItemIndex)..")", self)
 		return
 	end
 	if style.configs.face.items == nil or #style.configs.face.items == 0 then
+		IAprintDebug("showNPC", "BLOCKED: face items empty", self)
 		return
 	end
 
@@ -1689,9 +1749,7 @@ function IANeighbour:showNPC()
 	self:updateNPCSpot()
 	self:updateMapHotspot()
 
-	if IANeighbours ~= nil and IANeighbours.debug then
-		print("--- IANeighbour:showNPC() "..self.id.." - Character visible")
-	end
+	IAprintDebug("showNPC", "Character visible", self)
 end
 function IANeighbour:hideNPC()
 	local npc = self.npcInstance
@@ -1707,6 +1765,28 @@ function IANeighbour:hideNPC()
 		setWorldTranslation(npc.node, self.realPositionX, IANeighbour.NPC_HIDDEN_Y, self.realPositionZ)
 	end
 end
+
+--- Returns true if all prerequisites for showNPC() are met right now.
+-- Must stay in sync with showNPC() guard clauses.
+function IANeighbour:isNpcReadyToShow()
+	if self.npcInstance == nil then return false end
+	if self.humanCharacter == nil then return false end
+	if self.humanCharacter:getModel() == nil then return false end
+	if self.resolvedPlayerStyle == nil then return false end
+	if not self.humanModelStyleReady then return false end
+	if not self.resolvedPlayerStyle.isConfigurationLoaded then return false end
+	if self.resolvedPlayerStyle.configs == nil then return false end
+	if self.resolvedPlayerStyle.configs.face == nil then return false end
+	if self.resolvedPlayerStyle.configs.face.selectedItemIndex == nil or self.resolvedPlayerStyle.configs.face.selectedItemIndex <= 0 then return false end
+	if self.resolvedPlayerStyle.configs.face.items == nil or #self.resolvedPlayerStyle.configs.face.items == 0 then return false end
+	return true
+end
+
+--- Returns true if the NPC is currently active and visible in the game world.
+function IANeighbour:isNpcActuallyVisible()
+	return self.npcInstance ~= nil and self.npcInstance.isActive
+end
+
 function IANeighbour:updateNPCPosition(targetX, targetY, targetZ, targetRotation)
 	if targetX == nil or targetY == nil or targetZ == nil or targetRotation == nil then
 		return
@@ -1940,8 +2020,9 @@ function IANeighbour:updateNPCName(unavailable)
 		return
 	end
 	if unavailable then
-		self.npcInstance.name = self.name .. " (Unavailable)"
-		self.npcInstance.title = self.name .. " (Unavailable)"
+		local suffix = g_i18n:getText("ia_npc_unavailable")
+		self.npcInstance.name = self.name .. suffix
+		self.npcInstance.title = self.name .. suffix
 	else
 		self.npcInstance.name = self.name
 		self.npcInstance.title = self.name
@@ -1951,18 +2032,22 @@ function IANeighbour:updateNPCName(unavailable)
 	end
 end
 function IANeighbour:updateStyle(hathair,glasses,glassesColorIndex,facegear,facegearColorIndex,onepiece,onepieceColorIndex,bottom,bottomColorIndex,face,faceColorIndex,top,topColorIndex,gloves,glovesColorIndex,headgear,headgearColorIndex,footwear,footwearColorIndex,hairStyle,hairStyleColorIndex,beard,beardColorIndex)
+	IAprintDebug("updateStyle", "styleApplied=" .. tostring(self.styleApplied) .. " onepiece=" .. tostring(onepiece) .. " top=" .. tostring(top) .. " bottom=" .. tostring(bottom), self)
 	if self.styleApplied then
+		IAprintDebug("updateStyle", "BLOCKED: styleApplied already true", self)
 		return
 	end
 
 	local style = self.resolvedPlayerStyle
 	if style == nil then
+		IAprintDebug("updateStyle", "BLOCKED: resolvedPlayerStyle nil", self)
 		return
 	end
 
 	if IANeighbours.debug then
 		print("--- IANeighbour:updateStyle() "..self.id.." - Applying indices to PlayerStyle")
 	end
+	IAprintDebug("updateStyle", "applying params, will reload style async", self)
 
 	local p = {
 		hathair = hathair,
@@ -2036,6 +2121,11 @@ function IANeighbour:addVehicle(ia_vehicle)
 	self.vehicles[ia_vehicle.uniqueId] = ia_vehicle
 end
 
+function IANeighbour:updateFromXML(enabled, positionX, positionY, positionZ, rotation, action, farmId, activeSituationId, hathair, glasses, glassesColorIndex, facegear, facegearColorIndex, onepiece, onepieceColorIndex, bottom, bottomColorIndex, face, faceColorIndex, top, topColorIndex, gloves, glovesColorIndex, headgear, headgearColorIndex, footwear, footwearColorIndex, hairStyle, hairStyleColorIndex, beard, beardColorIndex, characterVisibility)
+	IAprintDebug("updateFromXML", "onepiece=" .. tostring(onepiece) .. " top=" .. tostring(top) .. " bottom=" .. tostring(bottom) .. " footwear=" .. tostring(footwear) .. " initialized=" .. tostring(self.initialized), self)
+	return self:_updateFromXMLImpl(enabled, positionX, positionY, positionZ, rotation, action, farmId, activeSituationId, hathair, glasses, glassesColorIndex, facegear, facegearColorIndex, onepiece, onepieceColorIndex, bottom, bottomColorIndex, face, faceColorIndex, top, topColorIndex, gloves, glovesColorIndex, headgear, headgearColorIndex, footwear, footwearColorIndex, hairStyle, hairStyleColorIndex, beard, beardColorIndex, characterVisibility)
+end
+
 -- Update neighbour data from XML (safe before :initialize(); used when XML load defers initialize until after map assignments)
 -- @param boolean enabled - Whether the neighbour is enabled
 -- @param number positionX - X position
@@ -2060,7 +2150,7 @@ end
 -- @param number beard - Beard index (optional)
 -- @param number beardColorIndex - Beard color index (optional)
 -- @param string characterVisibility - Character visibility ("yes", "in_car", or other) (optional)
-function IANeighbour:updateFromXML(enabled, positionX, positionY, positionZ, rotation, action, farmId, activeSituationId, hathair, glasses, glassesColorIndex, facegear, facegearColorIndex, onepiece, onepieceColorIndex, bottom, bottomColorIndex, face, faceColorIndex, top, topColorIndex, gloves, glovesColorIndex, headgear, headgearColorIndex, footwear, footwearColorIndex, hairStyle, hairStyleColorIndex, beard, beardColorIndex, characterVisibility)
+function IANeighbour:_updateFromXMLImpl(enabled, positionX, positionY, positionZ, rotation, action, farmId, activeSituationId, hathair, glasses, glassesColorIndex, facegear, facegearColorIndex, onepiece, onepieceColorIndex, bottom, bottomColorIndex, face, faceColorIndex, top, topColorIndex, gloves, glovesColorIndex, headgear, headgearColorIndex, footwear, footwearColorIndex, hairStyle, hairStyleColorIndex, beard, beardColorIndex, characterVisibility)
 	local changed = false
 	local styleChanged = false
 

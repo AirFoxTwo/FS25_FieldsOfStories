@@ -212,6 +212,11 @@ source(IANeighbours.dir .. "IAGameLoopHelper.lua")
 source(IANeighbours.dir .. "IAFieldOutcomeMission.lua")
 source(IANeighbours.dir .. "IAMissionBorrow.lua")
 source(IANeighbours.dir .. "IASettings.lua")
+if IANeighbours.debug then
+	source(IANeighbours.dir .. "lib/testFramework/IATestRunner.lua")
+	source(IANeighbours.dir .. "lib/testFramework/IATestScenarios.lua")
+	source(IANeighbours.dir .. "lib/testFramework/IATestRegistry.lua")
+end
 
 -- Vehicle borrow-access spec: register at mod load (before loadMap / validateTypes), not via source().
 if g_specializationManager ~= nil then
@@ -276,7 +281,7 @@ function IANeighbours:loadMap()
 	IANeighbours.mapInitJob = IAMapInitJob.new(self)
 	IAMapInitJob.getMapReferenceData() --initialize the map reference data by triggering the map async data loading
 	
-	g_currentMission.aiSystem:consoleCommandAIEnableDebug()
+	--g_currentMission.aiSystem:consoleCommandAIEnableDebug()
 
 	if addConsoleCommand ~= nil then
 		addConsoleCommand("iaForceFieldwork", "Fields of Stories: force a neighbour into a fieldwork situation", "consoleCommandIaForceFieldwork", IANeighbours, "[index|id|name]")
@@ -292,6 +297,10 @@ function IANeighbours:loadMap()
 		addConsoleCommand("iaPerfStatus", "Fields of Stories: print current performance debugging toggle states", "consoleCommandIaPerfStatus", IANeighbours)
 		addConsoleCommand("iaPerfEnableAll", "Fields of Stories: enable debugPerformance + set threshold to 0 (always log)", "consoleCommandIaPerfEnableAll", IANeighbours)
 		addConsoleCommand("iaPerfDisableAll", "Fields of Stories: disable all performance debugging toggles and guards", "consoleCommandIaPerfDisableAll", IANeighbours)
+		-- TEMP: combine auger pipe fold verification (remove once spawn/parking wiring is confirmed)
+		addConsoleCommand("iaCombinePipeInfo", "Fields of Stories (TEMP): print nearest combine pipe (auger) state fields", "consoleCommandIaCombinePipeInfo", IANeighbours)
+		addConsoleCommand("iaFoldCombinePipe", "Fields of Stories (TEMP): fold the nearest combine's auger pipe in", "consoleCommandIaFoldCombinePipe", IANeighbours)
+		addConsoleCommand("iaUnfoldCombinePipe", "Fields of Stories (TEMP): unfold the nearest combine's auger pipe out", "consoleCommandIaUnfoldCombinePipe", IANeighbours)
 	end
 
 	-- Mod settings: load persisted values and register the in-game settings page UI
@@ -304,6 +313,10 @@ function IANeighbours:loadMap()
 
 	if IABorrowAccess ~= nil then
 		IABorrowAccess.registerConsoleCommands()
+	end
+
+	if IANeighbours.debug then
+		IATestRunner.registerConsoleCommands()
 	end
 
 	IANeighbours.registerNpcMapHotspotTexture()
@@ -527,6 +540,112 @@ function IANeighbours.initPlayerStyleTemplates()
 	IANeighbours.femaleStyleTemplate = f
 end
 
+function IANeighbours:registerFarmerNPCs()
+	-- Find existing max NPC index in g_npcManager
+	local nextIndex = 0
+	if g_npcManager ~= nil and g_npcManager.npcs ~= nil then
+		for i = 1, #g_npcManager.npcs do
+			if g_npcManager.npcs[i] ~= nil then
+				nextIndex = i
+			end
+		end
+		nextIndex = nextIndex + 1
+	else
+		nextIndex = 1
+	end
+	
+	-- Dynamically find all farmer neighbours
+	local farmerNeighbours = {}
+	for _, neighbour in ipairs(self.neighbours or {}) do
+		if neighbour ~= nil and neighbour.job == "Farmer" and neighbour.role == "Neighbour" then
+			table.insert(farmerNeighbours, neighbour)
+		end
+	end
+	
+	IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: Gestartet. nextIndex=" .. nextIndex .. ", anzahlFarmer=" .. #farmerNeighbours, nil, nil, nil)
+	
+	-- Sort by id for deterministic index assignment
+	table.sort(farmerNeighbours, function(a, b) return a.id < b.id end)
+	
+	-- Create REAL NPC engine objects for each farmer neighbour
+	for i, neighbour in ipairs(farmerNeighbours) do
+		local npcIndex = nextIndex + i - 1
+		local npcKey = "FARMER_NPC_" .. tostring(neighbour.id)
+		local npcName = neighbour.name or "Farmer"
+		local npcImage = neighbour:_characterPortraitImagePathForMap()
+		
+		IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: npcIndex=" .. npcIndex .. " npcKey=" .. npcKey .. " npcName=" .. npcName, nil, nil, nil)
+		
+		-- Ensure existing registered NPC also has its index set (from a previous registration, e.g. save reload)
+		if neighbour.registeredNpc ~= nil then
+			neighbour.registeredNpc.index = npcIndex
+			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: NPC fuer " .. neighbour.name .. " existiert bereits, update Index auf " .. npcIndex, nil, nil, nil)
+			IAHelper_registerNpcInManager(neighbour.registeredNpc, npcIndex)
+		end
+		
+		IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: Erstelle NPC " .. npcIndex .. " fuer " .. neighbour.name .. " (key=" .. npcKey .. ")", nil, nil, nil)
+		
+		-- Create and load a REAL engine NPC object
+		local success, npc = pcall(function()
+			local npcObj = NPC.new()
+			npcObj:load("dataS2/npc/farmer/farmer.xml", npcKey, npcName)
+			npcObj.index = npcIndex  -- Important for farmland.npcIndex assignment in updateFarmlands()
+			npcObj.title = npcName
+			npcObj.imageFilename = npcImage
+			return npcObj
+		end)
+		
+		if success and npc ~= nil then
+			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: NPC geladen fuer " .. neighbour.name .. " mit Index " .. npcIndex, nil, nil, nil)
+			
+			-- Register in g_npcManager via helper (encapsulates direct g_npcManager access)
+			IAHelper_registerNpcInManager(npc, npcIndex)
+			if g_npcManager ~= nil and g_npcManager.nameToNPC ~= nil then
+				g_npcManager.nameToNPC[npcKey] = npc
+			end
+			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: NPC-Index " .. npcIndex .. " = " .. tostring(npc) .. " registriert in g_npcManager fuer " .. neighbour.name, nil, nil, nil)
+			
+			-- Store reference on the neighbour object
+			neighbour.registeredNpc = npc
+		else
+			local errMsg = tostring(npc)
+			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: FEHLGESCHLAGEN fuer " .. npcName .. ": " .. errMsg, nil, nil, nil)
+		end
+	end
+	
+	IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: Fertig", nil, nil, nil)
+end
+
+function IANeighbours:getCharacterPortraitPath(characterId, gender)
+	if characterId == nil then
+		return nil
+	end
+	
+	local basePath = Utils.getFilename("dataS2/character/npc/portraits/", self.dir)
+	
+	-- Try specific character portrait
+	local filename = string.format("%snpc_%d.dds", basePath, characterId)
+	if fileExists(filename) then
+		return filename
+	end
+	
+	-- Try PNG fallback
+	filename = string.format("%snpc_%d.png", basePath, characterId)
+	if fileExists(filename) then
+		return filename
+	end
+	
+	return nil
+end
+
+function IANeighbours:getDefaultCharacterPortraitPath(gender)
+	local basePath = Utils.getFilename("dataS2/character/npc/portraits/", self.dir)
+	if gender ~= nil and string.lower(gender) == "female" then
+		return string.format("%snpc_default_female.dds", basePath)
+	end
+	return string.format("%snpc_default_male.dds", basePath)
+end
+
 function IANeighbours.clearPlayerStyleTemplates()
 	IANeighbours.maleStyleTemplate = nil
 	IANeighbours.femaleStyleTemplate = nil
@@ -617,6 +736,90 @@ function IANeighbours:consoleCommandIaToggleFieldMissionProbeDebug()
 	if IAFieldOutcomeMission ~= nil and type(IAFieldOutcomeMission.syncProbeDebugMarkersForAllActive) == "function" then
 		IAFieldOutcomeMission.syncProbeDebugMarkersForAllActive()
 	end
+end
+
+--- TEMP developer console: iaCombinePipeInfo
+-- Find the nearest combine with a movable pipe (auger spout) and print its
+-- spec_pipe state fields so we can verify the fold-in mapping before wiring it
+-- into spawn/parking. Remove together with iaFoldCombinePipe.
+function IANeighbours:consoleCommandIaCombinePipeInfo()
+	local refX, refY, refZ = self:resolvePlayerRefPosition()
+	if refX == nil then
+		print("[iaCombinePipeInfo] could not resolve player position")
+		return
+	end
+	local vehicle, distSq = IAHelper_findNearestVehicleWithPipe(refX, refY, refZ)
+	if vehicle == nil then
+		print("[iaCombinePipeInfo] no combine with a movable pipe found")
+		return
+	end
+	local spec = vehicle.spec_pipe
+	local name = (vehicle.getFullName ~= nil) and vehicle:getFullName() or tostring(vehicle)
+	print(string.format("[iaCombinePipeInfo] %s (dist=%.1fm)", tostring(name), math.sqrt(distSq or 0)))
+	print(string.format("  currentState=%s targetState=%s foldMinState=%s foldMaxState=%s",
+		tostring(spec.currentState), tostring(spec.targetState),
+		tostring(spec.foldMinState), tostring(spec.foldMaxState)))
+	print(string.format("  hasMovablePipe=%s anim=%s foldMinTime=%s foldMaxTime=%s",
+		tostring(spec.hasMovablePipe), tostring(spec.animation and spec.animation.name),
+		tostring(spec.foldMinTime), tostring(spec.foldMaxTime)))
+end
+
+--- TEMP developer console: iaFoldCombinePipe
+-- Find the nearest combine with a movable pipe and fold its auger spout in via
+-- IAHelper_foldCombinePipeIn (the production logic). Remove this command once the
+-- spawn/parking wiring is verified.
+function IANeighbours:consoleCommandIaFoldCombinePipe()
+	local refX, refY, refZ = self:resolvePlayerRefPosition()
+	if refX == nil then
+		print("[iaFoldCombinePipe] could not resolve player position")
+		return
+	end
+	local vehicle, distSq = IAHelper_findNearestVehicleWithPipe(refX, refY, refZ)
+	if vehicle == nil then
+		print("[iaFoldCombinePipe] no combine with a movable pipe found")
+		return
+	end
+	local ok, msg = IAHelper_foldCombinePipeIn(vehicle)
+	local name = (vehicle.getFullName ~= nil) and vehicle:getFullName() or tostring(vehicle)
+	print(string.format("[iaFoldCombinePipe] %s (dist=%.1fm) -> ok=%s %s",
+		tostring(name), math.sqrt(distSq or 0), tostring(ok), tostring(msg)))
+end
+
+--- TEMP developer console: iaUnfoldCombinePipe
+-- Find the nearest combine with a movable pipe and unfold its auger spout out via
+-- IAHelper_unfoldCombinePipeOut. Counterpart of iaFoldCombinePipe.
+function IANeighbours:consoleCommandIaUnfoldCombinePipe()
+	local refX, refY, refZ = self:resolvePlayerRefPosition()
+	if refX == nil then
+		print("[iaUnfoldCombinePipe] could not resolve player position")
+		return
+	end
+	local vehicle, distSq = IAHelper_findNearestVehicleWithPipe(refX, refY, refZ)
+	if vehicle == nil then
+		print("[iaUnfoldCombinePipe] no combine with a movable pipe found")
+		return
+	end
+	local ok, msg = IAHelper_unfoldCombinePipeOut(vehicle)
+	local name = (vehicle.getFullName ~= nil) and vehicle:getFullName() or tostring(vehicle)
+	print(string.format("[iaUnfoldCombinePipe] %s (dist=%.1fm) -> ok=%s %s",
+		tostring(name), math.sqrt(distSq or 0), tostring(ok), tostring(msg)))
+end
+
+--- TEMP helper for the pipe console commands: resolve a world reference position
+-- (current vehicle root if seated, otherwise the player position).
+-- @return number|nil x, number|nil y, number|nil z
+function IANeighbours:resolvePlayerRefPosition()
+	if g_localPlayer == nil then
+		return nil, nil, nil
+	end
+	local v = g_localPlayer.getCurrentVehicle and g_localPlayer:getCurrentVehicle()
+	if v ~= nil and v.rootNode ~= nil then
+		return getWorldTranslation(v.rootNode)
+	end
+	if g_localPlayer.getPosition ~= nil then
+		return g_localPlayer:getPosition()
+	end
+	return nil, nil, nil
 end
 
 --- Developer console: iaDumpGrowthStates
@@ -981,6 +1184,10 @@ function IANeighbours:performRemoveModCleanup()
 	self.situationConfigs = {}
 	self.vehicleIdMapping = {}
 	IANeighbours.clearPlayerStyleTemplates()
+	-- Clean up orphaned farm 99 vehicles that are no longer tracked by any neighbour
+	if self.xmlHelper ~= nil and self.xmlHelper.removeOrphanedFarm99Vehicles ~= nil then
+		self.xmlHelper:removeOrphanedFarm99Vehicles()
+	end
 end
 
 --- Remove one neighbour from the list and run full :delete() (same teardown as remove-mod per character).
@@ -1142,6 +1349,9 @@ end
 --- Does not close IAPhoneDialogGUI; refreshes its widgets if it is the current dialog (idle layout when missed).
 --- @param reason string `IncomingCallEndReason.*`
 function IANeighbours.clearPendingIncomingPhoneOffer(reason)
+	if IATestRunner ~= nil and IATestRunner.onPhoneRingEnd ~= nil then
+		IATestRunner.onPhoneRingEnd(reason)
+	end
 	if IANeighbours._incomingPhonePayload == nil then
 		return
 	end
@@ -1414,6 +1624,9 @@ function IANeighbours.tryShowIncomingPhoneRing(neighbour, ringPayload)
 		IANeighbours.noteGlobalInboundPhoneCallOpened()
 	end
 	IANeighbours.addIncomingPhoneIngameNotification(ringPayload.neighbourName or neighbour.name)
+	if IATestRunner ~= nil and IATestRunner.onPhoneRingStart ~= nil then
+		IATestRunner.onPhoneRingStart(neighbour)
+	end
 	return true
 end
 
@@ -1579,6 +1792,28 @@ function IANeighbours:update(dt)
 
 		self.xmlHelper:loadData()
 		self.outboundXMLLoaded = true
+
+		-- Register NPC objects for farmer neighbours in g_npcManager
+		-- This must happen AFTER neighbours are loaded from XML
+		if not self._farmerNPCsRegistered then
+			self:registerFarmerNPCs()
+			self._farmerNPCsRegistered = true
+		end
+
+		-- Rebuild borrow-access O(1) lookup set after fleet load (may have persisted borrows)
+		if IABorrowAccess ~= nil and IABorrowAccess.rebuildBorrowedIdSet ~= nil then
+			IABorrowAccess.rebuildBorrowedIdSet()
+		end
+
+		if IANeighbours.debug then
+			if IATestRegistry.verbose then
+				print("[FOS_TEST] IATestRunner: outboundXMLLoaded = true, will call tryAutoRun()")
+			end
+
+			-- Auto-run test system: start the auto-run sequence once the mod is fully loaded
+			IATestRunner.tryAutoRun()
+		end
+
 		-- When map config was missing and bootstrap was not deferred to the dialog: enable map init + roadside splines (headless path)
 		if self.xmlHelper.mapConfigFileNotFound and not self.mapInitJobRun and not IANeighbours.pendingMapPlacesBootstrap then
 			self.mapInitJobRun = true
@@ -1652,6 +1887,17 @@ function IANeighbours:update(dt)
 
 	if not IANeighbours.skipBorrowUpdate and IAMissionBorrow ~= nil and type(IAMissionBorrow.update) == "function" then
 		IAMissionBorrow.update(dt)
+	end
+
+	-- AI-assisted test runner: process action queue when a test is active
+	if IANeighbours.debug then
+		IATestRunner.update(dt)
+
+		-- Auto-run system: count down the startup delay and launch tests when ready.
+		-- Only active after outbound XML is loaded (safe to call every frame).
+		if self.outboundXMLLoaded then
+			IATestRunner.tryAutoRun()
+		end
 	end
 
 	-- Debug drawing block: skipped entirely when skipDebugDrawing is true
@@ -1894,29 +2140,35 @@ end
 
 --- Set place.type to player_farm when on player-owned farmland, else restore basePlaceType (semantic type).
 function IANeighbours:reclassifyPlacesByPlayerFarmland()
-	if self.places == nil or g_farmlandManager == nil or g_farmlandManager.getFarmlandAtWorldPosition == nil then
-		return
-	end
-	for _, place in ipairs(self.places) do
-		if place == nil or place.id == nil then
-			-- Skip ephemeral places (e.g. fieldwork with nil id)
-		elseif place.hasWorldPosition == nil or not place:hasWorldPosition() then
-			-- No world position yet
-		elseif place.isPlaceableRelative and place:isPlaceableRelative() and place.x == 0 and place.z == 0 then
-			-- Unresolved placeable-relative
-		else
-			if place.basePlaceType == nil then
-				place.basePlaceType = place.type
-			end
-			local farmland = g_farmlandManager:getFarmlandAtWorldPosition(place.x, place.z)
-			local playerOwned = farmland ~= nil and farmland.isOwned == true and farmland.farmId ~= 99
-			if playerOwned then
-				place.type = "player_farm"
-			else
-				place.type = place.basePlaceType
-			end
-		end
-	end
+	-- DISABLED for now — the override causes misleading "waiting at your farm"
+    -- notifications for places that aren't semantically farms (e.g. public_place,
+    -- workshop, shop) but happen to sit on player-owned farmland.
+    
+	--return
+
+	--if self.places == nil or g_farmlandManager == nil or g_farmlandManager.getFarmlandAtWorldPosition == nil then
+	--	return
+	--end
+	--for _, place in ipairs(self.places) do
+	--	if place == nil or place.id == nil then
+	--		-- Skip ephemeral places (e.g. fieldwork with nil id)
+	--	elseif place.hasWorldPosition == nil or not place:hasWorldPosition() then
+	--		-- No world position yet
+	--	elseif place.isPlaceableRelative and place:isPlaceableRelative() and place.x == 0 and place.z == 0 then
+	--		-- Unresolved placeable-relative
+	--	else
+	--		if place.basePlaceType == nil then
+	--			place.basePlaceType = place.type
+	--		end
+	--		local farmland = g_farmlandManager:getFarmlandAtWorldPosition(place.x, place.z)
+	--		local playerOwned = farmland ~= nil and farmland.isOwned == true and farmland.farmId ~= 99
+	--		if playerOwned then
+	--			place.type = "player_farm"
+	--		else
+	--			place.type = place.basePlaceType
+	--		end
+	--	end
+	--end
 end
 
 function IANeighbours:updateFarmlands()
@@ -1925,43 +2177,69 @@ function IANeighbours:updateFarmlands()
 		--print("--- IANeighbours:updateFarmlands() - Starting farmland update")
 	end
 
-	-- Whole map: vanilla contract / mission generation skips fields when isMissionAllowed is false (see e.g. missionTypeContractGenerator).
-	if g_fieldManager ~= nil then
-		local fieldsList = nil
-		if type(g_fieldManager.getFields) == "function" then
-			local ok, list = pcall(function()
-				return g_fieldManager:getFields()
-			end)
-			if ok and list ~= nil then
-				fieldsList = list
+	-- Only strip vanilla missions in realistic mode; classic mode leaves them intact.
+	if IASettings == nil or type(IASettings.isMissionOfferModeClassic) ~= "function" or not IASettings.isMissionOfferModeClassic() then
+		-- Whole map: vanilla contract / mission generation skips fields when isMissionAllowed is false (see e.g. missionTypeContractGenerator).
+		if g_fieldManager ~= nil then
+			local fieldsList = nil
+			if type(g_fieldManager.getFields) == "function" then
+				local ok, list = pcall(function()
+					return g_fieldManager:getFields()
+				end)
+				if ok and list ~= nil then
+					fieldsList = list
+				end
 			end
-		end
-		if fieldsList == nil and type(g_fieldManager.fields) == "table" then
-			fieldsList = g_fieldManager.fields
-		end
-		if fieldsList ~= nil then
-			local stripNow = not IANeighbours.didStripVanillaFieldMissionsOnLoad
-			if stripNow then
-				IANeighbours.didStripVanillaFieldMissionsOnLoad = true
+			if fieldsList == nil and type(g_fieldManager.fields) == "table" then
+				fieldsList = g_fieldManager.fields
 			end
-			for _, field in pairs(fieldsList) do
-				if field ~= nil then
-					field.isMissionAllowed = false
-					if stripNow and field.currentMission ~= nil then
-						local m = field.currentMission
-						local skip = m.iaFieldsOfStoriesMission == true
-						if not skip and IAFieldOutcomeMission ~= nil and type(m.getMissionTypeName) == "function" then
-							local okT, typeName = pcall(m.getMissionTypeName, m)
-							if okT and typeName == IAFieldOutcomeMission.NAME then
-								skip = true
+			if fieldsList ~= nil then
+				local stripNow = not IANeighbours.didStripVanillaFieldMissionsOnLoad
+				if stripNow then
+					IANeighbours.didStripVanillaFieldMissionsOnLoad = true
+				end
+				for _, field in pairs(fieldsList) do
+					if field ~= nil then
+						field.isMissionAllowed = false
+						if stripNow and field.currentMission ~= nil then
+							local m = field.currentMission
+							local skip = m.iaFieldsOfStoriesMission == true
+							if not skip and IAFieldOutcomeMission ~= nil and type(m.getMissionTypeName) == "function" then
+								local okT, typeName = pcall(m.getMissionTypeName, m)
+								if okT and typeName == IAFieldOutcomeMission.NAME then
+									skip = true
+								end
+							end
+							if not skip and m.ownerFarmId == 0 and type(m.delete) == "function" then
+								if IANeighbours.debug then
+									print("--- IANeighbours:updateFarmlands() - First-load strip vanilla field mission id=" .. tostring(m.id))
+								end
+								m:delete()
 							end
 						end
-						if not skip and m.ownerFarmId == 0 and type(m.delete) == "function" then
-							if IANeighbours.debug then
-								print("--- IANeighbours:updateFarmlands() - First-load strip vanilla field mission id=" .. tostring(m.id))
-							end
-							m:delete()
-						end
+					end
+				end
+			end
+		end
+	else
+		-- Classic mode: restore isMissionAllowed so vanilla contracts can exist and aren't removed by the engine.
+		if g_fieldManager ~= nil then
+			local fieldsList = nil
+			if type(g_fieldManager.getFields) == "function" then
+				local ok, list = pcall(function()
+					return g_fieldManager:getFields()
+				end)
+				if ok and list ~= nil then
+					fieldsList = list
+				end
+			end
+			if fieldsList == nil and type(g_fieldManager.fields) == "table" then
+				fieldsList = g_fieldManager.fields
+			end
+			if fieldsList ~= nil then
+				for _, field in pairs(fieldsList) do
+					if field ~= nil then
+						field.isMissionAllowed = true
 					end
 				end
 			end
@@ -2148,10 +2426,10 @@ function IANeighbours:updateFarmlands()
 		end
 	end
 	
-	-- Assign unowned farmlands to farmer neighbours
+	-- Assign unowned farmlands to farmer neighbours (only farmlands that actually have fields)
 	local unownedFarmlands = {}
 	for _, farmland in pairs(farmlands) do
-		if farmland ~= nil and (farmland.isOwned == false or farmland.farmId == 99) and not assignedFarmlandIds[farmland.id] then
+		if farmland ~= nil and farmland.field ~= nil and (farmland.isOwned == false or farmland.farmId == 99) and not assignedFarmlandIds[farmland.id] then
 			table.insert(unownedFarmlands, farmland.id)
 		end
 	end
@@ -2232,7 +2510,11 @@ function IANeighbours:updateFarmlands()
 					end
 				end
 
-				farmland.npcIndex = 99
+
+				-- Set NPC index for this farmland to the neighbour's registered NPC
+				if neighbour.registeredNpc ~= nil then
+					farmland.npcIndex = neighbour.registeredNpc.index
+				end
 			end
 		end
 	end
@@ -2360,7 +2642,8 @@ function IANeighbours:updateNeighbours(dt,gameSeconds,game5Seconds)
 					-- Fieldwork forces characterVisibility to "no" in IASituation; when AI is paused and NPC is shown on foot (npcVisibleWhilePaused), allow conversation range like "yes"/"in_car".
 					local visibilityOk = sit ~= nil and (sit.characterVisibility == "yes" or sit.characterVisibility == "in_car")
 					local fieldworkOnFoot = sit ~= nil and sit.jobType ~= nil and sit.npcVisibleWhilePaused == true
-					if neighbour.distanceToPlayer < 5 and sit ~= nil and (visibilityOk or fieldworkOnFoot) then
+					if neighbour.distanceToPlayer < 5 and sit ~= nil and (visibilityOk or fieldworkOnFoot)
+						and neighbour.npcInstance ~= nil and neighbour.npcInstance.isActive then
 						if bestDistance == nil or neighbour.distanceToPlayer < bestDistance then
 							bestDistance = neighbour.distanceToPlayer
 							neighbourInRange = true
@@ -3496,7 +3779,7 @@ function IANeighbours:resetFarmlandsToDefault()
 					-- Reset farmland to default (farmId 0)
 					g_farmlandManager:setLandOwnership(farmland.id, 0)
 					farmland:setOwnerFarmId(0)
-					farmland.npcIndex = 0
+					-- NPC index is managed by IANeighbours:updateFarmlands() on the 5-second cycle.
 					farmland.showOnFarmlandsScreen = true
 					if farmland.field ~= nil and farmland.field.fieldState ~= nil then
 						farmland.field.fieldState.ownerFarmId = 0

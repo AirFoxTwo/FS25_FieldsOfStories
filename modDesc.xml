@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="109">
-    <version>1.0.0.1</version>
+<modDesc descVersion="110">
+    <version>1.0.0.3</version>
 	<author>AirFoxTwo</author>
 	<title>
 		<de>Fields Of Stories - Rollenspiel</de>
@@ -69,7 +69,7 @@ Story tab: Overview of all characters with relationship, relationship level, and
 Map locations: Place encounter locations (on foot, with a vehicle, or with a vehicle + implement) of various categories on the map.
 Character settings: Individual characters can be reset or removed, and their home locations can be removed.
 Mod settings: Function to remove all mod contents (reset is possible by saving the game and reloading).
-Game Settings: Adjust the number of contract calls per day.
+Game Settings: Adjust the number of contract calls per day. Activate realistic contract assignment or classic contract list.
 
 Optimize maps:
 Generator (only for unknown maps): On the first start of the mod on a map without a stored configuration, a location generator will detect known objects on the map and automatically create locations.
@@ -91,6 +91,23 @@ Missions: In later versions, the current conversations will be expanded with mis
 - Bugfix: Recently acquired fields are no longer used by the NPC
 - Bugfix: Fields are not longer adjusted to NPC-supported crops.
 - Bugfix: 10% Threshold for Fieldwork Missions completion.
+
+1.0.0.3:
+- Bugfix: Vehicles with attached implements no longer appear at vehicle-only locations.
+- Bugfix: Added safeguards for NPC behavior at high time scales (> 360) to ensure every situation remains active for at least 2 minutes.
+- Bugfix: NPC calls now occur even at higher time scales (> 100).
+- Bugfix: Added an option to switch field jobs between the classic format and the realistic (phone-based) format.
+- Bugfix: Removed locations on standard maps that were outside the accessible area.
+- Bugfix: "unavailable" no longer appears on the map for working characters.
+- Bugfix: NPCs now take actual playtime into account alongside in-game duration when performing their activities.
+- Bugfix: Removing outdated vehicles now happens automatically and when clicking the "Remove Mod Data" button.
+- Bugfix: Added a configurable limit for fields in contract calls to keep the contract list manageable.
+- Bugfix: Field ownership now displays the correct character (especially in the mission tab).
+- Bugfix: Fixed an issue where characters were not visually visible, yet conversations could still be initiated.
+- Bugfix: Added an adjustable threshold for field missions so it can be lowered in special cases.
+- Bugfix: Added compatibility with manual attach mod.
+- Bugfix: Fixed performances issues in combination with courseplay.
+- Added missing translations.
 ]]></en>
 		<de><![CDATA[Fields of Stories – Lebendige Charaktere im Landwirtschafts-Simulator
 
@@ -153,7 +170,7 @@ Story-Tab: Übersicht aller Charaktere mit Beziehung, Beziehungsstufe und Bezieh
 Karten-Orte: Platzieren von Ereignis-Orten (zu Fuß, mit Fahrzeug oder Fahrzeug mit Anbaugerät) verschiedener Kategorien auf der Karte.
 Charakter-Einstellungen: Einzelne Charaktere können zurückgesetzt oder entfernt werden, sowie dessen Heimat-Orte entfernt werden.
 Mod-Einstellungen: Funktion zum Entfernen aller Mod-Inhalte (Zurücksetzen möglich, indem das Spiel gespeichert und neu geladen wird).
-Spiel-Einstellungen: Anpassen der Anzahl der Auftragsanrufe pro Tag.
+Spiel-Einstellungen: Anpassen der Anzahl der Auftragsanrufe pro Tag. Aktivierung der realistischen Auftragsvergabe oder klassischer Auftragsliste.
 
 Karten optimieren:
 Generator (nur bei unbekannten Karten): Beim ersten Starten der Mod auf einer Karte ohne hinterlegte Konfiguration wird ein Orts-Generator bekannte Objekte auf der Karte erkennen und automatisch Orte erstellen.
@@ -177,6 +194,23 @@ Missionen: In späteren Versionen werden die bisherigen Gespräche um Missionen 
 - Bugfix: Kürzlich erworbene Felder werden nun nicht mehr vom NPC verwendet
 - Bugfix: Felder werden nicht mehr an die vom NPC unterstützten Kulturen angepasst.
 - Bugfix: 10% Schwelle für die Fertigstellung von Feldarbeits-Missionen.
+
+1.0.0.3:
+- Bugfix: Fahrzeuge mit Anbaugerät erscheinen nun nicht mehr auf Nur-Fahrzeug-Orten
+- Bugfix: Sicherungen beim NPC-Verhalten bei hohen Zeitskalen (> 360), sodass jede Situation mindestens 2min aktiv bleibt.
+- Bugfix: NPC-Anrufe kommen nun auch bei höheren Zeitskalen (> 100)
+- Bugfix: Einstellungsmöglichkeit ergänzt, um die Feldaufträge zwischen klassischem- und realistischen (Telefon) Auftrag umzustellen.
+- Bugfix: Orte auf Standardkarten außerhalb des betretbaren Bereichs entfernt
+- Bugfix: Bei Feldarbeit steht auf der Karte nun nicht mehr "nicht verfügbar".
+- Bugfix: NPCs haben neben der Weltzeit auch die reale Spieldauer im Blick bei ihrer Aufenthaltsdauer.
+- Bugfix: Entfernen von veralteten Fahrzeugen passiert nun automatisch und bei Klick auf den "Mod Daten entfernen" Button
+- Bugfix: Einstellbares Limit für Felder bei Auftragsanrufen, damit Auftragsliste übersichtlich bleibt.
+- Bugfix: Feldbesitz zeigt nun den korrekten Charakter an (insbesondere in dem Missionsreiter)
+- Bugfix: Fehler behoben, bei denen Charaktere nicht visuell sichtbar waren, jedoch ein Gespräch geführt werden konnte.
+- Bugfix: Einstellbarer Schwellwert für Feldmissionen, damit dieser in Sonderfällen herabgesetzt werden kann.
+- Bugfix: Kompatibilität mit Manual Attach Mod ergänzt.
+- Bugfix: Performanceprobleme in Kombination mit Courseplay gelöst.
+- Fehlende Übersetzungen ergänzt.
 ]]></de>
 	</description>
 	<iconFilename>icon_FieldsOfStories.dds</iconFilename>

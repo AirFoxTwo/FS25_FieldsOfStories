@@ -5316,22 +5316,6 @@
             <relRotation>-1.348523</relRotation>
             <collisionExcludeRefId id="115776"/>
         </place>
-        <place id="372" nodeName="electricPole" mapRefNodeId="115698">
-            <name>public_infrastructure at electricPole #4</name>
-            <type>public_infrastructure</type>
-            <x>-329.876404</x>
-            <y>56.932354</y>
-            <z>-1000.260193</z>
-            <rotation>0.169619</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.070890</offsetX>
-            <offsetY>-0.092603</offsetY>
-            <offsetZ>-0.006134</offsetZ>
-            <relRotation>-1.348523</relRotation>
-            <collisionExcludeRefId id="115698"/>
-        </place>
         <place id="373" nodeName="electricPole" mapRefNodeId="116105">
             <name>public_infrastructure at electricPole #6</name>
             <type>public_infrastructure</type>
@@ -5459,22 +5443,6 @@
             <offsetZ>-0.006134</offsetZ>
             <relRotation>-1.348523</relRotation>
             <collisionExcludeRefId id="115947"/>
-        </place>
-        <place id="381" nodeName="electricPole" mapRefNodeId="115784">
-            <name>public_infrastructure at electricPole #18</name>
-            <type>public_infrastructure</type>
-            <x>-637.431763</x>
-            <y>53.432350</y>
-            <z>963.357910</z>
-            <rotation>0.076174</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.070890</offsetX>
-            <offsetY>-0.092603</offsetY>
-            <offsetZ>-0.006134</offsetZ>
-            <relRotation>-1.348523</relRotation>
-            <collisionExcludeRefId id="115784"/>
         </place>
         <place id="382" nodeName="electricPole" mapRefNodeId="115756">
             <name>public_infrastructure at electricPole #19</name>
@@ -5635,22 +5603,6 @@
             <offsetZ>-0.006134</offsetZ>
             <relRotation>-1.348523</relRotation>
             <collisionExcludeRefId id="115770"/>
-        </place>
-        <place id="392" nodeName="electricPole" mapRefNodeId="115700">
-            <name>public_infrastructure at electricPole #31</name>
-            <type>public_infrastructure</type>
-            <x>-335.079010</x>
-            <y>56.932354</y>
-            <z>-949.813171</z>
-            <rotation>0.107967</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.070890</offsetX>
-            <offsetY>-0.092603</offsetY>
-            <offsetZ>-0.006134</offsetZ>
-            <relRotation>-1.348523</relRotation>
-            <collisionExcludeRefId id="115700"/>
         </place>
         <place id="393" nodeName="electricPole" mapRefNodeId="115877">
             <name>public_infrastructure at electricPole #32</name>
@@ -6260,22 +6212,6 @@
             <relRotation>-1.348523</relRotation>
             <collisionExcludeRefId id="116280"/>
         </place>
-        <place id="431" nodeName="electricPole" mapRefNodeId="116245">
-            <name>public_infrastructure at electricPole #78</name>
-            <type>public_infrastructure</type>
-            <x>253.870850</x>
-            <y>72.201294</y>
-            <z>-998.294128</z>
-            <rotation>0.841607</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.070890</offsetX>
-            <offsetY>-0.092603</offsetY>
-            <offsetZ>-0.006134</offsetZ>
-            <relRotation>-1.348523</relRotation>
-            <collisionExcludeRefId id="116245"/>
-        </place>
         <place id="432" nodeName="electricPole" mapRefNodeId="116237">
             <name>public_infrastructure at electricPole #79</name>
             <type>public_infrastructure</type>
@@ -6788,22 +6724,6 @@
             <relRotation>-1.348523</relRotation>
             <collisionExcludeRefId id="115861"/>
         </place>
-        <place id="464" nodeName="electricPole" mapRefNodeId="115786">
-            <name>public_infrastructure at electricPole #138</name>
-            <type>public_infrastructure</type>
-            <x>-640.821289</x>
-            <y>53.432350</y>
-            <z>1012.565796</z>
-            <rotation>0.195846</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.070890</offsetX>
-            <offsetY>-0.092603</offsetY>
-            <offsetZ>-0.006134</offsetZ>
-            <relRotation>-1.348523</relRotation>
-            <collisionExcludeRefId id="115786"/>
-        </place>
         <place id="465" nodeName="electricPole" mapRefNodeId="115780">
             <name>public_infrastructure at electricPole #139</name>
             <type>public_infrastructure</type>
@@ -7172,22 +7092,6 @@
             <relRotation>-1.348523</relRotation>
             <collisionExcludeRefId id="115702"/>
         </place>
-        <place id="488" nodeName="electricPole" mapRefNodeId="115683">
-            <name>public_infrastructure at electricPole #162</name>
-            <type>public_infrastructure</type>
-            <x>-624.619751</x>
-            <y>53.432350</y>
-            <z>964.928833</z>
-            <rotation>0.076174</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.070890</offsetX>
-            <offsetY>-0.092603</offsetY>
-            <offsetZ>-0.006134</offsetZ>
-            <relRotation>-1.348523</relRotation>
-            <collisionExcludeRefId id="115683"/>
-        </place>
         <place id="489" nodeName="electricPole" mapRefNodeId="115675">
             <name>public_infrastructure at electricPole #163</name>
             <type>public_infrastructure</type>
@@ -7315,22 +7219,6 @@
             <offsetZ>-0.006134</offsetZ>
             <relRotation>-1.348523</relRotation>
             <collisionExcludeRefId id="115457"/>
-        </place>
-        <place id="497" nodeName="electricPole" mapRefNodeId="115455">
-            <name>public_infrastructure at electricPole #171</name>
-            <type>public_infrastructure</type>
-            <x>-318.333923</x>
-            <y>56.932354</y>
-            <z>-949.565979</z>
-            <rotation>-3.032766</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.070890</offsetX>
-            <offsetY>-0.092603</offsetY>
-            <offsetZ>-0.006134</offsetZ>
-            <relRotation>-1.348523</relRotation>
-            <collisionExcludeRefId id="115455"/>
         </place>
         <place id="498" nodeName="electricPole" mapRefNodeId="115450">
             <name>public_infrastructure at electricPole #172</name>
@@ -7667,22 +7555,6 @@
             <offsetZ>-0.006134</offsetZ>
             <relRotation>-1.348523</relRotation>
             <collisionExcludeRefId id="116302"/>
-        </place>
-        <place id="519" nodeName="electricPole" mapRefNodeId="115453">
-            <name>public_infrastructure at electricPole #200</name>
-            <type>public_infrastructure</type>
-            <x>-313.829132</x>
-            <y>56.932354</y>
-            <z>-1000.070984</z>
-            <rotation>0.222273</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.070890</offsetX>
-            <offsetY>-0.092603</offsetY>
-            <offsetZ>-0.006134</offsetZ>
-            <relRotation>-1.348523</relRotation>
-            <collisionExcludeRefId id="115453"/>
         </place>
         <place id="520" nodeName="electricPole" mapRefNodeId="116016">
             <name>public_infrastructure at electricPole #201</name>
@@ -18996,22 +18868,6 @@
             <relRotation>0.307377</relRotation>
             <collisionExcludeRefId id="30522"/>
         </place>
-        <place id="1231" referenceFilename="$data/maps/trees/aspen/aspen_stage04.i3d" nodeName="$data/maps/trees/aspen/aspen_stage04.i3d" mapRefNodeId="39205">
-            <name>roadside_trees at $data/maps/trees/aspen/aspen_stage04.i3d #235</name>
-            <type>roadside_trees</type>
-            <x>251.676758</x>
-            <y>73.911880</y>
-            <z>-1003.514038</z>
-            <rotation>0.574212</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>-0.427903</offsetX>
-            <offsetY>-0.135021</offsetY>
-            <offsetZ>0.521573</offsetZ>
-            <relRotation>0.307377</relRotation>
-            <collisionExcludeRefId id="39205"/>
-        </place>
         <place id="1232" referenceFilename="$data/maps/trees/aspen/aspen_stage04.i3d" nodeName="$data/maps/trees/aspen/aspen_stage04.i3d" mapRefNodeId="43207">
             <name>roadside_trees at $data/maps/trees/aspen/aspen_stage04.i3d #236</name>
             <type>roadside_trees</type>
@@ -24339,22 +24195,6 @@
             <offsetZ>0.521573</offsetZ>
             <relRotation>0.307377</relRotation>
             <collisionExcludeRefId id="11426"/>
-        </place>
-        <place id="1565" referenceFilename="$data/maps/trees/aspen/aspen_stage05.i3d" nodeName="$data/maps/trees/aspen/aspen_stage05.i3d" mapRefNodeId="11656">
-            <name>roadside_trees at $data/maps/trees/aspen/aspen_stage05.i3d #147</name>
-            <type>roadside_trees</type>
-            <x>-308.896149</x>
-            <y>57.390278</y>
-            <z>-992.333374</z>
-            <rotation>1.149001</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>-0.427903</offsetX>
-            <offsetY>-0.135021</offsetY>
-            <offsetZ>0.521573</offsetZ>
-            <relRotation>0.307377</relRotation>
-            <collisionExcludeRefId id="11656"/>
         </place>
         <place id="1566" referenceFilename="$data/maps/trees/aspen/aspen_stage05.i3d" nodeName="$data/maps/trees/aspen/aspen_stage05.i3d" mapRefNodeId="34986">
             <name>roadside_trees at $data/maps/trees/aspen/aspen_stage05.i3d #148</name>
@@ -79794,28 +79634,6 @@
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
         </place>
-        <place id="5105">
-            <name>Roadside (auto 15.1)</name>
-            <type>roadside</type>
-            <x>244.304810</x>
-            <y>73.017036</y>
-            <z>-1005.526672</z>
-            <rotation>-2.555803</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5107">
-            <name>Roadside (auto 16.5)</name>
-            <type>roadside</type>
-            <x>514.234436</x>
-            <y>70.117722</y>
-            <z>1018.013977</z>
-            <rotation>3.135136</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
         <place id="5418">
             <name>Roadside (auto 16.7)</name>
             <type>roadside</type>
@@ -79981,17 +79799,6 @@
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
         </place>
-        <place id="5153">
-            <name>Roadside (auto 22.8)</name>
-            <type>roadside</type>
-            <x>-317.443268</x>
-            <y>57.698151</y>
-            <z>-1007.014648</z>
-            <rotation>3.108359</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
         <place id="5155">
             <name>Roadside (auto 27.1)</name>
             <type>roadside</type>
@@ -80146,17 +79953,6 @@
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
         </place>
-        <place id="5227">
-            <name>Roadside (auto 41.10)</name>
-            <type>roadside</type>
-            <x>-325.772400</x>
-            <y>57.727634</y>
-            <z>-989.393799</z>
-            <rotation>-0.095360</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
         <place id="5231">
             <name>Roadside (auto 42.2)</name>
             <type>roadside</type>
@@ -80285,17 +80081,6 @@
             <y>56.066399</y>
             <z>75.519547</z>
             <rotation>1.197388</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5329">
-            <name>Roadside (auto 51.10)</name>
-            <type>roadside</type>
-            <x>238.704361</x>
-            <y>73.041428</y>
-            <z>-1001.042175</z>
-            <rotation>0.587058</rotation>
             <sizeType>vehicle_attachment</sizeType>
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
@@ -82153,28 +81938,6 @@
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
         </place>
-        <place id="5469">
-            <name>Place 5469</name>
-            <type>character_homebase</type>
-            <x>-232.756729</x>
-            <y>59.810669</y>
-            <z>117.572083</z>
-            <rotation>0.008526</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5470">
-            <name>Place 5470</name>
-            <type>character_homebase</type>
-            <x>-237.755951</x>
-            <y>59.854385</y>
-            <z>117.606148</z>
-            <rotation>0.008729</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
         <place id="5471">
             <name>Place 5471</name>
             <type>character_homebase</type>
@@ -82248,6 +82011,28 @@
             <y>60.022449</y>
             <z>79.811386</z>
             <rotation>-0.008967</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5478">
+            <name>Place 5478</name>
+            <type>character_homebase</type>
+            <x>-232.845215</x>
+            <y>59.625427</y>
+            <z>121.791077</z>
+            <rotation>3.132323</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5479">
+            <name>Place 5479</name>
+            <type>character_homebase</type>
+            <x>-233.003693</x>
+            <y>59.905487</y>
+            <z>114.953819</z>
+            <rotation>-0.012759</rotation>
             <sizeType>vehicle_attachment</sizeType>
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
@@ -82345,6 +82130,8 @@
             <placeId id="5469"/>
             <placeId id="5470"/>
             <placeId id="5471"/>
+            <placeId id="5478"/>
+            <placeId id="5479"/>
         </neighbour>
         <neighbour id="17">
             <placeId id="154"/>

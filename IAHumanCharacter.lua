@@ -92,10 +92,13 @@ end
 
 function HumanModelHost:setEngineVisibility(visible)
 	local model = self.model
-	if model == nil or model.setVisibility == nil then
+	if model == nil or model.rootNode == nil then
 		return
 	end
-	model:setVisibility(visible == true)
+	if model.setVisibility then
+		model:setVisibility(visible == true)
+	end
+	iaSetNodeSubtreeVisible(model.rootNode, visible == true)
 end
 
 --- @return boolean false if rig not ready (caller may retry)

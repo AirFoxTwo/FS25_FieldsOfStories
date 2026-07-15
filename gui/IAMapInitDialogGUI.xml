@@ -158,17 +158,22 @@
                             <Bitmap id="characterDetailsBottomClipper" profile="emptyPanel" position="0px 0px" size="100% 6px" imageColor="0 0 0 0"/>
                             <ScrollingLayout profile="ia_mapinit_placeButtonsScrollingLayout" id="characterDetailsScrollingLayout" topClipperElementName="characterDetailsTopClipper" bottomClipperElementName="characterDetailsBottomClipper">
                                 <BoxLayout profile="ia_mapinit_characterDetailsBox" id="characterDetailsBox">
-                                    <Text profile="ia_mapinit_characterDetailText" id="characterDetailName" text="Name: -" />
-                                    <Text profile="ia_mapinit_characterDetailText" id="characterDetailJob" text="Job: -" />
-                                    <Text profile="ia_mapinit_characterDetailText" id="characterDetailRole" text="Role: -" />
+                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailNameHeader" text="$l10n_gui_mapinit_detail_name" />
+                                    <Text profile="ia_mapinit_characterDetailText" id="characterDetailName" text="-" />
+                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailJobHeader" text="$l10n_gui_mapinit_detail_job" />
+                                    <Text profile="ia_mapinit_characterDetailText" id="characterDetailJob" text="-" />
+                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailRoleHeader" text="$l10n_gui_mapinit_detail_role" />
+                                    <Text profile="ia_mapinit_characterDetailText" id="characterDetailRole" text="-" />
+                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailRelationshipHeader" text="$l10n_gui_mapinit_detail_relationship" />
+                                    <Text profile="ia_mapinit_characterDetailText" id="characterDetailRelationship" text="-" />
 
-                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailVehiclesHeader" text="Vehicles" />
+                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailVehiclesHeader" text="$l10n_gui_mapinit_detail_vehicles" />
                                     <Text profile="ia_mapinit_characterDetailText" id="characterDetailVehiclesList" text="-" />
 
-                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailCurrentSituationHeader" text="Current situation" />
+                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailCurrentSituationHeader" text="$l10n_gui_mapinit_detail_current_situation" />
                                     <Text profile="ia_mapinit_characterDetailText" id="characterDetailCurrentSituation" text="-" />
 
-                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailScheduleHeader" text="Planned fieldwork (today)" />
+                                    <Text profile="ia_mapinit_characterDetailHeader" id="characterDetailScheduleHeader" text="$l10n_gui_mapinit_detail_schedule" />
                                     <Text profile="ia_mapinit_characterDetailText" id="characterDetailSchedule" text="-" />
                                 </BoxLayout>
                             </ScrollingLayout>
@@ -179,10 +184,10 @@
 
                         <!-- Character actions -->
                         <BoxLayout profile="ia_mapinit_characterActionsLayout" id="characterActionsLayout">
-                            <Button profile="ia_mapinit_characterActionButton" id="resetCharacterButton" text="RESET Character" onClick="onClickResetCharacter" />
-                            <Button profile="ia_mapinit_characterActionButton" id="deleteCharacterButton" text="DELETE Character" onClick="onClickDeleteCharacter" />
+                            <Button profile="ia_mapinit_characterActionButton" id="resetCharacterButton" text="$l10n_gui_mapinit_reset_character" onClick="onClickResetCharacter" />
+                            <Button profile="ia_mapinit_characterActionButton" id="deleteCharacterButton" text="$l10n_gui_mapinit_delete_character" onClick="onClickDeleteCharacter" />
                             <Button profile="ia_mapinit_characterActionButton" id="addNearestHomebaseButton" text="$l10n_gui_mapinit_add_nearest_homebase" onClick="onClickAddNearestHomebase" />
-                            <Button profile="ia_mapinit_characterActionButton" id="removeHomeplacesButton" text="Remove Homeplaces" onClick="onClickRemoveHomeplaces" />
+                            <Button profile="ia_mapinit_characterActionButton" id="removeHomeplacesButton" text="$l10n_gui_mapinit_remove_homeplaces" onClick="onClickRemoveHomeplaces" />
                         </BoxLayout>
                     </BoxLayout>
                 </BoxLayout>
