@@ -60,6 +60,13 @@ IATestRunner._waitFramesRemaining = 0
 --- Wall-clock deadline for a waitWallClock action.
 IATestRunner._waitWallClockUntil = nil
 
+--- Polling deadline for a waitForLogEvent action.
+IATestRunner._waitLogEventUntil = nil
+--- Category to poll for in waitForLogEvent.
+IATestRunner._waitLogEventCategory = nil
+--- Event to poll for in waitForLogEvent.
+IATestRunner._waitLogEventEvent = nil
+
 --- Game-time target for waitGameMinutes / waitGameHours / waitGameDays.
 IATestRunner._waitGameTimeTarget = nil
 
@@ -71,6 +78,11 @@ IATestRunner._waitConditionLabel = nil
 
 --- true when any assert/fail has been emitted during this test.
 IATestRunner._anyAssertionFailed = false
+
+--- Optional override for the outsourced fieldwork type (contract type) chosen during
+--- rebuildDailyFieldworkSchedule. Set to e.g. "harvest" to force harvest contracts.
+--- Reset to nil in cleanupTestState between batch tests.
+IATestRunner.forceOutsourceType = nil
 
 --- Phase tracking for waitForNaturalContractCall: nil | "advancing" | "waiting".
 IATestRunner._natCallPhase = nil
@@ -237,6 +249,9 @@ function IATestRunner.beginTest(name, keepBuffer)
 	IATestRunner._actionIndex = 0
 	IATestRunner._waitFramesRemaining = 0
 	IATestRunner._waitWallClockUntil = nil
+	IATestRunner._waitLogEventUntil = nil
+	IATestRunner._waitLogEventCategory = nil
+	IATestRunner._waitLogEventEvent = nil
 	IATestRunner._waitGameTimeTarget = nil
 	IATestRunner._waitConditionFn = nil
 	IATestRunner._waitConditionLabel = nil
@@ -359,6 +374,9 @@ function IATestRunner.cleanupTestState()
 	if IASettings ~= nil then
 		IASettings.missionOfferModeIndex = IASettings.MISSION_OFFER_MODE_DEFAULT_INDEX  -- 2 = realistic
 	end
+
+	-- Reset forced outsource type override so subsequent tests use normal random selection
+	IATestRunner.forceOutsourceType = nil
 
 	IATestRunner.emit("test", "cleanup", {})
 end
@@ -599,6 +617,40 @@ function IATestRunner.update(dt)
 		return
 	end
 
+	-- Process log-event polling
+	if IATestRunner._waitLogEventUntil ~= nil then
+		local found = false
+		for _, entry in ipairs(IATestRunner._logLines) do
+			if entry.cat == IATestRunner._waitLogEventCategory and entry.evt == IATestRunner._waitLogEventEvent then
+				found = true
+				break
+			end
+		end
+		if found then
+			IATestRunner.emit("time", "log_event_found", {
+				category = IATestRunner._waitLogEventCategory,
+				event = IATestRunner._waitLogEventEvent,
+			})
+			IATestRunner._waitLogEventUntil = nil
+			IATestRunner._waitLogEventCategory = nil
+			IATestRunner._waitLogEventEvent = nil
+			IATestRunner._advanceActionQueue()
+			return
+		end
+		if (IANeighbours._wallClockSec or 0) >= IATestRunner._waitLogEventUntil then
+			IATestRunner.emit("time", "log_event_timeout", {
+				category = IATestRunner._waitLogEventCategory,
+				event = IATestRunner._waitLogEventEvent,
+			})
+			IATestRunner._waitLogEventUntil = nil
+			IATestRunner._waitLogEventCategory = nil
+			IATestRunner._waitLogEventEvent = nil
+			IATestRunner._advanceActionQueue()
+			return
+		end
+		return  -- still waiting
+	end
+
 	-- Process wall-clock waits
 	if IATestRunner._waitWallClockUntil ~= nil then
 		if (IANeighbours._wallClockSec or 0) < IATestRunner._waitWallClockUntil then
@@ -833,6 +885,19 @@ function IATestRunner._executeAction(action)
 		IATestRunner._waitFramesRemaining = action.frames or 1
 		IATestRunner.emit("time", "wait_frames", { frames = action.frames })
 
+	elseif atype == "waitForLogEvent" then
+		-- Poll the log buffer for a matching category+event within a timeout.
+		-- Uses wall-clock seconds; falls back to 15s if no timeout given.
+		local timeout = action.timeout or 15
+		IATestRunner._waitLogEventUntil = (IANeighbours._wallClockSec or 0) + timeout
+		IATestRunner._waitLogEventCategory = action.category
+		IATestRunner._waitLogEventEvent = action.event
+		IATestRunner.emit("time", "wait_log_event", {
+			category = action.category,
+			event = action.event,
+			timeout = timeout,
+		})
+
 	-- ── Condition Waits ──────────────────────────────────────────
 
 	elseif atype == "waitForNeighbourSituation" then
@@ -1026,7 +1091,7 @@ function IATestRunner._executeAction(action)
 		local failCount = 0
 		local errors = {}
 		local totalCount = 0
-		for _, n in ipairs(IANeighbours.neighbours or {}) do
+		for _, n in pairs(IANeighbours.neighbours or {}) do
 			if n ~= nil and n.enabled and n.initialized then
 				totalCount = totalCount + 1
 				local ok, err = n:forceNewSituation(sitId, true)
@@ -1102,17 +1167,267 @@ function IATestRunner._executeAction(action)
 
 	elseif atype == "forceFieldwork" then
 		local nToken = action.neighbourId or action.neighbourName or "1"
+		local fieldworkType = action.fieldworkType  -- optional: e.g. "grass_mowing", "seed", "lime"
 		local n = IANeighbours:resolveNeighbourForConsoleToken(nToken)
 		if n == nil then
 			IATestRunner.emit("test", "action_error", { error = "neighbour not found: " .. tostring(nToken) })
+		elseif fieldworkType ~= nil then
+			-- Inject a specific fieldwork type as a contract-enabled row into the schedule
+			-- This bypasses the random schedule selection to force a specific contract type
+			local helper = IANeighbours.gameLoopHelper
+			if helper == nil then
+				IATestRunner.emit("test", "action_error", { error = "no gameLoopHelper" })
+			else
+				-- Ensure schedule is initialized first
+				if n.fieldworkScheduleTasks == nil then
+					n.fieldworkScheduleTasks = {}
+				end
+				if n.fieldworkScheduleYear == nil or n.fieldworkScheduleMonth == nil then
+					-- Set schedule date to current game time
+					if g_currentMission ~= nil and g_currentMission.environment ~= nil then
+						local dayTime = g_currentMission.environment:getDayTime()
+						if g_currentMission.environment:getDayTime() ~= nil then
+							-- Just use some reasonable defaults
+							n.fieldworkScheduleYear = 2026
+							n.fieldworkScheduleMonth = 4
+							n.fieldworkScheduleDayInPeriod = 1
+						end
+					end
+				end
+				
+				-- Find the matching situation config
+				local config = nil
+				local configId = nil
+				local configs = helper.situationConfigs or helper.iaFieldworkSituationConfigs or {}
+				if #configs == 0 and IANeighbours.situationConfigs ~= nil then
+					configs = IANeighbours.situationConfigs
+				end
+				-- Also try helper.iaSituationConfigs
+				if #configs == 0 and helper.iaSituationConfigs ~= nil then
+					configs = helper.iaSituationConfigs
+				end
+				local fwLower = string.lower(tostring(fieldworkType))
+				for _, cfg in ipairs(configs) do
+					if cfg ~= nil and cfg.fieldwork ~= nil and string.lower(tostring(cfg.fieldwork)) == fwLower then
+						config = cfg
+						configId = cfg.id
+						break
+					end
+				end
+				
+				if config == nil then
+					-- Try searching in IANeighbours.allSituationConfigs
+					if IANeighbours.allSituationConfigs ~= nil then
+						for _, cfg in ipairs(IANeighbours.allSituationConfigs) do
+							if cfg ~= nil and cfg.fieldwork ~= nil and string.lower(tostring(cfg.fieldwork)) == fwLower then
+								config = cfg
+								configId = cfg.id
+								break
+							end
+						end
+					end
+				end
+				
+				if config == nil then
+					IATestRunner.emit("test", "action_error", { error = "No situation config found for fieldwork type: " .. tostring(fieldworkType) })
+				else
+					-- Find a matching farmland from this neighbour's assigned farmlands
+					local farmlandId = nil
+					if n.assignedFarmlands ~= nil and #n.assignedFarmlands > 0 then
+						if config.triggerFruitTypeIndex ~= nil and #config.triggerFruitTypeIndex > 0 then
+							-- Try to find a field that matches the fruit type requirement
+							if g_farmlandManager ~= nil and type(g_farmlandManager.getFarmlands) == "function" then
+								local allFarmlands = g_farmlandManager:getFarmlands()
+								for _, fl in ipairs(allFarmlands or {}) do
+									if fl ~= nil and fl.field ~= nil and fl.field.fieldState ~= nil then
+										-- Check if this farmland belongs to the neighbour
+										local isAssigned = false
+										for _, aid in ipairs(n.assignedFarmlands) do
+											if aid == fl.id then
+												isAssigned = true
+												break
+											end
+										end
+										if isAssigned then
+											local fruitIdx = fl.field.fieldState.fruitTypeIndex or 0
+											for _, triggerFruit in ipairs(config.triggerFruitTypeIndex) do
+												local resolvedTrigger = triggerFruit
+												if type(resolvedTrigger) == "string" then
+													if IAFieldwork ~= nil and type(IAFieldwork.resolveFruitTypeNameOrIndex) == "function" then
+														resolvedTrigger = IAFieldwork.resolveFruitTypeNameOrIndex(resolvedTrigger)
+													end
+												end
+												if tonumber(resolvedTrigger) == tonumber(fruitIdx) then
+													farmlandId = fl.id
+													break
+												end
+											end
+											if farmlandId ~= nil then break end
+										end
+									end
+								end
+							end
+						end
+						-- Fallback: just use the first assigned farmland
+						if farmlandId == nil then
+							farmlandId = n.assignedFarmlands[1]
+						end
+					end
+					
+					if farmlandId == nil then
+						IATestRunner.emit("test", "action_error", { error = "Neighbour has no assigned farmlands" })
+					else
+						-- Inject a contract-enabled row into the schedule
+						local newRow = {
+							situationId = tostring(configId),
+							farmlandId = farmlandId,
+							contractEnabled = true,
+						}
+						table.insert(n.fieldworkScheduleTasks, newRow)
+						
+						IATestRunner.emit("fieldwork", "force_type", {
+							neighbour = n.name,
+							fieldworkType = fieldworkType,
+							configId = tostring(configId),
+							farmlandId = farmlandId,
+						})
+						
+						print(string.format("[IATestRunner] forceFieldwork: neighbour=%s, type=%s, configId=%s, farmlandId=%d",
+							n.name, fieldworkType, tostring(configId), farmlandId))
+					end
+				end
+			end
 		else
+			-- Original behavior: force a random fieldwork situation
 			local ok, err = n:forceNewFieldworkSituation()
 			IATestRunner.emit("situation", "force_fieldwork", {
-				neighbour = n.name,
-				ok = ok,
-				error = err,
+				neighbour = n.name, ok = ok, error = err,
 			})
 		end
+
+	elseif atype == "forceFieldState" then
+		-- Force a specific field to a given fruit type and growth state for testing
+		-- Parameters: neighbourId/neighbourName (optional), farmlandId (optional), 
+		--              fruitTypeIndex (string or number), growthState (string or number),
+		--              updateVisuals (boolean, default true)
+		local farmlandId = action.farmlandId
+
+		-- Resolve the field
+		if farmlandId == nil then
+			-- Find from neighbour
+			local nToken = action.neighbourId or action.neighbourName
+			local n = nil
+			if nToken ~= nil then
+				n = IANeighbours:resolveNeighbourForConsoleToken(nToken)
+			else
+				-- Auto-discover first farmer neighbour
+				for _, nb in pairs(IANeighbours.neighbours or {}) do
+					if nb ~= nil and nb.initialized and nb.job == "Farmer" and nb.role == "Neighbour"
+						and nb.assignedFarmlands ~= nil and #nb.assignedFarmlands > 0 then
+						n = nb
+						break
+					end
+				end
+			end
+			if n == nil or n.assignedFarmlands == nil or #n.assignedFarmlands == 0 then
+				IATestRunner.emit("field", "force_state_error", { error = "No neighbour with assigned farmlands found" })
+				return
+			end
+			farmlandId = n.assignedFarmlands[1]
+		end
+
+		-- Get the field from farmland
+		local farmland = nil
+		if g_farmlandManager ~= nil and type(g_farmlandManager.getFarmlands) == "function" then
+			local farmlands = g_farmlandManager:getFarmlands()
+			for _, fl in ipairs(farmlands or {}) do
+				if fl ~= nil and fl.id == farmlandId then
+					farmland = fl
+					break
+				end
+			end
+		end
+
+		if farmland == nil or farmland.field == nil or farmland.field.fieldState == nil then
+			IATestRunner.emit("field", "force_state_error", { error = "Farmland " .. tostring(farmlandId) .. " not found or has no field/fieldState" })
+			return
+		end
+
+		local field = farmland.field
+
+		-- Resolve fruit type index
+		local fruitTypeIndex = action.fruitTypeIndex
+		if type(fruitTypeIndex) == "string" then
+			if IAFieldwork ~= nil and type(IAFieldwork.resolveFruitTypeNameOrIndex) == "function" then
+				local resolved = IAFieldwork.resolveFruitTypeNameOrIndex(fruitTypeIndex)
+				if resolved ~= nil then
+					fruitTypeIndex = resolved
+				end
+			end
+			-- Fallback: try game's fruitTypeManager
+			if type(fruitTypeIndex) == "string" and g_fruitTypeManager ~= nil then
+				local fruitTypes = g_fruitTypeManager:getFruitTypes()
+				for _, ft in ipairs(fruitTypes or {}) do
+					if ft ~= nil and ft.name ~= nil and string.upper(tostring(ft.name)) == string.upper(tostring(fruitTypeIndex)) then
+						fruitTypeIndex = ft.index
+						break
+					end
+				end
+			end
+		end
+		fruitTypeIndex = tonumber(fruitTypeIndex) or 0
+
+		-- Resolve growth state
+		local growthState = action.growthState
+		if type(growthState) == "string" then
+			-- Try to resolve via IAFieldwork helper
+			local resolvedGrowth = nil
+			if IAFieldwork ~= nil and type(IAFieldwork.getHarvestReadyGrowthStateForFruit) == "function" then
+				resolvedGrowth = IAFieldwork.getHarvestReadyGrowthStateForFruit(fruitTypeIndex)
+			end
+			if resolvedGrowth ~= nil then
+				growthState = resolvedGrowth
+			else
+				-- Fallback: try to look up from fruitType growthStateToName
+				if IAFieldwork ~= nil and type(IAFieldwork.getFruitGrowthStateNameToIndex) == "function" then
+					-- Use the growth state name lookup if available
+					local gsMap = IAFieldwork.getFruitGrowthStateNameToIndex(fruitTypeIndex)
+					if gsMap ~= nil then
+						local gsLower = string.lower(tostring(action.growthState))
+						for gsName, gsIndex in pairs(gsMap) do
+							if string.lower(tostring(gsName)) == gsLower then
+								growthState = gsIndex
+								break
+							end
+						end
+					end
+				end
+			end
+		end
+		growthState = tonumber(growthState) or 1
+
+		-- Apply the state to the field
+		field.fieldState.fruitTypeIndex = fruitTypeIndex
+		field.fieldState.growthState = growthState
+
+		-- Optionally update visuals (density maps)
+		local updateVisuals = action.updateVisuals
+		if updateVisuals == nil then
+			updateVisuals = true
+		end
+
+		if updateVisuals and IAFieldwork ~= nil and type(IAFieldwork.enqueueSetFieldToCropHarvestReady) == "function" then
+			IAFieldwork.enqueueSetFieldToCropHarvestReady(field, fruitTypeIndex)
+		end
+
+		IATestRunner.emit("field", "force_state", {
+			farmlandId = farmlandId,
+			fruitTypeIndex = fruitTypeIndex,
+			growthState = growthState,
+			updateVisuals = updateVisuals,
+		})
+
+		print(string.format("[IATestRunner] forceFieldState: farmland=%d, fruitTypeIndex=%d, growthState=%d", farmlandId, fruitTypeIndex, growthState))
 
 	elseif atype == "forceScheduleRebuild" then
 		local nToken = action.neighbourId or action.neighbourName
@@ -1135,6 +1450,140 @@ function IATestRunner._executeAction(action)
 		end
 		IATestRunner.emit("schedule", "force_rebuild", { neighbour = nToken })
 
+	elseif atype == "prepareFieldForWork" then
+		-- Find the first farmer neighbour with assigned farmlands and set their
+		-- first field to a plowable state (groundType=2, no crop) so that at
+		-- least one "Plow" fieldwork config matches after a schedule rebuild.
+		local targetN = nil
+		local targetFarmlandId = nil
+		local nToken = action.neighbourId or action.neighbourName
+		if nToken ~= nil then
+			targetN = IANeighbours:resolveNeighbourForConsoleToken(nToken)
+		end
+		if targetN == nil then
+			for _, nb in pairs(IANeighbours.neighbours or {}) do
+				if nb ~= nil and nb.job == "Farmer" and nb.role == "Neighbour"
+					and nb.assignedFarmlands ~= nil and #nb.assignedFarmlands > 0 then
+					targetN = nb
+					break
+				end
+			end
+		end
+		if targetN ~= nil and targetN.assignedFarmlands ~= nil and #targetN.assignedFarmlands > 0 then
+			targetFarmlandId = targetN.assignedFarmlands[1]
+		end
+
+		if targetFarmlandId == nil then
+			IATestRunner.emit("test", "action_error", { error = "no farmer with farmlands found for prepareFieldForWork" })
+			return
+		end
+
+		local farmlands = g_farmlandManager:getFarmlands()
+		local farmland = nil
+		for _, f in pairs(farmlands) do
+			if f ~= nil and f.id == targetFarmlandId then
+				farmland = f
+				break
+			end
+		end
+		if farmland == nil or farmland.field == nil then
+			IATestRunner.emit("test", "action_error", { error = "farmland " .. tostring(targetFarmlandId) .. " has no field" })
+			return
+		end
+
+		local field = farmland.field
+		local state = { groundType = FieldGroundType.PLOWED or 2, fruitTypeIndex = 0 }
+		local ok, task = pcall(IAFieldwork.buildFieldUpdateTaskFromExpectedState, field, state)
+		if ok and task ~= nil then
+			task:enqueue(true)
+			IATestRunner.emit("field", "prepare_for_work", {
+				neighbour = targetN.name,
+				farmlandId = targetFarmlandId,
+				groundType = state.groundType,
+			})
+		else
+			IATestRunner.emit("test", "action_error", { error = "prepareFieldForWork failed: " .. tostring(task) })
+		end
+
+	elseif atype == "prepareFieldForHarvest" then
+		-- Find the first farmer neighbour with assigned farmlands and set their
+		-- first field to a harvest-ready state so that harvest contract tasks
+		-- exist after a schedule rebuild. Uses fruitType from action config,
+		-- defaulting to MAIZE (which triggers harvest_deliver_corn configs).
+		local targetN = nil
+		local targetFarmlandId = nil
+		local nToken = action.neighbourId or action.neighbourName
+		if nToken ~= nil then
+			targetN = IANeighbours:resolveNeighbourForConsoleToken(nToken)
+		end
+		if targetN == nil then
+			for _, nb in pairs(IANeighbours.neighbours or {}) do
+				if nb ~= nil and nb.job == "Farmer" and nb.role == "Neighbour"
+					and nb.assignedFarmlands ~= nil and #nb.assignedFarmlands > 0 then
+					targetN = nb
+					break
+				end
+			end
+		end
+		if targetN ~= nil and targetN.assignedFarmlands ~= nil and #targetN.assignedFarmlands > 0 then
+			targetFarmlandId = targetN.assignedFarmlands[1]
+		end
+
+		if targetFarmlandId == nil then
+			IATestRunner.emit("test", "action_error", { error = "no farmer with farmlands found for prepareFieldForHarvest" })
+			return
+		end
+
+		local farmlands = g_farmlandManager:getFarmlands()
+		local farmland = nil
+		for _, f in pairs(farmlands) do
+			if f ~= nil and f.id == targetFarmlandId then
+				farmland = f
+				break
+			end
+		end
+		if farmland == nil or farmland.field == nil then
+			IATestRunner.emit("test", "action_error", { error = "farmland " .. tostring(targetFarmlandId) .. " has no field" })
+			return
+		end
+
+		local field = farmland.field
+
+		-- Use fruitType from action config, default to MAIZE
+		local fruitName = action.fruitType or "MAIZE"
+		local fruitTypeIndex = IAFieldwork.resolveFruitTypeNameOrIndex(fruitName)
+		if fruitTypeIndex == nil then
+			IATestRunner.emit("test", "action_error", {
+				action = "prepareFieldForHarvest",
+				error = "Could not resolve fruit type: " .. tostring(fruitName)
+			})
+			return
+		end
+		local growthState = IAFieldwork.getHarvestReadyGrowthStateForFruit(fruitTypeIndex)
+		if growthState == nil then
+			IATestRunner.emit("test", "action_error", {
+				action = "prepareFieldForHarvest",
+				error = "Could not get harvest-ready growth state for fruit type: " .. tostring(fruitName)
+			})
+			return
+		end
+		local state = {
+			fruitTypeIndex = fruitTypeIndex,
+			growthState = growthState,
+			weedState = 0,
+		}
+		local ok, task = pcall(IAFieldwork.buildFieldUpdateTaskFromExpectedState, field, state)
+		if ok and task ~= nil then
+			task:enqueue(true)
+			IATestRunner.emit("field", "prepare_for_harvest", {
+				neighbour = targetN.name,
+				farmlandId = targetFarmlandId,
+				fruitType = fruitName,
+			})
+		else
+			IATestRunner.emit("test", "action_error", { error = "prepareFieldForHarvest failed: " .. tostring(task) })
+		end
+
 	elseif atype == "triggerIncomingPhoneRing" then
 		-- Respect mission offer mode: classic mode blocks phone calls
 		if IASettings ~= nil and type(IASettings.isMissionOfferModeClassic) == "function" then
@@ -1146,39 +1595,65 @@ function IATestRunner._executeAction(action)
 				return
 			end
 		end
-		-- Find a suitable farmer neighbour and trigger a synthetic ring
+		-- Find a suitable farmer neighbour with contract-enabled tasks
 		local targetN = nil
 		local ringNid = action.neighbourId or action.neighbourName
 		if ringNid ~= nil then
 			targetN = IANeighbours:resolveNeighbourForConsoleToken(ringNid)
 		else
+			-- Pick the first farmer neighbour with contract-enabled tasks (same logic as console command)
 			for _, nb in pairs(IANeighbours.neighbours or {}) do
 				if nb ~= nil and nb.initialized and nb.role == "Neighbour" and nb.job == "Farmer" then
-					targetN = nb
+					local tasks = nb.fieldworkScheduleTasks
+					if tasks ~= nil then
+						for _, row in ipairs(tasks) do
+							if row ~= nil and row.contractEnabled == true then
+								targetN = nb
+								break
+							end
+						end
+					end
+				end
+				if targetN ~= nil then
 					break
+				end
+			end
+			-- Fallback: any farmer neighbour
+			if targetN == nil then
+				for _, nb in pairs(IANeighbours.neighbours or {}) do
+					if nb ~= nil and nb.initialized and nb.role == "Neighbour" and nb.job == "Farmer" then
+						targetN = nb
+						break
+					end
 				end
 			end
 		end
 		if targetN == nil then
 			IATestRunner.emit("phone", "ring_fail", { reason = "no eligible neighbour" })
 		else
-			local conv = IAConversation.new()
-			if conv ~= nil then
-				-- Build a minimal conversation for testing
-				conv.isStandalonePhoneCall = true
-				local payload = {
-					neighbourId = targetN.id,
-					neighbourName = targetN.name,
-					conversation = conv,
-					isContractFieldMissionOffer = false,
-					skipGlobalInboundWallClock = true,  -- don't set cooldown in tests
-				}
-				local ok = IANeighbours.tryShowIncomingPhoneRing(targetN, payload)
-				IATestRunner.emit("phone", "ring_triggered", {
-					neighbour = targetN.name,
-					ok = ok,
-				})
+			-- Reset per-neighbour daily state so onContractCallTimeTriggered isn't blocked
+			-- (same as consoleCommandIaTriggerNextCall)
+			targetN.contractCallRingAnsweredToday = false
+			targetN.contractCallRingOpensCount = 0
+			targetN.contractCallLastRingScheduleKey = nil
+			targetN.contractCallLastRingTotalMinutes = nil
+			targetN.contractCallTriggerFiredForScheduleKey = nil
+
+			-- Clear any pending ring and global cooldown (same as console command)
+			if IANeighbours._incomingPhonePayload ~= nil then
+				IANeighbours.clearPendingIncomingPhoneOffer(IANeighbours.IncomingCallEndReason.DECLINED)
 			end
+			IANeighbours._globalInboundPhoneCooldownUntilWallClockSec = 0
+
+			-- Use the natural contract call flow (same as iaTriggerNextCall)
+			local ok, err = pcall(function()
+				targetN:onContractCallTimeTriggered()
+			end)
+			IATestRunner.emit("phone", "ring_triggered", {
+				neighbour = targetN.name,
+				ok = ok and not err,
+				error = (not ok) and tostring(err) or nil,
+			})
 		end
 
 	elseif atype == "answerPhone" then
@@ -1186,11 +1661,11 @@ function IATestRunner._executeAction(action)
 		if p ~= nil then
 			-- First stop the ring sound and clear the pending state
 			IANeighbours.stopIncomingCallRingSound()
-			IANeighbours.incomingPhoneRingDialogOpen = true
 			IATestRunner.emit("phone", "answer", { neighbour = p.neighbourName })
 			-- Then actually answer
 			IANeighbours.answerIncomingPhoneFromPayload(p)
 			IANeighbours.clearPendingIncomingPhoneOffer(IANeighbours.IncomingCallEndReason.ANSWERED)
+			IANeighbours.incomingPhoneRingDialogOpen = false
 		else
 			IATestRunner.emit("phone", "answer_fail", { reason = "no pending payload" })
 		end
@@ -1205,6 +1680,15 @@ function IATestRunner._executeAction(action)
 		if g_gui ~= nil and g_gui.currentDialog ~= nil then
 			g_gui:closeDialog(g_gui.currentDialog)
 			IATestRunner.emit("ui", "dialog_closed", {})
+			-- Also clean up any active standalone phone conversation state
+			if IANeighbours ~= nil and type(IANeighbours.activeStandalonePhoneConversation) == "table" then
+				local conv = IANeighbours.activeStandalonePhoneConversation
+				if type(conv.stop) == "function" then
+					conv:stop(true)
+				end
+				IANeighbours.activeStandalonePhoneConversation = nil
+				IANeighbours.activeStandalonePhoneNeighbourId = nil
+			end
 		end
 
 	elseif atype == "triggerGameSave" then
@@ -1297,12 +1781,40 @@ function IATestRunner._executeAction(action)
 			local th = getTerrainHeightAtWorldPos(g_terrainNode, x, 0, z)
 			if th ~= nil then vy = th + 1.0 end
 		end
-		-- FS25 API: teleportTo (confirmed in EasyDevControls)
+
+		-- Eject from vehicle if player is in one (character controller blocks teleport)
+		if g_localPlayer.getIsInVehicle ~= nil and g_localPlayer:getIsInVehicle() then
+			if g_localPlayer.vehicle ~= nil and g_localPlayer.vehicle.getCharacterOut ~= nil then
+				pcall(function() g_localPlayer.vehicle:getCharacterOut(g_localPlayer) end)
+			end
+		end
+
+		-- Always try the API (may help with game-logic state), then force position via rootNode
 		if g_localPlayer.teleportTo ~= nil then
-			g_localPlayer:teleportTo(x, vy, z)
-			IATestRunner.emit("player", "teleport", { x = x, y = vy, z = z })
+			pcall(g_localPlayer.teleportTo, g_localPlayer, x, vy, z, true, true)
+			print(string.format("[IATestRunner] teleportPlayerTo: API teleport to (%.1f, %.1f, %.1f)", x, vy, z))
+		end
+
+		-- Always force position via setWorldTranslation (this is what actually works in FS25)
+		if g_localPlayer.rootNode ~= nil then
+			setWorldTranslation(g_localPlayer.rootNode, x, vy + 0.1, z)
+		end
+
+		-- Verify using getPosition() (game-logic character position, not node transform)
+		local px, py, pz = 0, 0, 0
+		if g_localPlayer.getPosition ~= nil then
+			px, py, pz = g_localPlayer:getPosition()
 		else
-			IATestRunner.emit("player", "teleport_fail", { reason = "teleportTo not available" })
+			px, py, pz = getWorldTranslation(g_localPlayer.rootNode)
+		end
+		local dx = math.abs(px - x)
+		local dz = math.abs(pz - z)
+		if dx > 10.0 or dz > 10.0 then
+			print(string.format("[IATestRunner] teleportPlayerTo: FAILED - player at (%.1f, %.1f) but target was (%.1f, %.1f)", px, pz, x, z))
+			IATestRunner.emit("player", "teleport_fail", { reason = "player did not move to target position", targetX = x, targetZ = z, actualX = px, actualZ = pz })
+		else
+			print(string.format("[IATestRunner] teleportPlayerTo: SUCCESS - player at (%.1f, %.1f)", px, pz))
+			IATestRunner.emit("player", "teleport", { x = x, y = vy, z = z })
 		end
 
 	elseif atype == "teleportPlayerToNeighbour" then
@@ -1339,13 +1851,681 @@ function IATestRunner._executeAction(action)
 			local th = getTerrainHeightAtWorldPos(g_terrainNode, nx, 0, nz)
 			if th ~= nil then ty = th + 1.0 end
 		end
-		-- FS25 API: teleportTo (confirmed in EasyDevControls)
-		if g_localPlayer.teleportTo ~= nil then
-			g_localPlayer:teleportTo(nx + 3, ty, nz + 3)
-			IATestRunner.emit("player", "teleport_to_neighbour", { neighbour = n.name, x = nx + 3, z = nz + 3 })
-		else
-			IATestRunner.emit("player", "teleport_fail", { neighbour = n.name, reason = "teleportTo not available" })
+		local targetX = nx + 3
+		local targetZ = nz + 3
+
+		-- Eject from vehicle if player is in one (character controller blocks teleport)
+		if g_localPlayer.getIsInVehicle ~= nil and g_localPlayer:getIsInVehicle() then
+			if g_localPlayer.vehicle ~= nil and g_localPlayer.vehicle.getCharacterOut ~= nil then
+				pcall(function() g_localPlayer.vehicle:getCharacterOut(g_localPlayer) end)
+			end
 		end
+
+		-- Always try the API (may help with game-logic state), then force position via rootNode
+		if g_localPlayer.teleportTo ~= nil then
+			pcall(g_localPlayer.teleportTo, g_localPlayer, targetX, ty, targetZ, true, true)
+			print(string.format("[IATestRunner] teleportPlayerToNeighbour: API teleport to (%.1f, %.1f, %.1f)", targetX, ty, targetZ))
+		end
+
+		-- Always force position via setWorldTranslation (this is what actually works in FS25)
+		if g_localPlayer.rootNode ~= nil then
+			setWorldTranslation(g_localPlayer.rootNode, targetX, ty + 0.1, targetZ)
+		end
+
+		-- Verify using getPosition() (game-logic character position, not node transform)
+		local px, py, pz = 0, 0, 0
+		if g_localPlayer.getPosition ~= nil then
+			px, py, pz = g_localPlayer:getPosition()
+		else
+			px, py, pz = getWorldTranslation(g_localPlayer.rootNode)
+		end
+		local dx = math.abs(px - targetX)
+		local dz = math.abs(pz - targetZ)
+		if dx > 10.0 or dz > 10.0 then
+			print(string.format("[IATestRunner] teleportPlayerToNeighbour: FAILED - player at (%.1f, %.1f) but target was (%.1f, %.1f)", px, pz, targetX, targetZ))
+			IATestRunner.emit("player", "teleport_fail", { neighbour = n.name, reason = "player did not move to target position", targetX = targetX, targetZ = targetZ, actualX = px, actualZ = pz })
+		else
+			print(string.format("[IATestRunner] teleportPlayerToNeighbour: SUCCESS - %s at (%.1f, %.1f)", n.name or "?", px, pz))
+			IATestRunner.emit("player", "teleport_to_neighbour", { neighbour = n.name, x = targetX, z = targetZ })
+		end
+
+	elseif atype == "teleportToField" then
+		-- Teleport player to the center of a neighbour's assigned farmland field.
+		-- Uses the same neighbour resolution as prepareFieldForHarvest.
+		-- Parameters:
+		--   neighbourId    (string, optional) → specific neighbour
+		--   neighbourName  (string, optional) → specific neighbour by name
+		--   farmlandIndex  (number, default 1) → 1-based index into assignedFarmlands
+		local targetN = nil
+		local targetFarmlandId = nil
+		local nToken = action.neighbourId or action.neighbourName
+		if nToken ~= nil then
+			targetN = IANeighbours:resolveNeighbourForConsoleToken(nToken)
+		end
+		if targetN == nil then
+			for _, nb in pairs(IANeighbours.neighbours or {}) do
+				if nb ~= nil and nb.job == "Farmer" and nb.role == "Neighbour"
+					and nb.assignedFarmlands ~= nil and #nb.assignedFarmlands > 0 then
+					targetN = nb
+					break
+				end
+			end
+		end
+		if targetN ~= nil and targetN.assignedFarmlands ~= nil and #targetN.assignedFarmlands > 0 then
+			local idx = action.farmlandIndex or 1
+			targetFarmlandId = targetN.assignedFarmlands[idx]
+		end
+
+		if targetFarmlandId == nil then
+			IATestRunner.emit("test", "action_error", { error = "no farmer with farmlands found for teleportToField" })
+			return
+		end
+
+		local farmlands = g_farmlandManager:getFarmlands()
+		local farmland = nil
+		for _, f in pairs(farmlands) do
+			if f ~= nil and f.id == targetFarmlandId then
+				farmland = f
+				break
+			end
+		end
+		if farmland == nil or farmland.field == nil then
+			IATestRunner.emit("test", "action_error", { error = "farmland " .. tostring(targetFarmlandId) .. " has no field" })
+			return
+		end
+
+		local field = farmland.field
+		local cx, cz = nil, nil
+
+		-- Primary: vanilla FS25 API
+		if type(field.getCenterOfFieldWorldPosition) == "function" then
+			cx, cz = field:getCenterOfFieldWorldPosition()
+		end
+		-- Fallback: direct properties
+		if (cx == nil or cz == nil) and field.posX ~= nil and field.posZ ~= nil then
+			cx, cz = field.posX, field.posZ
+		end
+
+		if cx == nil or cz == nil then
+			IATestRunner.emit("test", "action_error", { error = "could not resolve field center for farmland " .. tostring(targetFarmlandId) })
+			return
+		end
+
+		-- Get terrain height for Y
+		local ty = 0
+		if g_terrainNode ~= nil and getTerrainHeightAtWorldPos ~= nil then
+			local th = getTerrainHeightAtWorldPos(g_terrainNode, cx, 0, cz)
+			if th ~= nil then ty = th + 1.0 end
+		end
+
+		if g_localPlayer == nil then return end
+
+		-- Eject from vehicle if player is in one (character controller blocks teleport)
+		if g_localPlayer.getIsInVehicle ~= nil and g_localPlayer:getIsInVehicle() then
+			if g_localPlayer.vehicle ~= nil and g_localPlayer.vehicle.getCharacterOut ~= nil then
+				pcall(function() g_localPlayer.vehicle:getCharacterOut(g_localPlayer) end)
+			end
+		end
+
+		-- Always try the API (may help with game-logic state), then force position via rootNode
+		if g_localPlayer.teleportTo ~= nil then
+			pcall(g_localPlayer.teleportTo, g_localPlayer, cx, ty, cz, true, true)
+			print(string.format("[IATestRunner] teleportToField: API teleport to (%.1f, %.1f, %.1f)", cx, ty, cz))
+		end
+
+		-- Always force position via setWorldTranslation (this is what actually works in FS25)
+		if g_localPlayer.rootNode ~= nil then
+			setWorldTranslation(g_localPlayer.rootNode, cx, ty + 0.1, cz)
+		end
+
+		-- Verify using getPosition() (game-logic character position, not node transform)
+		local px, py, pz = 0, 0, 0
+		if g_localPlayer.getPosition ~= nil then
+			px, py, pz = g_localPlayer:getPosition()
+		else
+			px, py, pz = getWorldTranslation(g_localPlayer.rootNode)
+		end
+		local dx = math.abs(px - cx)
+		local dz = math.abs(pz - cz)
+		if dx > 10.0 or dz > 10.0 then
+			print(string.format("[IATestRunner] teleportToField: FAILED - player at (%.1f, %.1f) but target was (%.1f, %.1f)", px, pz, cx, cz))
+			IATestRunner.emit("player", "teleport_fail", { reason = "player did not move to field center", targetX = cx, targetZ = cz, actualX = px, actualZ = pz, farmlandId = targetFarmlandId })
+		else
+			print(string.format("[IATestRunner] teleportToField: SUCCESS - field %d at (%.1f, %.1f)", targetFarmlandId, px, pz))
+			IATestRunner.emit("player", "teleport_to_field", { farmlandId = targetFarmlandId, neighbour = targetN.name, x = cx, z = cz })
+		end
+
+	elseif atype == "teleportPlayerHarvesterToField" then
+			-- Teleport the player's harvester (combine) + attached cutter/header to a field.
+			-- Uses the same field resolution as teleportToField.
+			-- Parameters:
+			--   neighbourId    (string, optional) → whose farmland to use
+			--   neighbourName  (string, optional) → whose farmland to use by name
+			--   farmlandIndex  (number, default 1) → 1-based index into assignedFarmlands
+			--   rotation       (number, default 0) → vehicle yaw on field
+
+			-- 1. Resolve field (identical to teleportToField)
+			local targetN = nil
+			local targetFarmlandId = nil
+			local nToken = action.neighbourId or action.neighbourName
+			if nToken ~= nil then
+				targetN = IANeighbours:resolveNeighbourForConsoleToken(nToken)
+			end
+			if targetN == nil then
+				for _, nb in pairs(IANeighbours.neighbours or {}) do
+					if nb ~= nil and nb.job == "Farmer" and nb.role == "Neighbour"
+						and nb.assignedFarmlands ~= nil and #nb.assignedFarmlands > 0 then
+						targetN = nb
+						break
+					end
+				end
+			end
+			if targetN ~= nil and targetN.assignedFarmlands ~= nil and #targetN.assignedFarmlands > 0 then
+				local idx = action.farmlandIndex or 1
+				targetFarmlandId = targetN.assignedFarmlands[idx]
+			end
+
+			if targetFarmlandId == nil then
+				IATestRunner.emit("test", "action_error", { error = "no farmer with farmlands found for teleportPlayerHarvesterToField" })
+				return
+			end
+
+			local farmlands = g_farmlandManager:getFarmlands()
+			local farmland = nil
+			for _, f in pairs(farmlands) do
+				if f ~= nil and f.id == targetFarmlandId then
+					farmland = f
+					break
+				end
+			end
+			if farmland == nil or farmland.field == nil then
+				IATestRunner.emit("test", "action_error", { error = "farmland " .. tostring(targetFarmlandId) .. " has no field" })
+				return
+			end
+
+			local field = farmland.field
+			local cx, cz = nil, nil
+			if type(field.getCenterOfFieldWorldPosition) == "function" then
+				cx, cz = field:getCenterOfFieldWorldPosition()
+			end
+			if (cx == nil or cz == nil) and field.posX ~= nil and field.posZ ~= nil then
+				cx, cz = field.posX, field.posZ
+			end
+			if cx == nil or cz == nil then
+				IATestRunner.emit("test", "action_error", { error = "could not resolve field center for farmland " .. tostring(targetFarmlandId) })
+				return
+			end
+
+			local targetRot = action.rotation or 0
+
+			-- 2. Find player-owned harvester / combine
+			local playerFarmId = nil
+			if g_currentMission ~= nil and type(g_currentMission.getFarmId) == "function" then
+				playerFarmId = g_currentMission:getFarmId()
+			end
+			if playerFarmId == nil and g_currentMission ~= nil and g_currentMission.playerSystem ~= nil
+				and g_currentMission.playerSystem.localPlayer ~= nil then
+				local lp = g_currentMission.playerSystem.localPlayer
+				if lp.farmId ~= nil then
+					playerFarmId = lp.farmId
+				end
+			end
+			if playerFarmId == nil then
+				playerFarmId = 1
+			end
+
+			local harvester = nil
+			local harvesterTypeName = nil
+			if g_currentMission ~= nil and g_currentMission.vehicleSystem ~= nil then
+				for _, v in pairs(g_currentMission.vehicleSystem.vehicles) do
+					if v ~= nil then
+						local ownerFarmId = nil
+						if type(v.getOwnerFarmId) == "function" then
+							ownerFarmId = v:getOwnerFarmId()
+						end
+						if ownerFarmId == playerFarmId then
+							-- Check via spec_combine first (most reliable)
+							if v.spec_combine ~= nil then
+								harvester = v
+								harvesterTypeName = "combine"
+								break
+							end
+							-- Fallback: typeName string match
+							local tn = v.typeName and string.lower(tostring(v.typeName)) or ""
+							if tn == "combine" or tn == "harvester" or tn == "forageharvesters" then
+								harvester = v
+								harvesterTypeName = tn
+								break
+							end
+						end
+					end
+				end
+			end
+
+			if harvester == nil then
+				IATestRunner.emit("vehicle", "harvester_not_found", {
+					reason = "no player-owned harvester/combine found",
+					playerFarmId = playerFarmId,
+				})
+				print(string.format("[IATestRunner] teleportPlayerHarvesterToField: FAILED - no player harvester found (farmId=%d)", playerFarmId))
+				return
+			end
+
+			-- 3. Teleport harvester to field with offset from player position
+			-- The player is teleported to field center by teleportToField.
+			-- Place the harvester at an offset so they don't overlap.
+			local playerOffset = action.playerOffset or 25  -- meters to the right of field center
+			local hx = cx + playerOffset
+			local hz = cz
+
+			local ty = 0
+			if g_terrainNode ~= nil and getTerrainHeightAtWorldPos ~= nil then
+				local th = getTerrainHeightAtWorldPos(g_terrainNode, hx, 0, hz)
+				if th ~= nil then ty = th + 0.2 end
+			end
+
+			-- Eject player if sitting in the harvester (teleport may fail otherwise)
+			if g_localPlayer ~= nil and g_localPlayer.getIsInVehicle ~= nil and g_localPlayer:getIsInVehicle() then
+				if g_localPlayer.vehicle == harvester then
+					if harvester.getCharacterOut ~= nil then
+						pcall(function() harvester:getCharacterOut(g_localPlayer) end)
+					end
+				end
+			end
+
+			-- Stop AI if active (teleport while AI running can cause issues)
+			if harvester.getIsAIActive ~= nil and harvester:getIsAIActive() then
+				pcall(function()
+					harvester:stopCurrentAIJob(AIMessageSuccessStoppedByUser.new())
+				end)
+			end
+
+			-- Teleport following the Reconcile pattern from IAEquipmentPresence.Reconcile.executeDiff:
+			-- detach → hide → prepareForTeleport → teleport parent → teleport child → show parent → attach → show child
+			local okTeleport = false
+			local attachedImplements = {}
+			local headerObj = nil
+			local headerAttachJoint = nil
+			local headerAttachIndex = nil
+			local headerAttacherNode = nil  -- node on harvester side
+			local headerHookNode = nil      -- node on header side
+			pcall(function()
+				-- ── Reconcile Step 1: Detach — identify the real header (cutter), not the trailer ──
+				-- Collect all directly-attached implements from the harvester.
+				if harvester.getAttachedImplements ~= nil and type(harvester.getAttachedImplements) == "function" then
+					local okAtt, list = pcall(function() return harvester:getAttachedImplements() end)
+					if okAtt and list ~= nil then
+						for _, entry in pairs(list) do
+							local obj = entry
+							if type(entry) == "table" and entry.object ~= nil then
+								obj = entry.object
+							end
+							if obj ~= nil then
+								table.insert(attachedImplements, obj)
+							end
+						end
+					end
+				end
+
+				-- Identify the header: it has spec_combineCutter or spec_cutter.
+				-- The header trailer does NOT have these specs.
+				for _, obj in ipairs(attachedImplements) do
+					if obj ~= nil and (obj.spec_combineCutter ~= nil or obj.spec_cutter ~= nil) then
+						headerObj = obj
+						break
+					end
+				end
+
+				-- If header not found directly, it may be sitting on the header trailer.
+				-- Search each implement's own attached implements for the cutter.
+				if headerObj == nil then
+					for _, obj in ipairs(attachedImplements) do
+						if obj ~= nil and obj.getAttachedImplements ~= nil
+							and type(obj.getAttachedImplements) == "function" then
+							local okSub, subList = pcall(function() return obj:getAttachedImplements() end)
+							if okSub and subList ~= nil then
+								for _, subEntry in pairs(subList) do
+									local subObj = subEntry
+									if type(subEntry) == "table" and subEntry.object ~= nil then
+										subObj = subEntry.object
+									end
+									if subObj ~= nil and (subObj.spec_combineCutter ~= nil or subObj.spec_cutter ~= nil) then
+										headerObj = subObj
+										-- Detach header from trailer first
+										if obj.getImplementIndexByObject ~= nil then
+											local okIdx, impIdx = pcall(function()
+												return obj:getImplementIndexByObject(subObj)
+											end)
+											if okIdx and impIdx ~= nil then
+												pcall(function() obj:detachImplement(impIdx, true) end)
+											end
+										end
+										break
+									end
+								end
+							end
+						end
+						if headerObj ~= nil then break end
+					end
+				end
+
+				-- Remember front-attachment joint info for the header (for reattach later).
+				if headerObj ~= nil then
+					local joint, idx, aNode, hNode = identifyAttachmentJointFront(headerObj, harvester)
+					if joint ~= nil and idx ~= nil then
+						headerAttachJoint = joint
+						headerAttachIndex = idx
+						headerAttacherNode = aNode
+						headerHookNode = hNode
+					end
+					-- If header is still directly attached to harvester, detach it now.
+					if harvester.getImplementIndexByObject ~= nil then
+						local okIdx, impIdx = pcall(function()
+							return harvester:getImplementIndexByObject(headerObj)
+						end)
+						if okIdx and impIdx ~= nil then
+							pcall(function() harvester:detachImplement(impIdx, true) end)
+						end
+					end
+				end
+
+				-- Detach remaining implements (trailers etc.) from harvester.
+				for _, obj in ipairs(attachedImplements) do
+					if obj ~= nil and obj ~= headerObj then
+						if harvester.getImplementIndexByObject ~= nil then
+							local okIdx, impIdx = pcall(function()
+								return harvester:getImplementIndexByObject(obj)
+							end)
+							if okIdx and impIdx ~= nil then
+								pcall(function() harvester:detachImplement(impIdx, true) end)
+							end
+						end
+					end
+				end
+
+				-- ── Reconcile Step 2: Hide both (removePhysics + setVisibility false) ──
+				-- Match mech_hide(): removeFromPhysics first, then setVisibility(false)
+				harvester:removeFromPhysics()
+				harvester:setVisibility(false)
+				for _, obj in ipairs(attachedImplements) do
+					pcall(function() obj:removeFromPhysics() end)
+					pcall(function() obj:setVisibility(false) end)
+				end
+
+				-- ── Reconcile Step 3: prepareForTeleport ──
+				-- Match mech_prepareForTeleport(): fold combine pipe, unfold header if needed
+				if type(IAHelper_foldCombinePipeIn) == "function" then
+					pcall(function() IAHelper_foldCombinePipeIn(harvester) end)
+				end
+				-- Unfold header/cutter when unattached (same as shouldBeUnfoldedWhenUnattached)
+				for _, obj in ipairs(attachedImplements) do
+					if obj ~= nil and obj.spec_combineCutter ~= nil then
+						pcall(function()
+							if obj.setFoldState ~= nil then
+								obj:setFoldState(0, false)  -- unfold
+							end
+						end)
+					end
+				end
+				-- Also unfold headerObj if it was found on a trailer (not in attachedImplements)
+				if headerObj ~= nil and headerObj.spec_combineCutter ~= nil then
+					pcall(function()
+						if headerObj.setFoldState ~= nil then
+							headerObj:setFoldState(0, false)  -- unfold
+						end
+					end)
+				end
+
+				-- ── Reconcile Step 4: Teleport harvester (parent) ──
+				-- Match mech_teleportToPose(): removeFromPhysics (already done), set position,
+				-- only addToPhysics if visible (which is false, so skip — show will do it).
+				local terrainY = (g_terrainNode ~= nil and getTerrainHeightAtWorldPos ~= nil)
+					and getTerrainHeightAtWorldPos(g_terrainNode, hx, 0, hz) or ty
+				local isNearTerrain = (math.abs(ty - terrainY) <= 1.0)
+				if isNearTerrain and harvester.setWorldPosition ~= nil then
+					harvester:setRelativePosition(hx, 0.5, hz, targetRot, true)
+				else
+					setTranslation(harvester.rootNode, hx, ty, hz)
+					setRotation(harvester.rootNode, 0, targetRot, 0)
+				end
+
+				-- ── Reconcile Step 5: Teleport header (child) ──
+				-- Position header at calculated attachment-aligned world coords.
+				-- Do NOT add physics / show yet — attach + show will handle that.
+				for _, obj in ipairs(attachedImplements) do
+					if obj ~= nil and obj ~= headerObj then
+						local impX = hx + 5
+						local impZ = hz
+						local impY = ty
+						pcall(function()
+							setTranslation(obj.rootNode, impX, impY, impZ)
+							setRotation(obj.rootNode, 0, targetRot, 0)
+						end)
+					end
+				end
+				if headerObj ~= nil and headerAttacherNode ~= nil and headerHookNode ~= nil then
+					local headerX, headerY, headerZ = calculateAttachmentRootPosition2(
+						harvester.rootNode, headerObj.rootNode,
+						headerAttacherNode, headerHookNode
+					)
+					if headerX ~= nil and headerZ ~= nil then
+						if headerY == nil or headerY < ty then
+							headerY = ty
+						end
+						pcall(function()
+							setTranslation(headerObj.rootNode, headerX, headerY, headerZ)
+							setRotation(headerObj.rootNode, 0, targetRot, 0)
+						end)
+					end
+				end
+
+				-- ── Reconcile Step 6: Show harvester (parent) ──
+				-- Match mech_show(): addToPhysics first, then setVisibility(true)
+				harvester:addToPhysics()
+				harvester:setVisibility(true)
+
+				-- ── Reconcile Step 7: Reattach header (child) ──
+				if headerObj ~= nil and headerAttachJoint ~= nil and headerAttachIndex ~= nil then
+					-- [COMPAT] ManualAttach: prevent auto-detach of PTO/hoses
+					pcall(function()
+						if headerObj.spec_manualAttachPowerTakeOff then
+							headerObj.spec_manualAttachPowerTakeOff.isBlockingInitialPtoDetach = true
+						end
+					end)
+					pcall(function()
+						if headerObj.spec_manualAttachConnectionHoses then
+							headerObj.spec_manualAttachConnectionHoses.isBlockingInitialHoseDetach = true
+						end
+					end)
+					pcall(function()
+						harvester:attachImplement(headerObj, headerAttachJoint, headerAttachIndex, true, nil, nil, false)
+					end)
+				end
+
+				-- ── Reconcile Step 8: Show child implements ──
+				-- Now that the header is attached, show all implements.
+				for _, obj in ipairs(attachedImplements) do
+					pcall(function() obj:addToPhysics() end)
+					pcall(function() obj:setVisibility(true) end)
+				end
+
+				okTeleport = true
+			end)
+
+			-- Start motor
+			if okTeleport then
+				pcall(function() harvester:startMotor(true) end)
+			end
+
+			-- Verify teleport against offset position (not field center)
+			local vx, _, vz = getWorldTranslation(harvester.rootNode)
+			local dx = math.abs(vx - hx)
+			local dz = math.abs(vz - hz)
+			if dx > 10.0 or dz > 10.0 then
+				print(string.format("[IATestRunner] teleportPlayerHarvesterToField: FAILED - harvester at (%.1f, %.1f) but target was (%.1f, %.1f)", vx, vz, hx, hz))
+				IATestRunner.emit("vehicle", "harvester_teleport_fail", {
+					reason = "harvester did not move to target position",
+					targetX = hx, targetZ = hz, actualX = vx, actualZ = vz,
+					farmlandId = targetFarmlandId,
+					harvesterTypeName = harvesterTypeName,
+				})
+			else
+				print(string.format("[IATestRunner] teleportPlayerHarvesterToField: SUCCESS - %s on field %d at (%.1f, %.1f) offset=%.0fm", harvesterTypeName or "harvester", targetFarmlandId, vx, vz, playerOffset))
+				IATestRunner.emit("vehicle", "harvester_teleported", {
+					farmlandId = targetFarmlandId,
+					neighbour = targetN.name,
+					harvesterTypeName = harvesterTypeName,
+					x = hx, y = ty, z = hz,
+					rotation = targetRot,
+					playerOffset = playerOffset,
+				})
+			end
+
+	elseif atype == "positionCameraForScreenshot" then
+		-- Position the player (camera) at a controlled offset relative to a target vehicle.
+		-- Parameters:
+		--   targetExternalId (string, required) → vehicle's externalId
+		--   offsetForward    (number, default -15) → meters in vehicle's forward direction (negative = behind)
+		--   offsetRight      (number, default 0)   → meters to vehicle's right
+		--   offsetUp         (number, default 4)    → meters above vehicle position
+		--   lookAtForward    (number, default 0)    → look-at point offset forward from vehicle center
+		-- This action only positions the player; add a separate takeScreenshot action afterwards.
+		if g_localPlayer == nil then return end
+		if g_localPlayer.teleportTo == nil then return end
+		local targetExternalId = action.targetExternalId
+		if targetExternalId == nil then
+			IATestRunner.emit("camera", "position_fail", { reason = "missing targetExternalId" })
+			return
+		end
+		local offsetForward = action.offsetForward or -15
+		local offsetRight = action.offsetRight or 0
+		local offsetUp = action.offsetUp or 4
+		local lookAtForward = action.lookAtForward or 0
+
+		-- Find vehicle by externalId across all neighbours
+		local foundIA = nil
+		local foundNeighbourName = nil
+		if IANeighbours ~= nil and IANeighbours.neighbours ~= nil then
+			for _, n in pairs(IANeighbours.neighbours) do
+				if n ~= nil and n.getVehicleByExternalId ~= nil then
+					local ia = n:getVehicleByExternalId(targetExternalId)
+					if ia ~= nil then
+						foundIA = ia
+						foundNeighbourName = n.name
+						break
+					end
+				end
+			end
+		end
+		if foundIA == nil then
+			IATestRunner.emit("camera", "position_fail", { reason = "vehicle_not_found", externalId = targetExternalId })
+			return
+		end
+
+		-- Check vehicle has a rootNode
+		local rootNode = foundIA.vehicle ~= nil and foundIA.vehicle.rootNode or nil
+		if rootNode == nil or not entityExists(rootNode) then
+			IATestRunner.emit("camera", "position_fail", { reason = "vehicle_not_loaded", externalId = targetExternalId })
+			return
+		end
+
+		-- Get vehicle world position
+		local vx, vy, vz = getWorldTranslation(rootNode)
+
+		-- Get vehicle forward direction and yaw
+		local canComputeYaw = (localDirectionToWorld ~= nil and MathUtil ~= nil and MathUtil.getYRotationFromDirection ~= nil)
+		local vehicleYaw = 0
+		if canComputeYaw then
+			local fwdX, _, fwdZ = localDirectionToWorld(rootNode, 0, 0, 1)
+			vehicleYaw = MathUtil.getYRotationFromDirection(fwdX, fwdZ)
+		end
+
+		-- Compute camera world position using getWorldPositionFromYawLocalOffset
+		local cameraX, cameraY, cameraZ
+		if getWorldPositionFromYawLocalOffset ~= nil then
+			cameraX, cameraY, cameraZ = getWorldPositionFromYawLocalOffset(
+				vx, vy, vz, vehicleYaw,
+				offsetRight, offsetUp, offsetForward
+			)
+		else
+			-- Fallback: simple offset without rotation
+			cameraX = vx + offsetRight
+			cameraY = vy + offsetUp
+			cameraZ = vz + offsetForward
+		end
+
+		-- Clamp Y to terrain height to prevent underground placement
+		if g_terrainNode ~= nil and getTerrainHeightAtWorldPos ~= nil then
+			local th = getTerrainHeightAtWorldPos(g_terrainNode, cameraX, 0, cameraZ)
+			if th ~= nil then
+				cameraY = math.max(cameraY, th + 0.5)
+			end
+		end
+
+		-- Teleport player to camera position
+		if g_localPlayer.teleportTo ~= nil then
+			-- Try FS25 API first (may silently fail)
+			pcall(function() g_localPlayer:teleportTo(cameraX, cameraY, cameraZ, true, true) end)
+		end
+		-- Force via setWorldTranslation (this ACTUALLY works in FS25)
+		if g_localPlayer.rootNode ~= nil then
+			setWorldTranslation(g_localPlayer.rootNode, cameraX, cameraY + 0.1, cameraZ)
+		end
+
+		-- Compute look-at yaw/pitch to face vehicle
+		local lookYaw = vehicleYaw
+		local lookPitch = 0
+		if canComputeYaw and getWorldPositionFromYawLocalOffset ~= nil then
+			local lookX, lookY, lookZ = getWorldPositionFromYawLocalOffset(
+				vx, vy, vz, vehicleYaw,
+				0, 0, lookAtForward
+			)
+			local dx = lookX - cameraX
+			local dy = lookY - cameraY
+			local dz = lookZ - cameraZ
+			if dx ~= 0 or dz ~= 0 then
+				-- Get pitch/yaw to face the target
+				local rawPitch, rawYaw = MathUtil.directionToPitchYaw(dx, dy, dz)
+
+				-- Guard against NaN (can happen if vehicle world position is invalid)
+				lookPitch = rawPitch
+				lookYaw = rawYaw
+				if lookPitch ~= lookPitch then
+					lookPitch = -0.3 -- safe default: slight downward angle
+				end
+				if lookYaw ~= lookYaw then
+						-- NaN guard: compute direction from camera to vehicle center
+						lookYaw = MathUtil.getYRotationFromDirection(vx - cameraX, vz - cameraZ)
+				end
+
+				-- Use camera API to set the camera rotation (this actually works!)
+				if g_localPlayer.camera ~= nil and g_localPlayer.camera.setRotation ~= nil then
+					g_localPlayer.camera:setRotation(lookPitch, lookYaw, 0)
+				else
+					-- Fallback: rotate player model (less effective but better than nothing)
+					if setWorldRotation ~= nil and g_localPlayer.rootNode ~= nil and entityExists(g_localPlayer.rootNode) then
+						local flatYaw = MathUtil.getYRotationFromDirection(dx, dz)
+						setWorldRotation(g_localPlayer.rootNode, 0, flatYaw, 0)
+					else
+						IATestRunner.emit("camera", "rotation_skipped", {
+							reason = "no camera API and no player root node available"
+						})
+					end
+				end
+			end
+		end
+
+		IATestRunner.emit("camera", "positioned", {
+			externalId = targetExternalId,
+			neighbour = foundNeighbourName,
+			x = cameraX,
+			y = cameraY,
+			z = cameraZ,
+			pitch = lookPitch,
+			yaw = lookYaw,
+			vehicleX = vx,
+			vehicleZ = vz
+		})
 
 	-- ── State Snapshots ──────────────────────────────────────────
 
@@ -1361,6 +2541,49 @@ function IATestRunner._executeAction(action)
 
 	elseif atype == "setTimeScale" then
 		IATestRunner.setTimeScale(action.scale or 1)
+
+	-- ── Debug: Dump Neighbour Fleet ─────────────────────────────
+
+	elseif atype == "debugDumpNeighbourFleet" then
+		local nToken = action.neighbourId or action.neighbourName
+		local n = nil
+		if nToken ~= nil then
+			n = IANeighbours:resolveNeighbourForConsoleToken(nToken)
+		end
+		if n == nil then
+			-- Fallback to first farmer neighbour
+			for _, nb in pairs(IANeighbours.neighbours or {}) do
+				if nb ~= nil and nb.job == "Farmer" and nb.role == "Neighbour" then
+					n = nb
+					nToken = nToken or tostring(nb.id)
+					break
+				end
+			end
+		end
+		if n ~= nil then
+			local vehicleCount = 0
+			for _, v in pairs(n.vehicles or {}) do
+				if v ~= nil then
+					vehicleCount = vehicleCount + 1
+					IATestRunner.emit("debug", "fleet_vehicle", {
+						type = v.type,
+						category = v.category,
+						uniqueId = v.uniqueId,
+						isBorrowedByPlayer = v.isBorrowedByPlayer,
+						activeSituationId = v.activeSituationId,
+					})
+				end
+			end
+			IATestRunner.emit("debug", "fleet_summary", {
+				neighbour = nToken,
+				vehicleCount = vehicleCount,
+			})
+		else
+			IATestRunner.emit("debug", "fleet_summary", {
+				neighbour = "none",
+				vehicleCount = 0,
+			})
+		end
 
 	-- ── Assertions ──────────────────────────────────────────────
 
@@ -1438,6 +2661,155 @@ function IATestRunner._executeAction(action)
 			actual = tostring(actual),
 		})
 
+	elseif atype == "assertState" then
+		-- Assert on a runtime field of IANeighbours (e.g. _activeConversationKind).
+		-- Supported conditions: isNil, notNil, equals, notEquals.
+		local field = action.field
+		local condition = action.condition or "notNil"
+		local expected = action.value
+		local actual = IANeighbours[field]
+
+		local ok = true
+		if condition == "isNil" then
+			ok = (actual == nil)
+		elseif condition == "notNil" then
+			ok = (actual ~= nil)
+		elseif condition == "equals" then
+			ok = (tostring(actual) == tostring(expected))
+		elseif condition == "notEquals" then
+			ok = (tostring(actual) ~= tostring(expected))
+		end
+
+		if not ok then
+			IATestRunner._anyAssertionFailed = true
+		end
+		IATestRunner.emit("assert", ok and "pass" or "fail", {
+			condition = condition,
+			field = field,
+			expected = tostring(expected),
+			actual = tostring(actual),
+		})
+
+	elseif atype == "assertHomebaseParking" then
+		-- Validate homebase parking rules for all neighbours
+		local neighbourTarget = action.neighbourId or action.neighbourName
+		local checkedNeighbours = 0
+		local checkedVehicles = 0
+		local errors = {}
+
+		local function check(ok, msg)
+			if not ok then
+				table.insert(errors, msg)
+				IATestRunner._anyAssertionFailed = true
+				IATestRunner.emit("test", "assert/fail", { condition = "homebaseParking", detail = msg })
+			else
+				IATestRunner.emit("test", "assert/pass", { condition = "homebaseParking", detail = msg })
+			end
+		end
+
+		-- Determine oversize vehicle types (same as IAHomebaseParking:isOversizeVehicleType / classifyIASlotKind)
+		local oversizeTypes = {
+			combine = true,
+			greenbeanharvesters = true,
+			peaharvesters = true,
+			spinachharvesters = true,
+			beetharvesters = true,
+			beetloading = true,
+			forageharvesters = true,
+		}
+
+		local vehicleTypes = {
+			car = true,
+			tractor = true,
+			["tractor large"] = true,
+		}
+
+		-- Try to get the parking instance for place lookup
+		local parking = IANeighbours and IANeighbours.gameLoopHelper and IANeighbours.gameLoopHelper.homebaseParking
+		local places = IANeighbours and IANeighbours.places or {}
+
+		-- Iterate all neighbours
+for _, n in pairs(IANeighbours.neighbours or {}) do
+			if n ~= nil and n.enabled and n.initialized then
+				if neighbourTarget == nil or n.name == neighbourTarget or tostring(n.id) == tostring(neighbourTarget) then
+					checkedNeighbours = checkedNeighbours + 1
+
+					for _, ia in pairs(n.vehicles or {}) do
+						-- Skip vehicles in active situations
+						if ia.activeSituationId == nil or ia.activeSituationId == "" then
+							-- Skip hidden vehicles (couldn't get a parking spot)
+							local presenceState = ia.presenceState
+							if not (presenceState and presenceState.mode == "hidden") then
+								checkedVehicles = checkedVehicles + 1
+								local typeName = ia.typeName or "unknown"
+								local typeNameLower = typeName and string.lower(tostring(typeName))
+								local placeId = ia.parkingPlaceId
+								local semantic = ia.parkingPlaceSemantic
+								local extId = ia.externalId or ia.uniqueId
+
+								-- Check 1: Must have a parking place assigned
+								check(placeId ~= nil and placeId ~= "",
+									string.format("[%s] vehicle=%s(%s) missing parkingPlaceId (semantic=%s)", n.name, extId, typeName, tostring(semantic)))
+
+								if placeId and placeId ~= "" then
+									-- Determine the kind of place by looking it up
+									local placeKind = "unknown"
+									for _, p in ipairs(places) do
+										if p ~= nil and p.id == placeId then
+											if p.sizeType ~= nil and string.lower(tostring(p.sizeType)) == "oversize_vehicle" then
+												placeKind = "oversize"
+											elseif p.withVehicle and not p.withAttachment then
+												placeKind = "vehicle"
+											elseif p.withAttachment then
+												placeKind = "attachment"
+											end
+											break
+										end
+									end
+
+									-- Check 2: Oversize vehicles must be on oversize places
+									if typeNameLower and oversizeTypes[typeNameLower] then
+										check(placeKind == "oversize",
+											string.format("[%s] vehicle=%s(%s) OVERSIZE should be on oversize place but got kind=%s (placeId=%s)", n.name, extId, typeName, placeKind, tostring(placeId)))
+									end
+
+									-- Check 3: Regular vehicles must be on vehicle places (not oversize)
+									if typeNameLower and vehicleTypes[typeNameLower] then
+										check(placeKind == "vehicle",
+											string.format("[%s] vehicle=%s(%s) VEHICLE should be on vehicle place but got kind=%s (placeId=%s)", n.name, extId, typeName, placeKind, tostring(placeId)))
+									end
+
+									-- Check 4: Headers must be on same place as their trailer
+									local headerTrailerId = ia.headerTrailerExternalId
+									if headerTrailerId and headerTrailerId ~= "" then
+										local trailerIa = nil
+										for _, via in pairs(n.vehicles or {}) do
+											if tostring(via.externalId) == tostring(headerTrailerId) then
+												trailerIa = via
+												break
+											end
+										end
+										if trailerIa then
+											check(trailerIa.parkingPlaceId == ia.parkingPlaceId,
+												string.format("[%s] HEADER %s(%s) on placeId=%s but TRAILER %s(%s) on placeId=%s - NOT SAME SPOT!", n.name, extId, typeName, tostring(ia.parkingPlaceId), tostring(trailerIa.externalId or trailerIa.uniqueId), tostring(trailerIa.typeName or "unknown"), tostring(trailerIa.parkingPlaceId)))
+										else
+											IATestRunner.emit("test", "assert/skip", { condition = "homebaseParking", detail = string.format("[%s] HEADER %s has headerTrailer=%s but trailer not found in vehicles", n.name, extId, headerTrailerId) })
+										end
+									end
+								end
+							end  -- not hidden
+						end  -- activeSituationId nil/empty
+					end  -- for ia in pairs(n.vehicles)
+				end  -- neighbourTarget match
+			end  -- n ~= nil, enabled, initialized
+		end  -- for n in ipairs(neighbours)
+
+		if #errors == 0 then
+			IATestRunner.emit("test", "action", { action = "assertHomebaseParking", result = "pass", neighboursChecked = checkedNeighbours, vehiclesChecked = checkedVehicles })
+		else
+			IATestRunner.emit("test", "action", { action = "assertHomebaseParking", result = "fail", neighboursChecked = checkedNeighbours, vehiclesChecked = checkedVehicles, errorCount = #errors })
+		end
+
 	elseif atype == "assertAllNeighboursField" then
 		local field = action.field
 		-- Alias-Mappings (identisch zu assertNeighbourState)
@@ -1450,7 +2822,7 @@ function IATestRunner._executeAction(action)
 		local expected = action.expected
 		local cond = action.condition or "notNil"
 		local failedList = {}
-		for _, n in ipairs(IANeighbours.neighbours or {}) do
+		for _, n in pairs(IANeighbours.neighbours or {}) do
 			if n ~= nil and n.initialized then
 				local actual = nil
 				-- Computed fields
@@ -1494,19 +2866,15 @@ function IATestRunner._executeAction(action)
 			["ANIMAL_DEALER"] = true,
 		}
 
-		-- Resolve player farm ID so we can skip player-owned farmlands.
-		-- Player-owned farmlands and farmlands without fields use base-game NPCs
-		-- (GRANDPA, FARMER, HELPER) which are not managed by this mod.
-		local playerFarmId = nil
-		if g_currentMission ~= nil and g_currentMission.player ~= nil then
-			playerFarmId = g_currentMission.player.farmId
-		end
+		-- We only check farmlands where (isOwned == false or farmId == 99), which
+		-- matches the condition used in IANeighbours:updateFarmlands(). Farmlands
+		-- where isOwned == true and farmId ~= 99 are player-owned or base-game NPC
+		-- farms (GRANDPA, FARMER, HELPER) and are not managed by this mod.
 
 		local farmlands = g_farmlandManager:getFarmlands()
 		local totalFarmlands = 0
 		local farmlandsWithField = 0
-		local skippedPlayerFarmlands = 0
-		local skippedFarmId99 = 0
+		local skippedBaseOwnedFarmlands = 0
 		local farmlandsChecked = 0
 		local farmlandsWithNpc = 0
 		local invalidNpcIndexCount = 0
@@ -1521,14 +2889,11 @@ function IATestRunner._executeAction(action)
 			if farmland.field ~= nil then
 				farmlandsWithField = farmlandsWithField + 1
 
-				-- Skip player-owned farmlands (the player's starting farm uses base-game NPCs)
-				if playerFarmId ~= nil and farmland.farmId == playerFarmId then
-					skippedPlayerFarmlands = skippedPlayerFarmlands + 1
-				-- Skip base-game NPC-owned farmlands (farmId=99, managed by the base game)
-				elseif farmland.farmId == 99 then
-					skippedFarmId99 = skippedFarmId99 + 1
-				else
-					farmlandsChecked = farmlandsChecked + 1
+				-- Skip farmlands owned by player or base-game NPCs (isOwned == true, farmId ~= 99)
+					if farmland.isOwned == true and farmland.farmId ~= 99 then
+						skippedBaseOwnedFarmlands = skippedBaseOwnedFarmlands + 1
+					else
+						farmlandsChecked = farmlandsChecked + 1
 					local npcIndex = farmland.npcIndex
 
 					-- Check 1: npcIndex must not be 0 or 99
@@ -1578,8 +2943,7 @@ function IATestRunner._executeAction(action)
 		IATestRunner.emit("assert", allOk and "pass" or "fail", {
 			totalFarmlands = totalFarmlands,
 			farmlandsWithField = farmlandsWithField,
-			skippedPlayerFarmlands = skippedPlayerFarmlands,
-			skippedFarmId99 = skippedFarmId99,
+			skippedBaseOwnedFarmlands = skippedBaseOwnedFarmlands,
 			farmlandsChecked = farmlandsChecked,
 			farmlandsWithValidNpc = farmlandsWithNpc,
 			invalidNpcIndexCount = invalidNpcIndexCount,
@@ -1613,6 +2977,13 @@ function IATestRunner._executeAction(action)
 		elseif key == "contractCallsPerDayIndex" then
 			IASettings.contractCallsPerDayIndex = tonumber(val) or 3
 			valStr = tostring(IASettings.contractCallsPerDayIndex)
+		elseif key == "forceOutsourceType" then
+			if val ~= nil and val ~= "" then
+				IATestRunner.forceOutsourceType = tostring(val)
+			else
+				IATestRunner.forceOutsourceType = nil
+			end
+			valStr = tostring(IATestRunner.forceOutsourceType or "nil")
 		else
 			IATestRunner.emit("action_error", "unknown_key", { key = key })
 			return
@@ -1631,11 +3002,19 @@ function IATestRunner._executeAction(action)
 			IATestRunner.emit("mission", "accept_fail", { reason = "no gameLoopHelper" })
 			return
 		end
+		local fieldworkFilter = action.fieldwork  -- optional, e.g. "grass_mowing"
 		local targetN = nil
 		local targetOpenList = nil
 		local nid = action.neighbourId or action.neighbourName
 		if nid ~= nil then
 			targetN = IANeighbours:resolveNeighbourForConsoleToken(nid)
+		end
+		if targetN == nil then
+			-- First try the active phone conversation's neighbour
+			local phoneNid = IANeighbours.activeStandalonePhoneNeighbourId
+			if phoneNid ~= nil then
+				targetN = IANeighbours:resolveNeighbourForConsoleToken(phoneNid)
+			end
 		end
 		if targetN == nil then
 			-- Find first farmer neighbour with contract-enabled schedule tasks
@@ -1644,8 +3023,17 @@ function IATestRunner._executeAction(action)
 					and nb.fieldworkScheduleTasks ~= nil then
 					for _, row in ipairs(nb.fieldworkScheduleTasks) do
 						if row ~= nil and row.contractEnabled == true then
-							targetN = nb
-							break
+							local matchesFilter = true
+							if fieldworkFilter ~= nil then
+								local rowConfig = h:findSituationConfigById(row.situationId)
+								local rowFieldwork = rowConfig ~= nil and rowConfig.fieldwork ~= nil
+									and string.lower(tostring(rowConfig.fieldwork)) or ""
+								matchesFilter = (rowFieldwork == string.lower(tostring(fieldworkFilter)))
+							end
+							if matchesFilter then
+								targetN = nb
+								break
+							end
 						end
 					end
 					if targetN ~= nil then
@@ -1671,29 +3059,46 @@ function IATestRunner._executeAction(action)
 					table.insert(diagParts, string.format("%s(sch=%d,ctr=%d,fld=%d)", tostring(nb.name or "?"), schedLen, contractCount, farmlandCount))
 				end
 			end
-			IATestRunner.emit("mission", "accept_fail", { reason = "no neighbour with contract tasks", diag = table.concat(diagParts, " ") })
+			local failReason = "no neighbour with contract tasks"
+			if fieldworkFilter ~= nil then
+				failReason = "no neighbour with contract tasks matching fieldwork filter '" .. tostring(fieldworkFilter) .. "'"
+			end
+			IATestRunner.emit("mission", "accept_fail", { reason = failReason, diag = table.concat(diagParts, " ") })
 			return
 		end
 
-		-- Build open fieldwork list from contract-enabled schedule rows
+		-- Build open fieldwork list from contract-enabled schedule rows,
+		-- optionally filtered by fieldwork type
 		local openList = {}
 		for _, row in ipairs(targetN.fieldworkScheduleTasks) do
 			if row ~= nil and row.contractEnabled == true then
 				local config = h:findSituationConfigById(row.situationId)
 				if config ~= nil then
-					local entry = {
-						farmlandId = row.farmlandId,
-						config = config,
-						nextCropFruitTypeIndex = row.seedFruitTypeIndex,
-						neighbourFirstName = targetN.name,
-						neighbourId = targetN.id,
-					}
-					table.insert(openList, entry)
+					local matchesFilter = true
+					if fieldworkFilter ~= nil then
+						local rowFieldwork = config.fieldwork ~= nil
+							and string.lower(tostring(config.fieldwork)) or ""
+						matchesFilter = (rowFieldwork == string.lower(tostring(fieldworkFilter)))
+					end
+					if matchesFilter then
+						local entry = {
+							farmlandId = row.farmlandId,
+							config = config,
+							nextCropFruitTypeIndex = row.seedFruitTypeIndex,
+							neighbourFirstName = targetN.name,
+							neighbourId = targetN.id,
+						}
+						table.insert(openList, entry)
+					end
 				end
 			end
 		end
 		if #openList == 0 then
-			IATestRunner.emit("mission", "accept_fail", { reason = "no open fieldwork rows resolved" })
+			local failReason = "no open fieldwork rows resolved"
+			if fieldworkFilter ~= nil then
+				failReason = "no open fieldwork rows resolved matching fieldwork filter '" .. tostring(fieldworkFilter) .. "'"
+			end
+			IATestRunner.emit("mission", "accept_fail", { reason = failReason })
 			return
 		end
 
@@ -1745,6 +3150,142 @@ function IATestRunner._executeAction(action)
 				})
 			end
 		end
+
+	elseif atype == "acceptMission" then
+		-- Find a farmer neighbour with contract-enabled schedule tasks and accept a
+		-- field-outcome mission without borrowed equipment. Uses the game loop helper
+		-- to create missions via createAndRegisterFieldMissionsForOpenFieldworkList.
+		local h = IANeighbours ~= nil and IANeighbours.gameLoopHelper or nil
+		if h == nil then
+			IATestRunner.emit("mission", "accept_fail", { reason = "no gameLoopHelper" })
+			return
+		end
+		local fieldworkFilter = action.fieldwork  -- optional, e.g. "grass_mowing"
+		local targetN = nil
+		local targetOpenList = nil
+		local nid = action.neighbourId or action.neighbourName
+		if nid ~= nil then
+			targetN = IANeighbours:resolveNeighbourForConsoleToken(nid)
+		end
+		if targetN == nil then
+			-- First try the active phone conversation's neighbour
+			local phoneNid = IANeighbours.activeStandalonePhoneNeighbourId
+			if phoneNid ~= nil then
+				targetN = IANeighbours:resolveNeighbourForConsoleToken(phoneNid)
+			end
+		end
+		if targetN == nil then
+			-- Find first farmer neighbour with contract-enabled schedule tasks
+			for _, nb in pairs(IANeighbours.neighbours or {}) do
+				if nb ~= nil and nb.initialized and nb.job == "Farmer" and nb.role == "Neighbour"
+					and nb.fieldworkScheduleTasks ~= nil then
+					for _, row in ipairs(nb.fieldworkScheduleTasks) do
+						if row ~= nil and row.contractEnabled == true then
+							local matchesFilter = true
+							if fieldworkFilter ~= nil then
+								local rowConfig = h:findSituationConfigById(row.situationId)
+								local rowFieldwork = rowConfig ~= nil and rowConfig.fieldwork ~= nil
+									and string.lower(tostring(rowConfig.fieldwork)) or ""
+								matchesFilter = (rowFieldwork == string.lower(tostring(fieldworkFilter)))
+							end
+							if matchesFilter then
+								targetN = nb
+								break
+							end
+						end
+					end
+					if targetN ~= nil then
+						break
+					end
+				end
+			end
+		end
+		if targetN == nil then
+			local diagParts = {}
+			for _, nb in pairs(IANeighbours.neighbours or {}) do
+				if nb ~= nil and nb.initialized and nb.job == "Farmer" and nb.role == "Neighbour" then
+					local schedLen = nb.fieldworkScheduleTasks ~= nil and #nb.fieldworkScheduleTasks or 0
+					local contractCount = 0
+					if nb.fieldworkScheduleTasks ~= nil then
+						for _, row in ipairs(nb.fieldworkScheduleTasks) do
+							if row ~= nil and row.contractEnabled == true then
+								contractCount = contractCount + 1
+							end
+						end
+					end
+					local farmlandCount = nb.assignedFarmlands ~= nil and #nb.assignedFarmlands or 0
+					table.insert(diagParts, string.format("%s(sch=%d,ctr=%d,fld=%d)", tostring(nb.name or "?"), schedLen, contractCount, farmlandCount))
+				end
+			end
+			local failReason = "no neighbour with contract tasks"
+			if fieldworkFilter ~= nil then
+				failReason = "no neighbour with contract tasks matching fieldwork filter '" .. tostring(fieldworkFilter) .. "'"
+			end
+			IATestRunner.emit("mission", "accept_fail", { reason = failReason, diag = table.concat(diagParts, " ") })
+			return
+		end
+
+		-- Build open fieldwork list from contract-enabled schedule rows,
+		-- optionally filtered by fieldwork type
+		local openList = {}
+		for _, row in ipairs(targetN.fieldworkScheduleTasks) do
+			if row ~= nil and row.contractEnabled == true then
+				local config = h:findSituationConfigById(row.situationId)
+				if config ~= nil then
+					local matchesFilter = true
+					if fieldworkFilter ~= nil then
+						local rowFieldwork = config.fieldwork ~= nil
+							and string.lower(tostring(config.fieldwork)) or ""
+						matchesFilter = (rowFieldwork == string.lower(tostring(fieldworkFilter)))
+					end
+					if matchesFilter then
+						local entry = {
+							farmlandId = row.farmlandId,
+							config = config,
+							nextCropFruitTypeIndex = row.seedFruitTypeIndex,
+							neighbourFirstName = targetN.name,
+							neighbourId = targetN.id,
+						}
+						table.insert(openList, entry)
+					end
+				end
+			end
+		end
+		if #openList == 0 then
+			local failReason = "no open fieldwork rows resolved"
+			if fieldworkFilter ~= nil then
+				failReason = "no open fieldwork rows resolved matching fieldwork filter '" .. tostring(fieldworkFilter) .. "'"
+			end
+			IATestRunner.emit("mission", "accept_fail", { reason = failReason })
+			return
+		end
+
+		local farmId = IABorrowAccess ~= nil and IABorrowAccess.getPlayerFarmId ~= nil
+			and IABorrowAccess.getPlayerFarmId() or 1
+
+		local maxCount = action.maxCount
+
+		IATestRunner.emit("mission", "accept_started", {
+			neighbour = targetN.name,
+			openListCount = #openList,
+		})
+
+		local added, started = h:createAndRegisterFieldMissionsForOpenFieldworkList(openList, farmId, true, maxCount)
+
+		if added == nil or added <= 0 then
+			IATestRunner.emit("mission", "accept_fail", {
+				reason = "createAndRegisterFieldMissionsForOpenFieldworkList returned zero missions",
+				added = added or 0,
+				started = started or 0,
+			})
+			return
+		end
+
+		IATestRunner.emit("mission", "accept_success", {
+			neighbour = targetN.name,
+			added = added,
+			started = started,
+		})
 
 	elseif atype == "cancelMissionBorrowSession" then
 		-- Cancel/end all active borrow sessions, unborrowing vehicles back to homebase.
@@ -1851,10 +3392,505 @@ function IATestRunner._executeAction(action)
 			end
 		end
 
+	elseif atype == "forceDeliverySpawn" then
+		-- Directly test silo spawning at a neighbour's delivery point, bypassing mission pipeline
+		local nToken = action.neighbourId or action.neighbourName or "1"
+		local n = IANeighbours:resolveNeighbourForConsoleToken(nToken)
+		if n == nil then
+			-- Auto-discover first farmer neighbour
+			for _, nb in pairs(IANeighbours.neighbours or {}) do
+				if nb ~= nil and nb.initialized and nb.job == "Farmer" and nb.role == "Neighbour" then
+					n = nb
+					break
+				end
+			end
+		end
+		if n == nil then
+			IATestRunner.emit("test", "action_error", { error = "No farmer neighbour found" })
+			return
+		end
+
+		-- Find the delivery position using the delivery helper
+		local fx, fy, fz, place = nil, nil, nil, nil
+		if IAPlaceableHelper ~= nil and type(IAPlaceableHelper.findLargeAreaFarmPlace) == "function" then
+			place = IAPlaceableHelper.findLargeAreaFarmPlace(n)
+			if place ~= nil then
+				fx = place.x or 0
+				fy = (place.y or 0) + 1.0
+				fz = place.z or 0
+			end
+		end
+
+		if fx == nil then
+			IATestRunner.emit("test", "action_error", { error = "No delivery farm place found for neighbour: " .. tostring(n.name) })
+			return
+		end
+
+		print(string.format("[IATestRunner] forceDeliverySpawn: neighbour=%s, pos=(%.1f, %.1f, %.1f), placeId=%s",
+			n.name, fx, fy, fz, tostring(place.id)))
+
+		-- Spawn the silo
+		if IAPlaceableHelper ~= nil and type(IAPlaceableHelper.spawnPlaceable) == "function" then
+			local farmId = g_currentMission ~= nil and type(g_currentMission.getFarmId) == "function" and g_currentMission:getFarmId() or 1
+			local rotationY = 0
+			if place ~= nil and place.rotation ~= nil then
+				rotationY = place.rotation
+			end
+
+			-- Store delivery position for teleportToDeliveryPoint to use later
+			local helperStore = IATestRunner._deliverySpawnData or {}
+			helperStore.x = fx
+			helperStore.y = fy
+			helperStore.z = fz
+			IATestRunner._deliverySpawnData = helperStore
+
+			IAPlaceableHelper.spawnPlaceable(
+				IAFieldOutcomeDeliveryHelper.DELIVERY_SILO_XML or "data/placeables/mapUS/storage/storage.xml",
+				fx, fy, fz, rotationY, farmId,
+				function(placeable, errorMsg, args)
+					if placeable ~= nil then
+						IATestRunner.emit("delivery", "silo_spawned", {
+							neighbour = n.name,
+							x = fx, y = fy, z = fz,
+						})
+						print("[IATestRunner] Silo spawned successfully at delivery point")
+					else
+						IATestRunner.emit("test", "action_error", { error = "Failed to spawn silo: " .. tostring(errorMsg) })
+						print("[IATestRunner] Failed to spawn silo: " .. tostring(errorMsg))
+					end
+				end
+			)
+		else
+			IATestRunner.emit("test", "action_error", { error = "IAPlaceableHelper not available" })
+		end
+
+	-- ── Teleport ─────────────────────────────────────────────────
+
+	elseif atype == "teleportPlayer" then
+		-- Teleport the player to (x, y, z) for test verification
+		local x = a.x or 0
+		local y = a.y or 0
+		local z = a.z or 0
+		if g_currentMission ~= nil and g_currentMission.player ~= nil then
+			local playerNode = g_currentMission.player.rootNode or g_currentMission.player.node
+			if playerNode ~= nil then
+				setWorldTranslation(playerNode, x, y, z)
+				print(string.format("[IATestRunner] Teleported player to (%.1f, %.1f, %.1f)", x, y, z))
+			else
+				print("[IATestRunner] teleportPlayer: player node is nil")
+			end
+		else
+			print("[IATestRunner] teleportPlayer: g_currentMission or player is nil")
+		end
+
+	elseif atype == "teleportToDeliveryPoint" then
+		-- Teleport the player to the delivery spawn point stored by forceDeliverySpawn / spawnSiloAtCharacterLargeArea
+		if IATestRunner._deliverySpawnData ~= nil then
+			local spawnData = IATestRunner._deliverySpawnData
+			if g_localPlayer ~= nil and g_localPlayer.teleportTo ~= nil then
+				g_localPlayer:teleportTo(spawnData.x, spawnData.y, spawnData.z)
+				print(string.format("[IATestRunner] Teleported to delivery point (from spawnData) (%.1f, %.1f, %.1f)", spawnData.x, spawnData.y, spawnData.z))
+			elseif g_currentMission.player ~= nil then
+				local playerNode = g_currentMission.player.rootNode or g_currentMission.player.node
+				if playerNode ~= nil then
+					setWorldTranslation(playerNode, spawnData.x, spawnData.y, spawnData.z)
+					print(string.format("[IATestRunner] Teleported (fallback setWorldTranslation) to delivery point (from spawnData) (%.1f, %.1f, %.1f)", spawnData.x, spawnData.y, spawnData.z))
+				end
+			end
+		else
+			print("[IATestRunner] teleportToDeliveryPoint: no spawn data available (run forceDeliverySpawn or spawnSiloAtCharacterLargeArea first)")
+		end
+
+	elseif atype == "spawnSiloAtCharacterLargeArea" then
+		-- Standalone test: spawn a silo at a character's large area farm place
+		-- Parameters:
+		--   neighbourId (optional) → neighbour id string
+		--   neighbourName (optional) → neighbour name
+		--   xmlFilename (optional) → store item XML path
+		-- This bypasses the mission pipeline entirely.
+		local nToken = action.neighbourId or action.neighbourName or "1"
+		local n = IANeighbours:resolveNeighbourForConsoleToken(nToken)
+		if n == nil then
+			-- Auto-discover first farmer neighbour
+			for _, nb in pairs(IANeighbours.neighbours or {}) do
+				if nb ~= nil and nb.initialized and nb.job == "Farmer" and nb.role == "Neighbour" then
+					n = nb; break
+				end
+			end
+		end
+		if n == nil then
+			IATestRunner.emit("test", "action_error", { error = "No farmer neighbour found" })
+			return
+		end
+		
+		-- Check delivery helper is available
+		if IAFieldOutcomeDeliveryHelper == nil or type(IAFieldOutcomeDeliveryHelper.spawnSiloAtCharacterLargeArea) ~= "function" then
+			IATestRunner.emit("test", "action_error", { error = "IAFieldOutcomeDeliveryHelper.spawnSiloAtCharacterLargeArea not available" })
+			return
+		end
+		
+		local xmlFilename = action.xmlFilename
+		
+		-- Store the callback reference so teleportToDeliveryPoint can use the position
+		IAFieldOutcomeDeliveryHelper.spawnSiloAtCharacterLargeArea(n, xmlFilename,
+			function(placeable, errorMsg)
+				if placeable ~= nil then
+					-- Get position from placeable
+					local px, py, pz = 0, 0, 0
+					if placeable.getWorldPosition ~= nil then
+						px, py, pz = placeable:getWorldPosition()
+					end
+					-- Store spawn data for teleportToDeliveryPoint fallback
+					local helperStore = IATestRunner._deliverySpawnData or {}
+					helperStore.x = px
+					helperStore.y = py + 3.0  -- above terrain for player teleport
+					helperStore.z = pz
+					helperStore.placeable = placeable
+					IATestRunner._deliverySpawnData = helperStore
+					
+					IATestRunner.emit("delivery", "silo_spawned", { neighbour = n.name, x = px, y = py, z = pz })
+					print(string.format("[IATestRunner] silo_spawned at character '%s' large area (%.1f, %.1f, %.1f)", n.name or "?", px, py, pz))
+				else
+					IATestRunner.emit("test", "action_error", { error = "Failed to spawn silo: " .. tostring(errorMsg) })
+					print("[IATestRunner] Failed to spawn silo: " .. tostring(errorMsg))
+				end
+			end
+		)
+
+	elseif atype == "cleanupDeliverySpawn" then
+		-- Clean up the placeable that was spawned by spawnSiloAtCharacterLargeArea
+		local spawnData = IATestRunner._deliverySpawnData
+		if spawnData ~= nil and spawnData.placeable ~= nil then
+			if IAPlaceableHelper ~= nil and type(IAPlaceableHelper.removePlaceable) == "function" then
+				IAPlaceableHelper.removePlaceable(spawnData.placeable)
+				print("[IATestRunner] Cleaned up spawned silo placeable")
+			else
+				print("[IATestRunner] IAPlaceableHelper.removePlaceable not available for cleanup")
+			end
+			IATestRunner._deliverySpawnData = nil
+			IATestRunner.emit("test", "cleanupDeliverySpawn", {})
+		else
+			print("[IATestRunner] No delivery spawn data to clean up")
+		end
+
+	-- ── Farmer Placeables Detailed Assert ─────────────────────────
+
+	elseif atype == "assertFarmerPlaceablesDetailed" then
+		-- 1. Check FARMER_PLACEABLES exists and has 4 entries
+		local placeablesTableCount = 0
+		if IANeighbours.FARMER_PLACEABLES ~= nil then
+			for _, _ in pairs(IANeighbours.FARMER_PLACEABLES) do
+				placeablesTableCount = placeablesTableCount + 1
+			end
+		end
+		if placeablesTableCount == 4 then
+			IATestRunner.emit("assert", "pass", { field = "FARMER_PLACEABLES", expected = "4 entries", actual = tostring(placeablesTableCount) })
+		else
+			IATestRunner.emit("assert", "fail", { field = "FARMER_PLACEABLES", expected = "4 entries", actual = tostring(placeablesTableCount) })
+			IATestRunner._anyAssertionFailed = true
+		end
+
+		-- 2. For each farmer: check placeables
+		local farmerIds = { "18", "19", "20", "21" }
+		for _, fid in ipairs(farmerIds) do
+			local n = IANeighbours:resolveNeighbourForConsoleToken(fid)
+			if n == nil then
+				IATestRunner.emit("assert", "fail", { farmer = fid, field = "neighbour", expected = "exists", actual = "nil" })
+				IATestRunner._anyAssertionFailed = true
+			else
+				-- Check neighbour.placeables exists
+				local hasPlaceables = n.placeables ~= nil and next(n.placeables) ~= nil
+				if hasPlaceables then
+					IATestRunner.emit("assert", "pass", { farmer = n.name, field = "placeables", expected = "nonEmpty", actual = tostring(#n.placeables or "hash") })
+					-- Check each placeable for uniqueId + positions
+					for _, iaPl in pairs(n.placeables) do
+						if iaPl ~= nil then
+							local name = tostring(iaPl.xmlFilename or "unknown")
+							-- uniqueId
+							if iaPl.uniqueId ~= nil then
+								IATestRunner.emit("placeable", "check", { farmer = n.name, placeable = name, field = "uniqueId", status = "ok", value = tostring(iaPl.uniqueId) })
+							else
+								IATestRunner.emit("assert", "fail", { farmer = n.name, placeable = name, field = "uniqueId", expected = "notNil", actual = "nil" })
+								IATestRunner._anyAssertionFailed = true
+							end
+							-- positionX
+							if iaPl.positionX ~= nil then
+								IATestRunner.emit("placeable", "check", { farmer = n.name, placeable = name, field = "positionX", status = "ok", value = tostring(iaPl.positionX) })
+							else
+								IATestRunner.emit("assert", "fail", { farmer = n.name, placeable = name, field = "positionX", expected = "notNil", actual = "nil" })
+								IATestRunner._anyAssertionFailed = true
+							end
+							-- positionY
+							if iaPl.positionY ~= nil then
+								IATestRunner.emit("placeable", "check", { farmer = n.name, placeable = name, field = "positionY", status = "ok", value = tostring(iaPl.positionY) })
+							else
+								IATestRunner.emit("assert", "fail", { farmer = n.name, placeable = name, field = "positionY", expected = "notNil", actual = "nil" })
+								IATestRunner._anyAssertionFailed = true
+							end
+							-- positionZ
+							if iaPl.positionZ ~= nil then
+								IATestRunner.emit("placeable", "check", { farmer = n.name, placeable = name, field = "positionZ", status = "ok", value = tostring(iaPl.positionZ) })
+							else
+								IATestRunner.emit("assert", "fail", { farmer = n.name, placeable = name, field = "positionZ", expected = "notNil", actual = "nil" })
+								IATestRunner._anyAssertionFailed = true
+							end
+						end
+					end
+				else
+					IATestRunner.emit("assert", "fail", { farmer = n.name, field = "placeables", expected = "nonEmpty", actual = "nil or empty" })
+					IATestRunner._anyAssertionFailed = true
+				end
+			end
+		end
+
+	-- ── Teleport To Placeable ────────────────────────────────────
+
+	elseif atype == "teleportToPlaceable" then
+		local neighbourId = action.neighbourId
+		if neighbourId == nil then
+			IATestRunner.emit("camera", "position_fail", { reason = "missing neighbourId" })
+			return
+		end
+		if g_localPlayer == nil then return end
+
+		local n = IANeighbours:resolveNeighbourForConsoleToken(neighbourId)
+		if n == nil then
+			IATestRunner.emit("camera", "position_fail", { reason = "neighbour_not_found", neighbourId = neighbourId })
+			return
+		end
+
+		-- Find the first placeable of the neighbour
+		local iaPl = nil
+		if n.placeables ~= nil then
+			for _, pl in pairs(n.placeables) do
+				if pl ~= nil then
+					iaPl = pl
+					break
+				end
+			end
+		end
+		if iaPl == nil then
+			IATestRunner.emit("camera", "position_fail", { reason = "no_placeables", neighbour = n.name })
+			return
+		end
+
+		-- Determine placeable position: live game object or stored coordinates
+		local px, py, pz, pRot
+		if iaPl.placeable ~= nil and iaPl.placeable.rootNode ~= nil and entityExists(iaPl.placeable.rootNode) then
+			px, py, pz = getWorldTranslation(iaPl.placeable.rootNode)
+			pRot = (getNodeYawFromForward ~= nil) and getNodeYawFromForward(iaPl.placeable.rootNode) or (iaPl.rotation or 0)
+		else
+			px, py, pz = iaPl.positionX or 0, iaPl.positionY or 0, iaPl.positionZ or 0
+			pRot = iaPl.rotation or 0
+		end
+
+		local offsetForward = action.offsetForward or -12
+		local offsetRight = action.offsetRight or 5
+		local offsetUp = action.offsetUp or 4
+
+		-- Camera position calculation
+		local cameraX, cameraY, cameraZ
+		if getWorldPositionFromYawLocalOffset ~= nil then
+			cameraX, cameraY, cameraZ = getWorldPositionFromYawLocalOffset(px, py, pz, pRot, offsetRight, offsetUp, offsetForward)
+		else
+			cameraX = px + offsetRight
+			cameraY = py + offsetUp
+			cameraZ = pz + offsetForward
+		end
+
+		-- Terrain clamping
+		if g_terrainNode ~= nil and getTerrainHeightAtWorldPos ~= nil then
+			local th = getTerrainHeightAtWorldPos(g_terrainNode, cameraX, 0, cameraZ)
+			if th ~= nil then
+				cameraY = math.max(cameraY, th + 0.5)
+			end
+		end
+
+		-- Teleport
+		if g_localPlayer.teleportTo ~= nil then
+			pcall(function() g_localPlayer:teleportTo(cameraX, cameraY, cameraZ, true, true) end)
+		end
+		if g_localPlayer.rootNode ~= nil then
+			setWorldTranslation(g_localPlayer.rootNode, cameraX, cameraY + 0.1, cameraZ)
+		end
+
+		-- Point camera at placeable
+		local lookYaw = pRot
+		local lookPitch = -0.3
+		if MathUtil ~= nil and MathUtil.getYRotationFromDirection ~= nil then
+			local dx = px - cameraX
+			local dz = pz - cameraZ
+			if dx ~= 0 or dz ~= 0 then
+				lookYaw = MathUtil.getYRotationFromDirection(dx, dz)
+			end
+		end
+		if g_localPlayer.camera ~= nil and g_localPlayer.camera.setRotation ~= nil then
+			pcall(function() g_localPlayer.camera:setRotation(lookPitch, lookYaw, 0) end)
+		end
+
+		IATestRunner.emit("camera", "positioned", {
+			neighbour = n.name,
+			neighbourId = neighbourId,
+			x = cameraX, y = cameraY, z = cameraZ,
+			pitch = lookPitch, yaw = lookYaw,
+			placeableX = px, placeableZ = pz
+		})
+
 	-- ── Screenshot ────────────────────────────────────────────────
 
 	elseif atype == "takeScreenshot" then
 		IATestRunner.takeScreenshot()
+
+	-- ── Advance conversation to choice point ────────────────────
+
+	elseif atype == "advanceConversationToChoice" then
+		local timeoutMs = action.timeoutMs or 60000
+		local startTime = IANeighbours._wallClockSec or 0
+		local maxWait = timeoutMs / 1000
+		IATestRunner._waitConditionFn = function()
+			local elapsed = (IANeighbours._wallClockSec or 0) - startTime
+			if elapsed > maxWait then
+				IATestRunner.emit("conversation", "advance_to_choice_fail", { reason = "timeout after " .. string.format("%.1f", elapsed) .. "s", timeoutMs = timeoutMs })
+				return true
+			end
+			local conv = IANeighbours.activeStandalonePhoneConversation
+			if conv == nil then
+				return false
+			end
+			if conv.isChoicePoint then
+				IATestRunner.emit("conversation", "choice_reached", { wallClockSec = IANeighbours._wallClockSec })
+				return true
+			end
+			conv:requestAdvanceToNextLine()
+			return false
+		end
+		IATestRunner._waitConditionLabel = "advanceConversationToChoice"
+
+	elseif atype == "advanceConversationToEnd" then
+		local timeoutMs = action.timeoutMs or 60000
+		local startTime = IANeighbours._wallClockSec or 0
+		local maxWait = timeoutMs / 1000
+		IATestRunner._waitConditionFn = function()
+			local elapsed = (IANeighbours._wallClockSec or 0) - startTime
+			if elapsed > maxWait then
+				IATestRunner.emit("conversation", "advance_to_end_fail", { reason = "timeout after " .. string.format("%.1f", elapsed) .. "s", timeoutMs = timeoutMs })
+				return true
+			end
+			local conv = IANeighbours.activeStandalonePhoneConversation
+			if conv == nil then
+				IATestRunner.emit("conversation", "conversation_ended", { wallClockSec = IANeighbours._wallClockSec })
+				return true
+			end
+			conv:requestAdvanceToNextLine()
+			return false
+		end
+		IATestRunner._waitConditionLabel = "advanceConversationToEnd"
+
+	-- ── Conversation option selection ───────────────────────────
+
+	elseif atype == "selectOption" then
+		-- Wählt eine Conversation-Option aus (für Phone- und Face-to-Face-Gespräche).
+		-- Nutzt das framework-eigene _waitConditionFn-Polling statt coroutine.yield(),
+		-- da coroutine in der FS25-Lua-Sandbox nicht verfügbar ist.
+		local optionIndex = action.optionIndex or 1
+		local conv = IANeighbours.activeStandalonePhoneConversation
+		
+		-- Fallback: in-world situation conversation suchen
+		if conv == nil then
+			for _, n in pairs(IANeighbours.neighbours or {}) do
+				if n ~= nil and n.activeSituation ~= nil 
+				   and n.activeSituation.conversation ~= nil then
+					conv = n.activeSituation.conversation
+					break
+				end
+			end
+		end
+		
+		if conv == nil then
+			IATestRunner.emit("conversation", "select_option_fail", { reason = "no active conversation found" })
+			return
+		end
+		
+		-- Helper: versuche eine Option auszuwählen, falls verfügbar.
+		-- Returns true wenn eine Selektion stattfand (erfolgreich oder Fehler),
+		-- false wenn noch keine Optionen verfügbar sind.
+		local function trySelect()
+			-- Check: nextOptions
+			if conv.nextOptions ~= nil and #conv.nextOptions > 0 then
+				if optionIndex <= #conv.nextOptions then
+					local opt = conv.nextOptions[optionIndex]
+					conv:selectOption(opt.id)
+					IATestRunner.emit("conversation", "option_selected", {
+						optionIndex = optionIndex,
+						optionId = opt.id,
+						optionText = opt.text,
+					})
+				else
+					IATestRunner.emit("conversation", "select_option_fail", {
+						reason = "optionIndex out of range",
+						optionIndex = optionIndex,
+						nextOptionsCount = #conv.nextOptions,
+						mainMenuOptionsCount = conv._mainMenuOptions ~= nil and #conv._mainMenuOptions or 0,
+					})
+					IATestRunner._anyAssertionFailed = true
+				end
+				return true  -- options were available, action is done
+			end
+			-- Check: _mainMenuOptions
+			if conv._mainMenuOptions ~= nil and #conv._mainMenuOptions > 0 then
+				if optionIndex <= #conv._mainMenuOptions then
+					local opt = conv._mainMenuOptions[optionIndex]
+					conv:selectOption(opt.id)
+					IATestRunner.emit("conversation", "option_selected", {
+						optionIndex = optionIndex,
+						optionId = opt.id,
+						optionText = opt.text,
+					})
+				else
+					IATestRunner.emit("conversation", "select_option_fail", {
+						reason = "optionIndex out of range",
+						optionIndex = optionIndex,
+						nextOptionsCount = conv.nextOptions ~= nil and #conv.nextOptions or 0,
+						mainMenuOptionsCount = #conv._mainMenuOptions,
+					})
+					IATestRunner._anyAssertionFailed = true
+				end
+				return true  -- options were available, action is done
+			end
+			return false  -- noch keine Optionen verfügbar → weiter pollen
+		end
+		
+		-- Quick-Path: Optionen sind bereits verfügbar
+		if trySelect() then
+			return
+		end
+		
+		-- Slow-Path: Setze _waitConditionFn für Frame-basiertes Polling.
+		-- Der Update-Loop (onUpdate) ruft die Condition jede Frame auf.
+		-- Sobald sie true zurückgibt, wird _advanceActionQueue() getriggert.
+		local maxWaitSec = (action.timeoutMs or 30000) / 1000
+		local deadline = (IANeighbours._wallClockSec or 0) + maxWaitSec
+		IATestRunner.emit("conversation", "select_option_waiting", {
+			optionIndex = optionIndex,
+			timeoutSec = maxWaitSec,
+		})
+		
+		IATestRunner._waitConditionFn = function()
+			-- Timeout-Check
+			if (IANeighbours._wallClockSec or 0) >= deadline then
+				IATestRunner.emit("conversation", "select_option_fail", { 
+					reason = "timeout waiting for options",
+					timeoutSec = maxWaitSec,
+					nextOptions = conv.nextOptions,
+					hasMainMenu = conv._mainMenuOptions ~= nil,
+				})
+				IATestRunner._anyAssertionFailed = true
+				return true  -- Abbruch: advance zur nächsten Action
+			end
+			-- Versuche Selektion
+			return trySelect()
+		end
+		IATestRunner._waitConditionLabel = "selectOption index=" .. tostring(optionIndex)
 
 	-- ── Unknown action ──────────────────────────────────────────
 
@@ -2482,28 +4518,6 @@ function IATestRunner._runNextAutoTest()
 		-- Emit a sentinel console marker so trigger_gamestart.ps1 can detect
 		-- test completion by polling log.txt, avoiding the hardcoded 600s wait.
 		print("[FOS_TEST_ALL_COMPLETE]")
-
-		-- Write a sentinel file to modSettings/FoS_tests/ so the PowerShell
-		-- polling loop can detect completion and kill the game early.
-		local ok, err = pcall(function()
-			local dir = IATestRunner.getTestOutputDirectory()
-			-- strip trailing slash
-			if dir and dir ~= "" then
-				local sentinelPath = dir .. "AUTO_RUN_COMPLETE"
-				if createFolder ~= nil and not folderExists(dir) then
-					createFolder(dir)
-				end
-				local f = io.open(sentinelPath, "w")
-				if f then
-					f:write("complete\n")
-					f:close()
-					IAprintDebug("IATestRunner", "Sentinel file written: " .. sentinelPath)
-				end
-			end
-		end)
-		if not ok then
-			IAprintDebug("IATestRunner", "Sentinel file write failed (non-fatal): " .. tostring(err))
-		end
 
 		return
 	end

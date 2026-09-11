@@ -14,6 +14,7 @@
             <text name="gui_voice_pack_warn_message" text="Stai giocando a Fields of Stories senza il pacchetto vocale (optional). Versione richiesta: %s" />
             <text name="gui_voice_pack_warn_recheck" text="Ricontrolla"/>
             <text name="gui_voice_pack_warn_ok_notification" text="Pacchetto vocale OK: la versione corrisponde a Fields of Stories."/>
+            <text name="ia_homebase_setup_warning" text="Fields of Stories: Le basi abitative non sono complete. Posiziona le aree di base necessarie per completare la configurazione."/>
             <text name="gui_dialog_button_ignore" text="Ignora"/>
             <text name="gui_mapplaces_gen_title" text="Fields of Stories – Generazione di luoghi sulla mappa"/>
             <text name="gui_mapplaces_gen_message" text="Sperimentale: non è stata trovata alcuna configurazione salvata per questa mappa. Se si continua, &quot;Fields of Stories&quot; creerà automaticamente da centinaia a migliaia di luoghi sulla mappa. Il gioco sembrerà bloccato fino al termine della generazione."/>
@@ -28,6 +29,37 @@
             <text name="gui_firstload_tutorial_message6" text="5. Nota la roadmap: la mod è ancora solo una piccola parte della visione del progetto:&#10;-Aiutanti e collaboratori,&#10;-personaggi che si muovono e guidano,&#10;-grandi eventi,&#10;-decine di tipi di missione, tutto questo è possibile, ma richiede tempo e il vostro supporto."/>
             <text name="gui_phone_title" text="%s"/>
             <text name="gui_phone_title_default" text="Telefono"/>
+            <text name="construction_foS_category" text="Fields of Stories"/>
+            <text name="construction_foS_tab_placeables" text="Luoghi generali"/>
+            <text name="construction_foS_tab_character_homebase" text="Casa personaggio"/>
+            <text name="fos_char_homebase_name" text="Casa di: %s"/>
+            <text name="fos_char_homebase_desc" text="Posizionamento casa per il personaggio #%s."/>
+            <text name="fos_char_homebase_name_1" text="Mary Carter (Familiare, Agricoltore)"/>
+            <text name="fos_char_homebase_desc_1" text="Luogo di casa per Mary Carter."/>
+            <text name="fos_char_homebase_name_2" text="John Carter (Familiare, Agricoltore)"/>
+            <text name="fos_char_homebase_desc_2" text="Luogo di casa per John Carter."/>
+            <text name="fos_char_homebase_name_10" text="Sharon Whitaker (Funzionario)"/>
+            <text name="fos_char_homebase_desc_10" text="Luogo di casa per Sharon Whitaker."/>
+            <text name="fos_char_homebase_name_11" text="Kyle Bennett (Civile)"/>
+            <text name="fos_char_homebase_desc_11" text="Luogo di casa per Kyle Bennett."/>
+            <text name="fos_char_homebase_name_13" text="Lukas Brenner (Vicino, Guardia forestale)"/>
+            <text name="fos_char_homebase_desc_13" text="Luogo di casa per Lukas Brenner."/>
+            <text name="fos_char_homebase_name_14" text="Martin Walker (Funzionario, Sindaco)"/>
+            <text name="fos_char_homebase_desc_14" text="Luogo di casa per Martin Walker."/>
+            <text name="fos_char_homebase_name_15" text="Susan Keller (Partner commerciale, Commerciante di cereali)"/>
+            <text name="fos_char_homebase_desc_15" text="Luogo di casa per Susan Keller."/>
+            <text name="fos_char_homebase_name_16" text="Andy Hoffman (Partner commerciale, Rivenditore di macchine agricole)"/>
+            <text name="fos_char_homebase_desc_16" text="Luogo di casa per Andy Hoffman."/>
+            <text name="fos_char_homebase_name_17" text="Paul Meyer (Partner commerciale, Contoterzista)"/>
+            <text name="fos_char_homebase_desc_17" text="Luogo di casa per Paul Meyer."/>
+            <text name="fos_char_homebase_name_18" text="Marcus Brown (Vicino, Agricoltore)"/>
+            <text name="fos_char_homebase_desc_18" text="Luogo di casa per Marcus Brown."/>
+            <text name="fos_char_homebase_name_19" text="Jacob Miller (Vicino, Agricoltore)"/>
+            <text name="fos_char_homebase_desc_19" text="Luogo di casa per Jacob Miller."/>
+            <text name="fos_char_homebase_name_20" text="Emma Kensington (Vicino, Agricoltore)"/>
+            <text name="fos_char_homebase_desc_20" text="Luogo di casa per Emma Kensington."/>
+            <text name="fos_char_homebase_name_21" text="Brian Winter (Vicino, Agricoltore)"/>
+            <text name="fos_char_homebase_desc_21" text="Luogo di casa per Brian Winter."/>
             <text name="gui_phone_message" text="Chiamata in ingresso"/>
             <text name="gui_phone_answer" text="Rispondi"/>
             <text name="gui_phone_decline" text="Rifiuta"/>
@@ -121,7 +153,7 @@
             <text name="gui_help_contracts_title" text="Contratti sul campo e chiamate"/>
             <text name="gui_help_contracts_body" text="Gli agricoltori a volte hanno più lavoro nei campi di quanto riescano a gestire e ti chiameranno per chiederti aiuto. Queste offerte sono veri lavori retribuiti nei loro campi. Potrebbero affidarti un'intera serie di campi da completare.&#10;&#10;La chiamata:&#10;1. Un agricoltore può chiamarti durante il giorno, all'incirca tra le 08:00 e le 15:00. Sentirai squillare e vedrai un avviso di chiamata.&#10;2. Apri il telefono e premi Rispondi per ascoltare l'offerta, oppure Rifiuta / Esc per chiuderla.&#10;3. Lo stesso agricoltore potrebbe riprovare più tardi. Esiste un limite giornaliero alle chiamate per i contratti, configurabile nelle impostazioni di gioco. Se non rispondi affatto a una chiamata, verranno effettuati in totale altri tre tentativi di chiamarti.&#10;&#10;Scelta del lavoro: nella conversazione telefonica puoi in genere accettare l'intera superficie del campo o soltanto la prima metà e scegliere se utilizzare le tue attrezzature o prendere in prestito i macchinari del vicino. Ciò richiede che l'agricoltore possa rendere disponibili i suoi macchinari. Naturalmente puoi anche rifiutare la richiesta.&#10;&#10;Senza prestito: completi il contratto con i tuoi macchinari. Il lavoro viene pagato per ettaro ed è concluso quando il campo raggiunge lo stato richiesto. Al momento, l'avanzamento non viene calcolato in modo uniforme.&#10;&#10;Questi contratti vengono sempre richiesti telefonicamente e saranno visibili nel normale menu delle missioni solo dopo l'accettazione.&#10;&#10;Ricompensa e reputazione: completare un contratto ti fa ricevere il pagamento e migliora il tuo rapporto con l'agricoltore. Fallire, annullare o far scadere il contratto ha l'effetto opposto."/>
             <text name="gui_help_contracts_body2" text="Con il prestito: il vicino ti presta esattamente gli attrezzi necessari, tuttavia i pesi e il trattore non vengono prestati. Quando necessario, i macchinari presi in prestito sono già riforniti di sementi, prodotto per l'irrorazione, fertilizzante, letame o liquame, che possono essere riforniti presso la fattoria del vicino.&#10;Il prestito comporta un compenso leggermente inferiore rispetto all'uso delle tue attrezzature. Importante: un contratto con attrezzature prese in prestito resta al 99 percento finché non riporti ogni macchina presa in prestito alla fattoria del vicino e non la sganci lì. Solo allora il contratto è considerato completato.&#10;&#10;Se prendi in prestito le attrezzature, troverai un indicatore sulla mappa che mostra dove ritirare i macchinari. Lì puoi rifornire i materiali di consumo, ad esempio liquame, sementi o erbicida, e al termine del contratto parcheggiare nuovamente i macchinari."/>
-            <text name="gui_help_contracts_body3" text=""/>
+            <text name="gui_help_contracts_body3" text="Contratti di raccolta e consegna&#10;&#10;Alcuni contratti di lavoro nei campi richiedono anche la consegna del raccolto:&#10;&#10;Consegna del raccolto: raccogli una coltura (es. mais, grano, colza) e consegna il cereale al silo dell'agricoltore. Il gioco tiene traccia di ciò che la tua mietitrebbia raccoglie e lo confronta con ciò che consegni. Devi consegnare almeno il 99% di quanto hai raccolto.&#10;&#10;Consegna dello sfalcio: falcia l'erba e consegnala (in balle o sfusa) al silo dell'agricoltore.&#10;&#10;Se più contratti di consegna condividono lo stesso silo e lo stesso tipo di coltura, le consegne vengono ripartite proporzionalmente.&#10;&#10;Indicatore di avanzamento:&#10;0-80% copre il lavoro nei campi, 80-99% significa lavoro nei campi completato ma consegna ancora in sospeso. Al 100% entrambi sono terminati — riscuoti il contratto dal menu missioni per ricevere il pagamento.&#10;&#10;Bonus di consegna extra:&#10;L'agricoltore si aspetta l'intero raccolto — non tenere nulla per te. Puoi continuare a consegnare anche dopo che il contratto ha raggiunto il 100%. Al momento della riscossione, ogni eccedenza oltre quanto presente nel silo al completamento garantisce un bonus di +50 punti rapporto."/>
             <text name="gui_help_contract_cap_call_info" text="Quando un agricoltore ha bisogno di una mano, sentirai squillare e vedrai un avviso di chiamata in arrivo, all'incirca tra le 08:00 e le 15:00."/>
             <text name="gui_help_contract_cap_call" text="Apri il telefono e premi Rispondi per ascoltare l'offerta, oppure Rifiuta / Esc per chiuderla.&#10;&#10;Puoi regolare il numero di chiamate di lavoro nelle impostazioni di gioco. Si riferisce al numero di agricoltori che cercano aiuto, non al numero di chiamate.&#10;&#10;Importante: se non rispondi affatto a una chiamata, verranno effettuati in totale altri tre tentativi di chiamarti."/>
             <text name="gui_help_contract_cap_choices" text="Durante la chiamata scegli il lavoro: l'intero campo oppure solo la prima metà e se usare le tue attrezzature o prendere in prestito i macchinari del vicino."/>
@@ -149,6 +181,7 @@
             <text name="gui_mapinit_place_size_vehicle_attachment" text="Veicolo + attrezzo"/>
             <text name="gui_mapinit_place_size_oversize_vehicle" text="Veicolo di grandi dimensioni"/>
             <text name="gui_mapinit_place_size_large_area" text="Area ampia"/>
+            <text name="gui_mapinit_place_size_silo" text="Silo"/>
             <text name="gui_mapinit_place_type_label" text="Tipo di luogo:"/>
             <text name="gui_mapinit_place_type_shop" text="Negozio"/>
             <text name="gui_mapinit_place_type_gas_station" text="Distributore di carburante"/>
@@ -212,6 +245,17 @@
             <text name="ia_field_outcome_mission_desc_short" text="Usa %s per completare questa attività."/>
             <text name="ia_field_outcome_mission_desc_seed" text="Usa %s per seminare %s."/>
             <text name="ia_field_outcome_neighbour_generic" text="il tuo vicino"/>
+            <text name="ia_field_outcome_task_done" text="Completato"/>
+            <text name="ia_field_outcome_task_open" text="Aperto"/>
+            <text name="ia_field_outcome_task_fieldwork" text="Lavoro nei campi: %s"/>
+            <text name="ia_field_outcome_task_delivery" text="Consegna"/>
+            <text name="ia_field_outcome_task_return" text="Riconsegna attrezzatura"/>
+            <text name="ia_field_outcome_task_delivery_progress" text="%s / %s consegnato"/>
+            <text name="ia_field_outcome_task_delivery_not_started" text="Non iniziato"/>
+            <text name="ia_field_outcome_task_return_after_fieldwork" text="Dopo il lavoro nei campi"/>
+            <text name="ia_fieldwork_label_harvest_corn" text="Raccogli il mais"/>
+            <text name="ia_force_complete_button" text="Forza completamento"/>
+            <text name="ia_force_complete_no_mission" text="Nessun contratto Fields of Stories attivo selezionato."/>
             <text name="ia_field_outcome_target_fertilizer" text="Obiettivo: raggiungere lo stadio di fertilizzazione %d con fertilizzante minerale sul campo."/>
             <text name="ia_field_outcome_target_slurry" text="Obiettivo: applicare liquame o residui di fermentazione, digestato, fino allo stadio di fertilizzazione %d."/>
             <text name="ia_field_outcome_target_manure" text="Obiettivo: distribuire letame solido fino allo stadio di fertilizzazione %d."/>
@@ -281,7 +325,80 @@
             <text name="ia_settings_fieldworkCompletionThreshold_90" text="90%"/>
             <text name="ia_settings_fieldworkCompletionThreshold_95" text="95%"/>
             <text name="ia_settings_fieldworkCompletionThreshold_100" text="100%"/>
+            <text name="ia_settings_voiceVolume_title" text="Volume delle voci"/>
+            <text name="ia_settings_voiceVolume_info" text="Volume delle battute parlate dei vicini."/>
+            <text name="ia_settings_voiceVolume_10" text="10%"/>
+            <text name="ia_settings_voiceVolume_20" text="20%"/>
+            <text name="ia_settings_voiceVolume_30" text="30%"/>
+            <text name="ia_settings_voiceVolume_40" text="40%"/>
+            <text name="ia_settings_voiceVolume_50" text="50%"/>
+            <text name="ia_settings_voiceVolume_60" text="60%"/>
+            <text name="ia_settings_voiceVolume_70" text="70%"/>
+            <text name="ia_settings_voiceVolume_80" text="80%"/>
+            <text name="ia_settings_voiceVolume_90" text="90%"/>
+            <text name="ia_settings_voiceVolume_100" text="100%"/>
             <text name="ia_npc_unavailable" text=" (Non disponibile)"/>
             <text name="gui_language" text="it"/>
-	</texts>
+            <text name="fos_place_character_church" text="Indicatore: Chiesa"/>
+            <text name="fos_place_character_church_desc" text="Fields of Stories - Un luogo di culto dove i PNG partecipano alle funzioni e agli incontri della comunità"/>
+            <text name="fos_place_character_dirt_road" text="Indicatore: Strada sterrata"/>
+            <text name="fos_place_character_dirt_road_desc" text="Fields of Stories - Una tranquilla strada sterrata dove i PNG passeggiano e vivono incontri rurali"/>
+            <text name="fos_place_character_gas_station" text="Indicatore: Distributore di carburante"/>
+            <text name="fos_place_character_gas_station_desc" text="Fields of Stories - Un distributore di carburante dove i PNG fanno rifornimento e si incontrano"/>
+            <text name="fos_place_character_industry" text="Indicatore: Industria"/>
+            <text name="fos_place_character_industry_desc" text="Fields of Stories - Una zona industriale dove i PNG lavorano e producono beni"/>
+            <text name="fos_place_character_player_farm" text="Indicatore: Fattoria del giocatore"/>
+            <text name="fos_place_character_player_farm_desc" text="Fields of Stories - Indica la fattoria del giocatore, il cuore delle tue attività agricole"/>
+            <text name="fos_place_character_private_relax_place" text="Indicatore: Luogo privato per il relax"/>
+            <text name="fos_place_character_private_relax_place_desc" text="Fields of Stories - Un rifugio appartato dove i PNG cercano privacy e tranquillità"/>
+            <text name="fos_place_character_public_infrastructure" text="Indicatore: Infrastruttura pubblica"/>
+            <text name="fos_place_character_public_infrastructure_desc" text="Fields of Stories - Servizi pubblici e centro infrastrutturale per la comunità locale"/>
+            <text name="fos_place_character_public_place" text="Indicatore: Luogo pubblico"/>
+            <text name="fos_place_character_public_place_desc" text="Fields of Stories - Una piazza pubblica animata dove i PNG si riuniscono, chiacchierano e trascorrono il tempo libero"/>
+            <text name="fos_place_character_public_relax_place" text="Indicatore: Area relax"/>
+            <text name="fos_place_character_public_relax_place_desc" text="Fields of Stories - Un'area pubblica di relax dove i PNG si rilassano e godono del tempo libero"/>
+            <text name="fos_place_character_remove" text="Strumento: Rimuovi luogo"/>
+            <text name="fos_place_character_remove_desc" text="Fields of Stories - Rimuove l'indicatore di luogo più vicino entro 5 metri"/>
+            <text name="fos_place_character_roadside" text="Indicatore: Bordo strada"/>
+            <text name="fos_place_character_roadside_desc" text="Fields of Stories - Un punto sul bordo strada dove i PNG si fermano per una chiacchierata o una pausa"/>
+            <text name="fos_place_character_sell_point" text="Indicatore: Punto vendita"/>
+            <text name="fos_place_character_sell_point_desc" text="Fields of Stories - Un punto di scambio dove i PNG consegnano merci e fanno affari"/>
+            <text name="fos_place_character_shop" text="Indicatore: Negozio"/>
+            <text name="fos_place_character_shop_desc" text="Fields of Stories - Un'area commerciale dove i PNG vanno a curiosare e acquistare"/>
+            <text name="fos_place_character_workshop" text="Indicatore: Officina"/>
+            <text name="fos_place_character_workshop_desc" text="Fields of Stories - Un'officina di riparazione dove i PNG mantengono e riparano le loro attrezzature"/>
+            <text name="fos_place_character_shed" text="Indicatore: Rimessa"/>
+            <text name="fos_place_character_shed_desc" text="Fields of Stories - Un capannone dove i PNG tengono i loro attrezzi e attrezzature"/>
+            <text name="gui_fos_place_created" text="Luogo creato: %s (%s)"/>
+            <text name="gui_fos_place_size_select" text="Dimensione luogo"/>
+            <text name="gui_fos_bulk_remove_title" text="Rimozione multipla luoghi"/>
+            <text name="gui_fos_bulk_remove_confirm" text="Rimuovere %d luogo/luoghi di tipo '%s'?"/>
+            <text name="gui_fos_bulk_remove_confirm_char" text="Rimuovere %d luogo/luoghi per '%s'?"/>
+            <text name="gui_fos_bulk_remove_btn_yes" text="Rimuovi tutto"/>
+            <text name="gui_fos_bulk_remove_btn_no" text="Annulla"/>
+            <text name="gui_fos_bulk_remove_none" text="Nessun luogo di questo tipo da rimuovere."/>
+            <text name="gui_fos_bulk_remove_done" text="Rimossi %d luogo/luoghi."/>
+            <text name="gui_mapinit_classic_init_mode" text="Modalità iniz. classica"/>
+            <text name="gui_mapinit_dialog_first_message" text="Apri il menu Costruzioni per creare luoghi su tutta la mappa. Oppure attiva la Modalità Classica della versione 1.0 che richiede di guidare per salvare i luoghi."/>
+            <text name="gui_mapinit_dialog_first_title" text="Configura luoghi"/>
+            <text name="gui_mapinit_open_construction_menu" text="Apri menu Costruzioni"/>
+            <text name="ia_delivery_marker_label" text="Punto di consegna alla fattoria"/>
+            <text name="ia_field_outcome_deliver_wrong_location" text="Devi consegnare il raccolto alla fattoria, non venderlo altrove!"/>
+            <text name="ia_field_outcome_delivery_complete" text="Consegna completata! La merce è arrivata alla fattoria."/>
+            <text name="ia_field_outcome_mission_deliver_note" text="Consegna il raccolto alla fattoria (segnata sulla mappa)."/>
+            <text name="ia_field_outcome_target_grass_mowing" text="Obiettivo: falciare l'erba e consegnarla alla fattoria."/>
+            <text name="ia_field_outcome_target_harvest_deliver_corn" text="Obiettivo: raccogliere il mais e consegnare il grano alla fattoria."/>
+            <text name="ia_field_outcome_target_lime_deliver" text="Obiettivo: applicare calce uniformemente su tutto il campo."/>
+            <text name="ia_field_outcome_target_stone_picking" text="Obiettivo: rimuovere tutte le pietre dal campo."/>
+            <text name="ia_fieldwork_equip_grass_mower" text="falciatrice e carro autocaricante o imballatrice"/>
+            <text name="ia_fieldwork_equip_harvest_deliver_corn" text="mietitrebbia e rimorchio per cereali"/>
+            <text name="ia_fieldwork_equip_stone_picker" text="raccoglisassi"/>
+            <text name="ia_fieldwork_label_grass_mowing" text="Falciare erba e consegnare"/>
+            <text name="ia_fieldwork_label_grass_mowing_short" text="Falciare erba"/>
+            <text name="ia_fieldwork_label_harvest_deliver_corn" text="Raccogliere mais e consegnare"/>
+            <text name="ia_fieldwork_label_harvest_deliver_with_crop" text="Raccogliere %s e consegnare"/>
+            <text name="ia_fieldwork_label_stone_picking" text="Raccolta pietre"/>
+            <text name="input_IAPlaceSizeSelect" text="Selezione dimensione luogo (Fields of Stories)"/>
+            <text name="input_IAPlaceBulkRemove" text="Rimozione multipla luoghi (Fields of Stories)"/>
+</texts>
 </l10n>

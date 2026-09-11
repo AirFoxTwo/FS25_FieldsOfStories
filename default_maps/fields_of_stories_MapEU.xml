@@ -836,38 +836,6 @@
             <relRotation>-0.016275</relRotation>
             <collisionExcludeRefId id="95059"/>
         </place>
-        <place id="55" referenceFilename="$data/maps/mapEU/textures/buildings/bunkerShed/bunkerShed.i3d" nodeName="$data/maps/mapEU/textures/buildings/bunkerShed/bunkerShed.i3d" mapRefNodeId="105690">
-            <name>shed at $data/maps/mapEU/textures/buildings/bunkerShed/bunkerShed.i3d</name>
-            <type>shed</type>
-            <x>-163.466187</x>
-            <y>57.556396</y>
-            <z>127.976669</z>
-            <rotation>1.556840</rotation>
-            <sizeType>vehicle</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>-0.023330</offsetX>
-            <offsetY>0.131396</offsetY>
-            <offsetZ>11.466187</offsetZ>
-            <relRotation>3.127636</relRotation>
-            <collisionExcludeRefId id="105690"/>
-        </place>
-        <place id="56" referenceFilename="$data/maps/mapEU/textures/buildings/bunkerShed/bunkerShed.i3d" nodeName="$data/maps/mapEU/textures/buildings/bunkerShed/bunkerShed.i3d" mapRefNodeId="105690">
-            <name>shed at $data/maps/mapEU/textures/buildings/bunkerShed/bunkerShed.i3d</name>
-            <type>shed</type>
-            <x>-148.688019</x>
-            <y>57.337635</y>
-            <z>128.051514</z>
-            <rotation>-1.560165</rotation>
-            <sizeType>vehicle</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.051513</offsetX>
-            <offsetY>-0.087370</offsetY>
-            <offsetZ>-3.311981</offsetZ>
-            <relRotation>0.010631</relRotation>
-            <collisionExcludeRefId id="105690"/>
-        </place>
         <place id="57" nodeName="parkingLines06" mapRefNodeId="89447">
             <name>public_place at parkingLines06 #1</name>
             <type>public_place</type>
@@ -6803,22 +6771,6 @@
             <offsetZ>-0.006134</offsetZ>
             <relRotation>-1.348523</relRotation>
             <collisionExcludeRefId id="115766"/>
-        </place>
-        <place id="470" nodeName="electricPole" mapRefNodeId="115762">
-            <name>public_infrastructure at electricPole #144</name>
-            <type>public_infrastructure</type>
-            <x>-530.028015</x>
-            <y>59.686489</y>
-            <z>424.332703</z>
-            <rotation>0.299574</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>0.070890</offsetX>
-            <offsetY>-0.092603</offsetY>
-            <offsetZ>-0.006134</offsetZ>
-            <relRotation>-1.348523</relRotation>
-            <collisionExcludeRefId id="115762"/>
         </place>
         <place id="471" nodeName="electricPole" mapRefNodeId="115754">
             <name>public_infrastructure at electricPole #145</name>
@@ -19763,22 +19715,6 @@
             <offsetZ>0.521573</offsetZ>
             <relRotation>0.307377</relRotation>
             <collisionExcludeRefId id="17066"/>
-        </place>
-        <place id="1288" referenceFilename="$data/maps/trees/aspen/aspen_stage04.i3d" nodeName="$data/maps/trees/aspen/aspen_stage04.i3d" mapRefNodeId="37841">
-            <name>roadside_trees at $data/maps/trees/aspen/aspen_stage04.i3d #293</name>
-            <type>roadside_trees</type>
-            <x>-98.968498</x>
-            <y>55.606880</y>
-            <z>94.011879</z>
-            <rotation>-2.977298</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>-0.427903</offsetX>
-            <offsetY>-0.135021</offsetY>
-            <offsetZ>0.521573</offsetZ>
-            <relRotation>0.307377</relRotation>
-            <collisionExcludeRefId id="37841"/>
         </place>
         <place id="1289" referenceFilename="$data/maps/trees/aspen/aspen_stage04.i3d" nodeName="$data/maps/trees/aspen/aspen_stage04.i3d" mapRefNodeId="35106">
             <name>roadside_trees at $data/maps/trees/aspen/aspen_stage04.i3d #294</name>
@@ -43716,22 +43652,6 @@
             <relRotation>1.284531</relRotation>
             <collisionExcludeRefId id="26460"/>
         </place>
-        <place id="2787" referenceFilename="$data/maps/trees/beech/beech_stage04.i3d" nodeName="$data/maps/trees/beech/beech_stage04.i3d" mapRefNodeId="37929">
-            <name>roadside_trees at $data/maps/trees/beech/beech_stage04.i3d #199</name>
-            <type>roadside_trees</type>
-            <x>140.097412</x>
-            <y>56.075218</y>
-            <z>223.714172</z>
-            <rotation>2.733948</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>-0.756151</offsetX>
-            <offsetY>0.014719</offsetY>
-            <offsetZ>0.013065</offsetZ>
-            <relRotation>1.284531</relRotation>
-            <collisionExcludeRefId id="37929"/>
-        </place>
         <place id="2788" referenceFilename="$data/maps/trees/beech/beech_stage04.i3d" nodeName="$data/maps/trees/beech/beech_stage04.i3d" mapRefNodeId="36550">
             <name>roadside_trees at $data/maps/trees/beech/beech_stage04.i3d #200</name>
             <type>roadside_trees</type>
@@ -52595,22 +52515,6 @@
             <offsetZ>0.013065</offsetZ>
             <relRotation>1.284531</relRotation>
             <collisionExcludeRefId id="31248"/>
-        </place>
-        <place id="3343" referenceFilename="$data/maps/trees/beech/beech_stage05.i3d" nodeName="$data/maps/trees/beech/beech_stage05.i3d" mapRefNodeId="38387">
-            <name>roadside_trees at $data/maps/trees/beech/beech_stage05.i3d #366</name>
-            <type>roadside_trees</type>
-            <x>539.486877</x>
-            <y>68.684219</y>
-            <z>579.438171</z>
-            <rotation>0.285400</rotation>
-            <sizeType>character</sizeType>
-            <withVehicle>false</withVehicle>
-            <withAttachment>false</withAttachment>
-            <offsetX>-0.756151</offsetX>
-            <offsetY>0.014719</offsetY>
-            <offsetZ>0.013065</offsetZ>
-            <relRotation>1.284531</relRotation>
-            <collisionExcludeRefId id="38387"/>
         </place>
         <place id="3344" referenceFilename="$data/maps/trees/beech/beech_stage05.i3d" nodeName="$data/maps/trees/beech/beech_stage05.i3d" mapRefNodeId="14104">
             <name>roadside_trees at $data/maps/trees/beech/beech_stage05.i3d #367</name>
@@ -79260,17 +79164,6 @@
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
         </place>
-        <place id="5099">
-            <name>Place 220 #3</name>
-            <type>sell_point</type>
-            <x>658.237732</x>
-            <y>73.064812</y>
-            <z>-42.121479</z>
-            <rotation>-2.298880</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
         <place id="5100">
             <name>Place 221</name>
             <type>sell_point</type>
@@ -79634,600 +79527,6 @@
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
         </place>
-        <place id="5418">
-            <name>Roadside (auto 16.7)</name>
-            <type>roadside</type>
-            <x>519.389038</x>
-            <y>71.744217</y>
-            <z>849.491577</z>
-            <rotation>3.070805</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5450">
-            <name>Roadside (auto 16.8)</name>
-            <type>roadside</type>
-            <x>526.140503</x>
-            <y>70.584969</y>
-            <z>765.476501</z>
-            <rotation>3.026216</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5441">
-            <name>Roadside (auto 16.9)</name>
-            <type>roadside</type>
-            <x>536.809875</x>
-            <y>72.729561</y>
-            <z>681.891479</z>
-            <rotation>2.978377</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5407">
-            <name>Roadside (auto 17.1)</name>
-            <type>roadside</type>
-            <x>343.135712</x>
-            <y>78.462646</y>
-            <z>-841.859375</z>
-            <rotation>0.567211</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5447">
-            <name>Roadside (auto 17.2)</name>
-            <type>roadside</type>
-            <x>419.377106</x>
-            <y>79.332245</y>
-            <z>-722.176208</z>
-            <rotation>0.567611</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5123">
-            <name>Roadside (auto 17.3)</name>
-            <type>roadside</type>
-            <x>494.850464</x>
-            <y>80.076599</y>
-            <z>-602.119995</z>
-            <rotation>0.511025</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5417">
-            <name>Roadside (auto 17.4)</name>
-            <type>roadside</type>
-            <x>559.143494</x>
-            <y>80.082909</y>
-            <z>-476.125824</z>
-            <rotation>0.336455</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5428">
-            <name>Roadside (auto 17.5)</name>
-            <type>roadside</type>
-            <x>604.211670</x>
-            <y>79.784721</y>
-            <z>-341.715424</z>
-            <rotation>0.254896</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5419">
-            <name>Roadside (auto 17.7)</name>
-            <type>roadside</type>
-            <x>649.560730</x>
-            <y>72.994873</y>
-            <z>-62.801064</z>
-            <rotation>0.016669</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5133">
-            <name>Roadside (auto 17.8)</name>
-            <type>roadside</type>
-            <x>647.517212</x>
-            <y>71.482231</y>
-            <z>78.765541</z>
-            <rotation>-0.112552</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5135">
-            <name>Roadside (auto 17.9)</name>
-            <type>roadside</type>
-            <x>627.082092</x>
-            <y>68.266815</y>
-            <z>218.715652</z>
-            <rotation>-0.230613</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5412">
-            <name>Roadside (auto 17.10)</name>
-            <type>roadside</type>
-            <x>593.356201</x>
-            <y>69.804413</y>
-            <z>356.316467</z>
-            <rotation>-0.232725</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5448">
-            <name>Roadside (auto 22.1)</name>
-            <type>roadside</type>
-            <x>-505.589905</x>
-            <y>57.871010</y>
-            <z>-177.399246</z>
-            <rotation>2.916695</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5405">
-            <name>Roadside (auto 22.2)</name>
-            <type>roadside</type>
-            <x>-475.244232</x>
-            <y>61.144829</y>
-            <z>-295.529327</z>
-            <rotation>2.858853</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5149">
-            <name>Roadside (auto 22.6)</name>
-            <type>roadside</type>
-            <x>-382.542542</x>
-            <y>59.734432</y>
-            <z>-772.794128</z>
-            <rotation>2.754771</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5155">
-            <name>Roadside (auto 27.1)</name>
-            <type>roadside</type>
-            <x>-616.229309</x>
-            <y>56.901257</y>
-            <z>915.125244</z>
-            <rotation>2.831865</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5157">
-            <name>Roadside (auto 27.2)</name>
-            <type>roadside</type>
-            <x>-592.695251</x>
-            <y>57.119278</y>
-            <z>843.778992</z>
-            <rotation>2.815269</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5159">
-            <name>Roadside (auto 27.3)</name>
-            <type>roadside</type>
-            <x>-568.613708</x>
-            <y>56.976780</y>
-            <z>772.568909</z>
-            <rotation>2.816492</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5161">
-            <name>Roadside (auto 27.4)</name>
-            <type>roadside</type>
-            <x>-544.674316</x>
-            <y>57.033920</y>
-            <z>701.297791</z>
-            <rotation>2.827052</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5163">
-            <name>Roadside (auto 27.5)</name>
-            <type>roadside</type>
-            <x>-521.780823</x>
-            <y>58.229515</y>
-            <z>629.578857</z>
-            <rotation>2.911722</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5165">
-            <name>Roadside (auto 27.6)</name>
-            <type>roadside</type>
-            <x>-509.771667</x>
-            <y>59.243275</y>
-            <z>555.289795</z>
-            <rotation>-3.119572</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5167">
-            <name>Roadside (auto 27.7)</name>
-            <type>roadside</type>
-            <x>-512.970886</x>
-            <y>60.892685</y>
-            <z>480.138916</z>
-            <rotation>-3.050293</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5171">
-            <name>Roadside (auto 27.9)</name>
-            <type>roadside</type>
-            <x>-522.270874</x>
-            <y>60.033836</y>
-            <z>330.289246</z>
-            <rotation>-3.129787</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5177">
-            <name>Roadside (auto 28.2)</name>
-            <type>roadside</type>
-            <x>-524.521606</x>
-            <y>61.542290</y>
-            <z>430.935760</z>
-            <rotation>0.084106</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5203">
-            <name>Roadside (auto 29.9)</name>
-            <type>roadside</type>
-            <x>425.775696</x>
-            <y>79.336365</y>
-            <z>-725.433289</z>
-            <rotation>-2.574408</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5205">
-            <name>Roadside (auto 29.10)</name>
-            <type>roadside</type>
-            <x>349.234070</x>
-            <y>78.463562</y>
-            <z>-845.588501</z>
-            <rotation>-2.570020</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5209">
-            <name>Roadside (auto 30.2)</name>
-            <type>roadside</type>
-            <x>-41.439468</x>
-            <y>56.194283</y>
-            <z>105.091904</z>
-            <rotation>-1.989380</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5211">
-            <name>Roadside (auto 30.3)</name>
-            <type>roadside</type>
-            <x>-84.447739</x>
-            <y>55.658100</y>
-            <z>86.320808</z>
-            <rotation>-1.958022</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5215">
-            <name>Roadside (auto 30.5)</name>
-            <type>roadside</type>
-            <x>-172.023972</x>
-            <y>57.717033</y>
-            <z>52.734077</z>
-            <rotation>-1.909458</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5231">
-            <name>Roadside (auto 42.2)</name>
-            <type>roadside</type>
-            <x>435.551544</x>
-            <y>64.837021</y>
-            <z>412.565857</z>
-            <rotation>-2.190752</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5235">
-            <name>Roadside (auto 42.4)</name>
-            <type>roadside</type>
-            <x>401.656586</x>
-            <y>61.456337</y>
-            <z>388.429108</z>
-            <rotation>-2.180036</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5237">
-            <name>Roadside (auto 42.5)</name>
-            <type>roadside</type>
-            <x>384.563782</x>
-            <y>60.046333</y>
-            <z>376.534088</z>
-            <rotation>-2.175111</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5269">
-            <name>Roadside (auto 45.1)</name>
-            <type>roadside</type>
-            <x>241.733917</x>
-            <y>57.663921</y>
-            <z>275.968842</z>
-            <rotation>-2.185251</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5271">
-            <name>Roadside (auto 45.2)</name>
-            <type>roadside</type>
-            <x>226.462875</x>
-            <y>57.255566</y>
-            <z>265.214722</z>
-            <rotation>-2.180843</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5273">
-            <name>Roadside (auto 45.3)</name>
-            <type>roadside</type>
-            <x>211.133636</x>
-            <y>56.838150</y>
-            <z>254.534821</z>
-            <rotation>-2.172154</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5275">
-            <name>Roadside (auto 45.4)</name>
-            <type>roadside</type>
-            <x>195.695831</x>
-            <y>56.502510</y>
-            <z>244.005569</z>
-            <rotation>-2.160374</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5277">
-            <name>Roadside (auto 45.5)</name>
-            <type>roadside</type>
-            <x>180.146011</x>
-            <y>56.285782</y>
-            <z>233.646637</z>
-            <rotation>-2.153131</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5279">
-            <name>Roadside (auto 45.6)</name>
-            <type>roadside</type>
-            <x>164.532333</x>
-            <y>56.153160</y>
-            <z>223.389923</z>
-            <rotation>-2.148267</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5281">
-            <name>Roadside (auto 45.7)</name>
-            <type>roadside</type>
-            <x>148.866531</x>
-            <y>56.101025</y>
-            <z>213.209320</z>
-            <rotation>-2.142751</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5299">
-            <name>Roadside (auto 47.6)</name>
-            <type>roadside</type>
-            <x>-174.122452</x>
-            <y>57.723816</y>
-            <z>59.532398</z>
-            <rotation>1.224257</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5301">
-            <name>Roadside (auto 47.7)</name>
-            <type>roadside</type>
-            <x>-130.554016</x>
-            <y>56.066399</y>
-            <z>75.519547</z>
-            <rotation>1.197388</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5331">
-            <name>Roadside (auto 52.1)</name>
-            <type>roadside</type>
-            <x>-350.792786</x>
-            <y>59.518520</y>
-            <z>-870.075623</z>
-            <rotation>-0.384551</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5333">
-            <name>Roadside (auto 52.2)</name>
-            <type>roadside</type>
-            <x>-382.272949</x>
-            <y>59.520718</y>
-            <z>-792.721436</z>
-            <rotation>-0.358780</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5335">
-            <name>Roadside (auto 52.3)</name>
-            <type>roadside</type>
-            <x>-407.505432</x>
-            <y>59.385593</y>
-            <z>-713.047607</z>
-            <rotation>-0.152763</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5337">
-            <name>Roadside (auto 52.4)</name>
-            <type>roadside</type>
-            <x>-416.728943</x>
-            <y>59.030445</y>
-            <z>-630.022278</z>
-            <rotation>-0.025583</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5339">
-            <name>Roadside (auto 52.5)</name>
-            <type>roadside</type>
-            <x>-420.204468</x>
-            <y>58.653908</y>
-            <z>-546.827698</z>
-            <rotation>-0.140778</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5341">
-            <name>Roadside (auto 52.6)</name>
-            <type>roadside</type>
-            <x>-435.080963</x>
-            <y>58.566399</y>
-            <z>-465.013031</z>
-            <rotation>-0.272476</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5343">
-            <name>Roadside (auto 52.7)</name>
-            <type>roadside</type>
-            <x>-457.038666</x>
-            <y>61.222557</y>
-            <z>-384.533600</z>
-            <rotation>-0.276500</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5347">
-            <name>Roadside (auto 52.9)</name>
-            <type>roadside</type>
-            <x>-503.131500</x>
-            <y>60.106281</y>
-            <z>-223.986908</z>
-            <rotation>-0.206091</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5349">
-            <name>Roadside (auto 52.10)</name>
-            <type>roadside</type>
-            <x>-516.401611</x>
-            <y>57.420490</y>
-            <z>-141.585556</z>
-            <rotation>-0.074538</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5351">
-            <name>Roadside (auto 55.1)</name>
-            <type>roadside</type>
-            <x>545.003174</x>
-            <y>69.254852</y>
-            <z>588.275757</z>
-            <rotation>-0.163541</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5353">
-            <name>Roadside (auto 55.2)</name>
-            <type>roadside</type>
-            <x>532.694885</x>
-            <y>72.087471</y>
-            <z>662.742004</z>
-            <rotation>-0.153615</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5355">
-            <name>Roadside (auto 55.3)</name>
-            <type>roadside</type>
-            <x>522.141846</x>
-            <y>71.577560</y>
-            <z>737.541382</z>
-            <rotation>-0.109658</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
-        <place id="5357">
-            <name>Roadside (auto 55.4)</name>
-            <type>roadside</type>
-            <x>514.780212</x>
-            <y>70.822403</y>
-            <z>812.723755</z>
-            <rotation>-0.068813</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-        </place>
         <place id="5236">
             <name>Sell point (buyingStationLiquidManure T1)</name>
             <type>sell_point</type>
@@ -80287,18 +79586,6 @@
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
             <description>ownerFarmId=0; isSellingPoint=true; rootNodeName=bakery; supportedFillTypes=85,60,48,66,63,59,43; unloadTriggerIndex=1; aiNode=14239761; stationId=210</description>
-        </place>
-        <place id="5250">
-            <name>Sell point (debrisCrusher T2)</name>
-            <type>sell_point</type>
-            <x>540.697632</x>
-            <y>72.099998</y>
-            <z>722.973450</z>
-            <rotation>1.387570</rotation>
-            <sizeType>vehicle_attachment</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>true</withAttachment>
-            <description>ownerFarmId=0; isSellingPoint=true; rootNodeName=debrisCrusher; supportedFillTypes=112; unloadTriggerIndex=2; aiNode=14239908; stationId=218</description>
         </place>
         <place id="5252">
             <name>Sell point (livestockMarket T1)</name>
@@ -80768,28 +80055,6 @@
             <y>57.059658</y>
             <z>-578.118164</z>
             <rotation>-1.599229</rotation>
-            <sizeType>vehicle</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>false</withAttachment>
-        </place>
-        <place id="5156">
-            <name>Place 5156</name>
-            <type>character_homebase</type>
-            <x>-60.154102</x>
-            <y>56.797081</y>
-            <z>-592.215027</z>
-            <rotation>3.123447</rotation>
-            <sizeType>vehicle</sizeType>
-            <withVehicle>true</withVehicle>
-            <withAttachment>false</withAttachment>
-        </place>
-        <place id="5422">
-            <name>Place 5156</name>
-            <type>character_homebase</type>
-            <x>-54.909954</x>
-            <y>57.036942</y>
-            <z>-585.280396</z>
-            <rotation>1.583279</rotation>
             <sizeType>vehicle</sizeType>
             <withVehicle>true</withVehicle>
             <withAttachment>false</withAttachment>
@@ -82037,6 +81302,380 @@
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
         </place>
+        <place id="5480">
+            <name>Place 5480</name>
+            <type>roadside</type>
+            <x>-51.197929</x>
+            <y>56.124794</y>
+            <z>111.865456</z>
+            <rotation>1.151583</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5481">
+            <name>Place 5481</name>
+            <type>roadside</type>
+            <x>171.997177</x>
+            <y>56.175472</y>
+            <z>240.316238</z>
+            <rotation>0.989360</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5482">
+            <name>Place 5482</name>
+            <type>roadside</type>
+            <x>440.054413</x>
+            <y>65.898170</y>
+            <z>427.849640</z>
+            <rotation>0.949741</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5483">
+            <name>Place 5483</name>
+            <type>roadside</type>
+            <x>536.821655</x>
+            <y>70.096825</y>
+            <z>618.504578</z>
+            <rotation>-0.158287</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5484">
+            <name>Place 5484</name>
+            <type>sell_point</type>
+            <x>551.588745</x>
+            <y>72.013512</y>
+            <z>740.453003</z>
+            <rotation>-0.032485</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5485">
+            <name>Place 5485</name>
+            <type>roadside</type>
+            <x>626.734192</x>
+            <y>65.745026</y>
+            <z>270.672699</z>
+            <rotation>2.894784</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5486">
+            <name>Place 5486</name>
+            <type>roadside</type>
+            <x>390.729218</x>
+            <y>79.247635</y>
+            <z>-786.779968</z>
+            <rotation>-2.569146</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5487">
+            <name>Place 5487</name>
+            <type>roadside</type>
+            <x>350.386108</x>
+            <y>78.919998</y>
+            <z>-823.542664</z>
+            <rotation>0.534437</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5488">
+            <name>Place 5488</name>
+            <type>roadside</type>
+            <x>-538.775330</x>
+            <y>57.689602</y>
+            <z>649.521118</z>
+            <rotation>-0.317798</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5489">
+            <name>Place 5489</name>
+            <type>roadside</type>
+            <x>-623.490845</x>
+            <y>57.226063</y>
+            <z>901.559875</z>
+            <rotation>-0.298512</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5490">
+            <name>Place 5490</name>
+            <type>roadside</type>
+            <x>-568.743225</x>
+            <y>56.968922</y>
+            <z>783.433899</z>
+            <rotation>2.824290</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5491">
+            <name>Place 5491</name>
+            <type>roadside</type>
+            <x>-519.084717</x>
+            <y>60.304108</y>
+            <z>348.681580</z>
+            <rotation>-3.112949</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5492">
+            <name>Place 5492</name>
+            <type>roadside</type>
+            <x>-366.292694</x>
+            <y>57.198544</y>
+            <z>302.168335</z>
+            <rotation>2.581311</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5493">
+            <name>Place 5493</name>
+            <type>player_farm</type>
+            <x>-190.183289</x>
+            <y>59.010284</y>
+            <z>27.318525</z>
+            <rotation>2.246845</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5494">
+            <name>Place 5494</name>
+            <type>shop</type>
+            <x>-499.917114</x>
+            <y>60.996109</y>
+            <z>-285.710297</z>
+            <rotation>2.246845</rotation>
+            <sizeType>character</sizeType>
+            <withVehicle>false</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="5495">
+            <name>Place 5495</name>
+            <type>shop</type>
+            <x>-515.634460</x>
+            <y>59.430252</y>
+            <z>-206.576294</z>
+            <rotation>1.574054</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="5496">
+            <name>Place 5496</name>
+            <type>shop</type>
+            <x>-516.407898</x>
+            <y>59.192162</y>
+            <z>217.656494</z>
+            <rotation>1.574054</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="5497">
+            <name>Place 5497</name>
+            <type>character_homebase</type>
+            <x>-253.238754</x>
+            <y>59.965321</y>
+            <z>115.728775</z>
+            <rotation>-0.020734</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5498">
+            <name>Place 5498</name>
+            <type>character_homebase</type>
+            <x>-38.785774</x>
+            <y>56.049168</y>
+            <z>718.682617</z>
+            <rotation>3.130546</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5499">
+            <name>Place 5499</name>
+            <type>character_homebase</type>
+            <x>-585.993042</x>
+            <y>59.486385</y>
+            <z>558.686707</z>
+            <rotation>-3.134315</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5500">
+            <name>Place 5500</name>
+            <type>character_homebase</type>
+            <x>-50.595718</x>
+            <y>57.100460</y>
+            <z>-562.408997</z>
+            <rotation>-3.134315</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5501">
+            <name>Place 5501</name>
+            <type>character_homebase</type>
+            <x>-60.443794</x>
+            <y>56.872871</y>
+            <z>-591.434021</z>
+            <rotation>-3.129422</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="5502">
+            <name>Place 5502</name>
+            <type>character_homebase</type>
+            <x>-54.638145</x>
+            <y>57.077656</y>
+            <z>-585.960754</z>
+            <rotation>-1.554539</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="5503">
+            <name>Place 5503</name>
+            <type>character_homebase</type>
+            <x>-297.757812</x>
+            <y>58.670414</y>
+            <z>128.757919</z>
+            <rotation>-1.581600</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="5504">
+            <name>Place 5504</name>
+            <type>character_homebase</type>
+            <x>-171.166794</x>
+            <y>57.965500</y>
+            <z>134.716736</z>
+            <rotation>-0.756400</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5505">
+            <name>Place 5505</name>
+            <type>character_homebase</type>
+            <x>-147.506668</x>
+            <y>57.423599</y>
+            <z>131.466370</z>
+            <rotation>-0.005459</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5506">
+            <name>Place 5506</name>
+            <type>character_homebase</type>
+            <x>-664.606873</x>
+            <y>59.000000</y>
+            <z>-524.684814</z>
+            <rotation>1.574579</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="5507">
+            <name>Place 5507</name>
+            <type>character_homebase</type>
+            <x>-583.931580</x>
+            <y>59.000004</y>
+            <z>-522.079407</z>
+            <rotation>1.574579</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5508">
+            <name>Place 5508</name>
+            <type>character_homebase</type>
+            <x>-647.452087</x>
+            <y>59.000000</y>
+            <z>-466.476776</z>
+            <rotation>-0.007358</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5509">
+            <name>Place 5509</name>
+            <type>character_homebase</type>
+            <x>-584.963745</x>
+            <y>59.000008</y>
+            <z>-510.902985</z>
+            <rotation>1.576676</rotation>
+            <sizeType>large_area</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5510">
+            <name>Place 5510</name>
+            <type>character_homebase</type>
+            <x>-623.531250</x>
+            <y>59.000000</y>
+            <z>-465.572937</z>
+            <rotation>1.830749</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="5511">
+            <name>Place 5511</name>
+            <type>character_homebase</type>
+            <x>-647.624146</x>
+            <y>59.000004</y>
+            <z>-458.025269</z>
+            <rotation>-0.003455</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="5512">
+            <name>Place 5512</name>
+            <type>character_homebase</type>
+            <x>142.407410</x>
+            <y>55.992218</y>
+            <z>145.267639</z>
+            <rotation>1.570796</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="5513">
+            <name>Place 5513</name>
+            <type>character_homebase</type>
+            <x>142.304642</x>
+            <y>55.992214</y>
+            <z>141.415451</z>
+            <rotation>1.570796</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
     </places>
     <neighbourHomebaseAssignments>
         <neighbour id="21">
@@ -82058,6 +81697,9 @@
             <placeId id="5452"/>
             <placeId id="5466"/>
             <placeId id="5467"/>
+            <placeId id="5500"/>
+            <placeId id="5501"/>
+            <placeId id="5502"/>
         </neighbour>
         <neighbour id="20">
             <placeId id="5168"/>
@@ -82080,6 +81722,7 @@
             <placeId id="5455"/>
             <placeId id="5456"/>
             <placeId id="5457"/>
+            <placeId id="5498"/>
         </neighbour>
         <neighbour id="19">
             <placeId id="5184"/>
@@ -82102,6 +81745,7 @@
             <placeId id="5458"/>
             <placeId id="5459"/>
             <placeId id="5460"/>
+            <placeId id="5499"/>
         </neighbour>
         <neighbour id="18">
             <placeId id="179"/>
@@ -82132,6 +81776,10 @@
             <placeId id="5471"/>
             <placeId id="5478"/>
             <placeId id="5479"/>
+            <placeId id="5497"/>
+            <placeId id="5503"/>
+            <placeId id="5504"/>
+            <placeId id="5505"/>
         </neighbour>
         <neighbour id="17">
             <placeId id="154"/>
@@ -82167,6 +81815,12 @@
             <placeId id="5399"/>
             <placeId id="5400"/>
             <placeId id="5401"/>
+            <placeId id="5506"/>
+            <placeId id="5507"/>
+            <placeId id="5508"/>
+            <placeId id="5509"/>
+            <placeId id="5510"/>
+            <placeId id="5511"/>
         </neighbour>
         <neighbour id="16">
             <placeId id="155"/>
@@ -82179,6 +81833,8 @@
             <placeId id="5366"/>
             <placeId id="5370"/>
             <placeId id="5371"/>
+            <placeId id="5512"/>
+            <placeId id="5513"/>
         </neighbour>
         <neighbour id="14">
             <placeId id="143"/>

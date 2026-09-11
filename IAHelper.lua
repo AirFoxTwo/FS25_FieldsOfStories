@@ -656,6 +656,18 @@ function getPositionBlockedByCollision(neighbours, x, y, z, radiusM, excludeNode
 				end
 			end
 		end
+		-- Optional map-level whitelist from map config XML (fields_of_stories_<mapId>.xml <collisionWhitelist>)
+		local mapList = neighbours.mapCollisionExcludeNodeNames
+		if mapList ~= nil and type(mapList) == "table" then
+			for _, pattern in ipairs(mapList) do
+				if pattern ~= nil then
+					local p = string.lower(tostring(pattern))
+					if p == lowerStr or (string.len(p) > 0 and string.find(lowerStr, p) ~= nil) then
+						return true
+					end
+				end
+			end
+		end
 		return false
 	end
 
@@ -956,34 +968,6 @@ function getNodeYawFromForward(node, fallbackYaw)
 	return normalizeYawPi(yaw or fallbackYaw or 0)
 end
 
-function printObj(obj, hierarchyLevel,prefix) 
-	if (hierarchyLevel == nil) then
-	  hierarchyLevel = 0
-	elseif (hierarchyLevel == 4) then
-	  return 0
-	end
-  
-	local whitespace = ""
-	for i=0,hierarchyLevel,1 do
-	  whitespace = whitespace .. "-"
-	end
-	io.write(whitespace)
-	print("Debug: "..prefix)
-	print(obj)
-	if (type(obj) == "table") then
-	  for k,v in pairs(obj) do
-		io.write(whitespace .. "-")
-		if (type(v) == "table") then
-		  printObj(v, hierarchyLevel+1,prefix.." - "..k)
-		else
-		  print(prefix.." - "..k..": "..tostring(v))
-		end           
-	  end
-	else
-	  print(obj)
-	end
-end
-
 --- In-game calendar month 1–12 from `environment.currentPeriod` (+2, with 13→1 / 14→2 wrap). Same rules as `getCurrentGameHours`.
 --- @return number|nil
 function getEnvironmentMonth1to12()
@@ -1148,6 +1132,48 @@ function IAHelper_getFieldForFarmlandId(farmlandId)
 		end
 	end
 	return nil
+end
+
+--- Sample a fresh FieldState from the actual terrain for a field.
+--- Tries three tiers (matching XMLHelper outbound save):
+---   1. FieldState.new():update() at field center (reads live density maps)
+---   2. field:getFieldState() (may return a refreshed snapshot)
+---   3. field.fieldState (cached, last resort)
+--- @param table|userdata field - FS engine field object
+--- @return table|nil FieldState or nil if nothing is available
+function IAHelper_getFieldStateFresh(field)
+	if field == nil then
+		return nil
+	end
+	local fs = nil
+	-- Tier 1: fresh probe at field center (reads live density maps)
+	if FieldState ~= nil and type(FieldState.new) == "function" then
+		local cx, cz = nil, nil
+		if type(field.getCenterOfFieldWorldPosition) == "function" then
+			cx, cz = field:getCenterOfFieldWorldPosition()
+		end
+		if cx ~= nil and cz ~= nil then
+			local probe = FieldState.new()
+			if type(probe.update) == "function" then
+				local okUp, _ = pcall(probe.update, probe, cx, cz)
+				if okUp then
+					fs = probe
+				end
+			end
+		end
+	end
+	-- Tier 2: getFieldState (engine may have a refreshed snapshot)
+	if fs == nil and type(field.getFieldState) == "function" then
+		local okG, g = pcall(field.getFieldState, field)
+		if okG and g ~= nil then
+			fs = g
+		end
+	end
+	-- Tier 3: cached fieldState (last resort)
+	if fs == nil and field.fieldState ~= nil then
+		fs = field.fieldState
+	end
+	return fs
 end
 
 --- Union of place ids listed in `neighbour[fieldName]` for every neighbour (`assignedHomebasePlaceIds`, `assignedWorkplacePlaceIds`, …).
@@ -1332,6 +1358,9 @@ function createAndPlayVoiceSample(baseDir, relativePath, sourceNode, effectPrese
 		local innerRadius = 3
 		local outerRadius = 25
 		local volume = 1
+		if IASettings ~= nil and IASettings.getVoiceVolume ~= nil then
+			volume = IASettings.getVoiceVolume()
+		end
 		local loops = 1
 		local name = "IANeighbours_voice_3d"
 		local soundNode = createAudioSource(name, fileName, outerRadius, innerRadius, volume, loops)
@@ -1379,7 +1408,11 @@ function createAndPlayVoiceSample(baseDir, relativePath, sourceNode, effectPrese
 		return nil
 	end
 	applyVoiceEffectPreset(sample, effectPreset)
-	playSample(sample, 1, 1, 0, 0, 0)
+	local volume = 1
+	if IASettings ~= nil and IASettings.getVoiceVolume ~= nil then
+		volume = IASettings.getVoiceVolume()
+	end
+	playSample(sample, 1, volume, 0, 0, 0)
 	return sample
 end
 
@@ -1522,8 +1555,7 @@ local function iaIsFieldContractEligible(field, opts)
 end
 
 -- -----------------------------------------------------------------------------
--- FS25_ContractTypeGenerator parity: isAvailableForField, FieldUpdateTask prep,
--- tryGenerateMission call order (no-arg first), getFieldForMission + debugField.
+-- isAvailableForField, FieldUpdateTask prep, tryGenerateMission call order (no-arg first), getFieldForMission + debugField.
 -- -----------------------------------------------------------------------------
 
 local function iaIsFruitHarvestableInCurrentPeriod(fruit, growthMode, period)
@@ -1873,7 +1905,7 @@ local function iaGetMissionPreparationStrategies(missionTypeName)
 			rollerLevel = 1,
 		})
 	end
-	-- Reference mod has no dedicated fertilize block; add one (name is often fertilizeMission / fertilize).
+	-- No dedicated fertilize block; add one (name is often fertilizeMission / fertilize).
 	if string.find(lowerName, "fertil", 1, true) ~= nil and cropFruit ~= nil then
 		addStrategy("fertilize_base", {
 			fruitTypeIndex = cropFruit.index,
@@ -1946,7 +1978,7 @@ local function iaGetMissionPreparationStrategies(missionTypeName)
 	return strategies
 end
 
----Reference FS25_ContractTypeGenerator: tryGenerateMission with no args, then (classObject); then contract-style (true) fallbacks.
+--- tryGenerateMission with no args, then (classObject); then contract-style (true) fallbacks.
 local function iaCallTryGenerateMission(classObject)
 	if classObject == nil or type(classObject.tryGenerateMission) ~= "function" then
 		return false, nil
@@ -2052,106 +2084,6 @@ local function iaRegisterMissionAndValidate(mission, missionType)
 		end
 	end
 	return false
-end
-
----Generate contracts for specific farmlands/fields by mission type name.
--- Uses base-game managers directly (no dependency on external_docs reference mods).
--- When the first pass returns nil, mirrors FS25_ContractTypeGenerator force path: FieldUpdateTask field prep + retry (unless opts.forcePrepareOnFailure == false).
--- @param string missionTypeName e.g. "HarvestMission"
--- @param number requestedCount how many missions to attempt
--- @param table|nil opts { farmlandIds={...}|set, fieldIds={...}|set, allowOwnedFields=bool, overrideMaxNumInstances=bool, forcePrepareOnFailure=bool }
--- @return number requestedCountSanitized, number generatedCount, table missionsGenerated
-function IAHelper_generateFieldContractsByType(missionTypeName, requestedCount, opts)
-	local missionsGenerated = {}
-	local genCount = 0
-
-	if g_missionManager == nil or missionTypeName == nil or missionTypeName == "" then
-		return 0, 0, missionsGenerated
-	end
-
-	local numericCount = tonumber(requestedCount) or 1
-	local req = math.max(1, math.floor(numericCount))
-
-	local missionType = g_missionManager:getMissionType(missionTypeName)
-	if missionType == nil or missionType.classObject == nil or type(missionType.classObject.tryGenerateMission) ~= "function" then
-		return req, 0, missionsGenerated
-	end
-
-	-- optional: loosen per-type cap so the mission manager doesn't block generation
-	local oldMaxNumInstances = nil
-	local missionTypeData = nil
-	if opts ~= nil and opts.overrideMaxNumInstances == true and type(g_missionManager.getMissionTypeDataByName) == "function" then
-		missionTypeData = g_missionManager:getMissionTypeDataByName(missionTypeName)
-		if missionTypeData ~= nil then
-			oldMaxNumInstances = missionTypeData.maxNumInstances
-			missionTypeData.maxNumInstances = math.max(missionTypeData.maxNumInstances or 0, (missionTypeData.numInstances or 0) + req)
-		end
-	end
-
-	-- collect candidate fields (farmland/field filtering happens here)
-	local candidates = {}
-	if g_fieldManager ~= nil and type(g_fieldManager.fields) == "table" then
-		for _, field in pairs(g_fieldManager.fields) do
-			if iaIsFieldContractEligible(field, opts) then
-				candidates[#candidates + 1] = field
-			end
-		end
-	end
-
-	-- shuffle so we don't always hit the same fields first
-	for i = #candidates, 2, -1 do
-		local j = math.random(1, i)
-		candidates[i], candidates[j] = candidates[j], candidates[i]
-	end
-
-	local classObject = missionType.classObject
-	local forcePrepOnFailure = true
-	if opts ~= nil and opts.forcePrepareOnFailure == false then
-		forcePrepOnFailure = false
-	end
-	for _ = 1, req do
-		local created = nil
-
-		-- Reference: isAvailableForField before tryGenerateMission
-		for _, field in ipairs(candidates) do
-			local canUse = true
-			if classObject.isAvailableForField ~= nil then
-				local okAv, av = iaCallIsAvailableForField(classObject, field)
-				if okAv then
-					canUse = av
-				end
-			end
-			if canUse then
-				created = iaTryGenerateMissionOnField(classObject, field)
-				if created ~= nil then
-					break
-				end
-			end
-		end
-
-		-- Reference: force field state via FieldUpdateTask then retry (mutates terrain; disable with opts.forcePrepareOnFailure = false)
-		if created == nil and forcePrepOnFailure then
-			created = iaForcePrepareAndTryGenerateOnCandidates(missionTypeName, classObject, candidates)
-		end
-
-		if created == nil then
-			break
-		end
-
-		if iaRegisterMissionAndValidate(created, missionType) then
-			genCount = genCount + 1
-			missionsGenerated[#missionsGenerated + 1] = created
-		else
-			-- validation removed it; stop early to avoid hammering
-			break
-		end
-	end
-
-	if missionTypeData ~= nil and oldMaxNumInstances ~= nil then
-		missionTypeData.maxNumInstances = oldMaxNumInstances
-	end
-
-	return req, genCount, missionsGenerated
 end
 
 --- True if `tostring(value)` equals `tostring(item)` for any row in `array` (case-insensitive). Nil value, nil array, or empty array => false.
@@ -2712,6 +2644,229 @@ function IAHelper_getBorderInsetProbePoints(field, insetMinM, insetMaxM, maxCoun
 	return out
 end
 
+--- Compute the inward normal (toward polygon centroid) at a fraction t along edge A→B.
+-- @param ax,az,bx,bz edge endpoints
+-- @param cx,cz polygon centroid
+-- @param t fraction along edge (0 at A, 1 at B)
+-- @return number|nil px, number|nil pz (point on edge), number|nil nix, number|nil niz (unit inward normal)
+local function iaHelperInwardNormalAtEdgeFraction(ax, az, bx, bz, cx, cz, t)
+	local ex, ez = bx - ax, bz - az
+	local elen = math.sqrt(ex * ex + ez * ez)
+	if elen < 1e-6 then
+		return nil
+	end
+	local tx, tz = ex / elen, ez / elen
+	local px, pz = ax + ex * t, az + ez * t
+	local nix, niz = -tz, tx
+	local toCx, toCz = cx - px, cz - pz
+	if nix * toCx + niz * toCz < 0 then
+		nix, niz = -nix, -niz
+	end
+	return px, pz, nix, niz
+end
+
+--- Deterministic continuous ring of probes at a fixed inset from the field border.
+-- Walks each polygon edge at spacingM intervals, offsetting inward by insetM along the inward normal.
+-- Filters points that fall outside the polygon (concave edges) and deduplicates corner overlaps.
+-- @param table field FS Field with polygonPoints
+-- @param number insetM fixed inward offset from border in meters (e.g. 5)
+-- @param number spacingM distance between probes along the perimeter (e.g. 10)
+-- @return table array of { x = number, z = number }
+function IAHelper_getRingProbePoints(field, insetM, spacingM)
+	local out = {}
+	if field == nil then
+		return out
+	end
+	local verts = iaHelperFieldPolygonVertsWorld(field)
+	local n = #verts
+	if n < 3 then
+		return out
+	end
+
+	local inM = math.max(0.5, tonumber(insetM) or 5)
+	local spM = math.max(1.0, tonumber(spacingM) or 10)
+	local cx, cz = iaHelperPolygonCentroidXZ(verts)
+	local minSep2 = (spM * 0.7) * (spM * 0.7)
+
+	for i = 1, n do
+		local j = (i % n) + 1
+		local ax, az = verts[i].x, verts[i].z
+		local bx, bz = verts[j].x, verts[j].z
+		local ex, ez = bx - ax, bz - az
+		local elen = math.sqrt(ex * ex + ez * ez)
+		if elen < 1e-3 then
+			-- degenerate edge, skip
+		else
+			-- number of steps: at least 1 per edge; step size ≤ spacingM
+			local nSteps = math.max(1, math.floor(elen / spM))
+			for s = 0, nSteps do
+				local t = (nSteps > 0) and (s / nSteps) or 0.5
+				local _, _, nix, niz = iaHelperInwardNormalAtEdgeFraction(ax, az, bx, bz, cx, cz, t)
+				if nix ~= nil then
+					local px = ax + ex * t + nix * inM
+					local pz = az + ez * t + niz * inM
+					if iaHelperPointInPolygonXZ(px, pz, verts) then
+						-- reject if closer than insetM to ANY edge (fixes corner probes leaking near adjacent borders)
+						if iaHelperMinDistSqToPolygonBorder(px, pz, verts) >= 8 then
+							if not iaHelperTooCloseToAny(px, pz, out, minSep2) then
+								out[#out + 1] = { x = px, z = pz }
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return out
+end
+
+--- Deterministic hexagonal grid of probe points covering the field interior, with a border margin.
+-- Uses honeycomb packing: row spacing = spacingM * sqrt(3)/2, odd rows offset by spacingM/2.
+-- @param table field FS Field with polygonPoints
+-- @param number spacingM grid spacing in meters; if nil/0, computed from field area and maxCount
+-- @param number borderMarginM minimum distance from polygon border (excludes ring zone)
+-- @param table|nil excludeList optional array of { x, z } — new points stay ≥ ~0.5 m from these
+-- @param number|nil maxCount cap on output count
+-- @return table array of { x = number, z = number }
+function IAHelper_getGridProbePoints(field, spacingM, borderMarginM, excludeList, maxCount)
+	local out = {}
+	if field == nil then
+		return out
+	end
+	local verts = iaHelperFieldPolygonVertsWorld(field)
+	local n = #verts
+	if n < 3 then
+		return out
+	end
+
+	local marginM = math.max(0, tonumber(borderMarginM) or 8)
+	local marginSq = marginM * marginM
+	local cap = tonumber(maxCount)
+	if cap ~= nil and cap <= 0 then
+		return out
+	end
+
+	local exList = excludeList
+	if exList == nil or type(exList) ~= "table" then
+		exList = {}
+	end
+
+	local minX, maxX = verts[1].x, verts[1].x
+	local minZ, maxZ = verts[1].z, verts[1].z
+	for i = 2, n do
+		local p = verts[i]
+		minX = math.min(minX, p.x)
+		maxX = math.max(maxX, p.x)
+		minZ = math.min(minZ, p.z)
+		maxZ = math.max(maxZ, p.z)
+	end
+
+	local spanX = maxX - minX
+	local spanZ = maxZ - minZ
+	if spanX < 1e-4 or spanZ < 1e-4 then
+		return out
+	end
+
+	-- spacing: use provided, or compute from field area / remaining budget
+	local spM = tonumber(spacingM)
+	if spM == nil or spM <= 0 then
+		if cap ~= nil and cap > 0 then
+			local areaEst = spanX * spanZ
+			-- hexagonal cell area ≈ spacing² * sqrt(3)/2; solve for spacing
+			spM = math.sqrt(areaEst / (cap * 0.866))
+			spM = math.max(5, spM) -- floor at 5m
+		else
+			spM = 10
+		end
+	end
+
+	local sqrt3_2 = 0.8660254037844386 -- sqrt(3)/2
+	local rowH = spM * sqrt3_2
+	local minSep2 = 0.25
+
+	-- row index from minZ upward
+	local row = 0
+	local rz = minZ
+	while rz <= maxZ do
+		local offsetX = (row % 2 == 1) and (spM * 0.5) or 0
+		local rx = minX + offsetX
+		while rx <= maxX do
+			if iaHelperPointInPolygonXZ(rx, rz, verts) then
+				if iaHelperMinDistSqToPolygonBorder(rx, rz, verts) > marginSq then
+					if not iaHelperTooCloseToAny(rx, rz, out, minSep2) then
+						if not iaHelperTooCloseToAny(rx, rz, exList, minSep2) then
+							out[#out + 1] = { x = rx, z = rz }
+							if cap ~= nil and #out >= cap then
+								return out
+							end
+						end
+					end
+				end
+			end
+			rx = rx + spM
+		end
+		row = row + 1
+		rz = rz + rowH
+	end
+
+	return out
+end
+
+--- Console debug: show ring + grid probe markers for a field (regardless of active mission).
+-- Stores debug nodes in IANeighbours._standaloneFieldProbeDebugNodes so the console command can clear them.
+-- @param table field FS Field with polygonPoints
+function IAHelper_showFieldProbesDebug(field)
+	if field == nil or IANeighbours == nil or type(IANeighbours.addDebugPointAtPosition) ~= "function" then
+		print("[iaShowFieldProbes] cannot show probes: field nil or debug API missing")
+		return
+	end
+	IAHelper_clearFieldProbesDebug()
+
+	local RING_INSET_M = 5
+	local RING_SPACING_M = 10
+	local GRID_MARGIN_M = 8
+
+	local ring = IAHelper_getRingProbePoints(field, RING_INSET_M, RING_SPACING_M)
+	local grid = IAHelper_getGridProbePoints(field, nil, GRID_MARGIN_M, ring, nil)
+
+	local all = {}
+	for _, p in ipairs(ring or {}) do
+		table.insert(all, { x = p.x, z = p.z, label = string.format("RING #%d", #all + 1), tier = 2 })
+	end
+	for _, p in ipairs(grid or {}) do
+		table.insert(all, { x = p.x, z = p.z, label = string.format("GRID #%d", #all + 1), tier = 1 })
+	end
+
+	local nodes = {}
+	for _, p in ipairs(all) do
+		local y = 0
+		if g_terrainNode ~= nil and getTerrainHeightAtWorldPos ~= nil then
+			y = getTerrainHeightAtWorldPos(g_terrainNode, p.x, 0, p.z) + 0.2
+		end
+		local node = IANeighbours:addDebugPointAtPosition(p.x, y, p.z, p.label, p.tier)
+		if node ~= nil and node ~= 0 then
+			table.insert(nodes, node)
+		end
+	end
+
+	IANeighbours._standaloneFieldProbeDebugNodes = nodes
+	print(string.format("[iaShowFieldProbes] ring=%d grid=%d total=%d debug nodes", #(ring or {}), #(grid or {}), #all))
+end
+
+--- Console debug: clear standalone field probe markers.
+function IAHelper_clearFieldProbesDebug()
+	if IANeighbours == nil or IANeighbours._standaloneFieldProbeDebugNodes == nil then
+		return
+	end
+	if type(IANeighbours.removeDebugPointNode) == "function" then
+		for _, node in ipairs(IANeighbours._standaloneFieldProbeDebugNodes) do
+			IANeighbours:removeDebugPointNode(node)
+		end
+	end
+	IANeighbours._standaloneFieldProbeDebugNodes = nil
+end
+
 --- Fix selectedItemIndex when items[index] is missing (avoids PlayerStyle async nil.filename).
 function iaCoercePlayerStyleSlotItem(slot, slotName, wantedIndex, debugPrefix)
 	if slot == nil or slot.items == nil then
@@ -3136,17 +3291,37 @@ end
 
 --- Draw all stored map-init place debug boxes as connected gray line segments (borrow-return box style).
 -- Applies the same range filter as debug points; pass nil ref to skip filtering.
-function IAHelper_drawMapInitPlaceDebugBoxes(ianeighbours, refX, refY, refZ, rangeSq)
+-- @param cursorRefX optional construction cursor X (OR filter with player ref)
+-- @param cursorRefY optional construction cursor Y
+-- @param cursorRefZ optional construction cursor Z
+function IAHelper_drawMapInitPlaceDebugBoxes(ianeighbours, refX, refY, refZ, rangeSq, cursorRefX, cursorRefY, cursorRefZ)
 	if ianeighbours == nil or ianeighbours.mapInitPlaceDebugBoxes == nil or drawDebugLine == nil then
 		return
 	end
 	local maxSq = rangeSq or (50 * 50)
 	for _, box in ipairs(ianeighbours.mapInitPlaceDebugBoxes) do
 		if box ~= nil and box.corners ~= nil then
-			local inRange = true
-			if refX ~= nil and refY ~= nil and refZ ~= nil and box.centerX ~= nil and box.centerZ ~= nil then
-				local dx, dy, dz = box.centerX - refX, (box.centerY or 0) - refY, box.centerZ - refZ
-				inRange = (dx * dx + dy * dy + dz * dz) <= maxSq
+			local inRange = false
+			local cx, cy, cz = box.centerX, box.centerY or 0, box.centerZ
+			if cx ~= nil and cz ~= nil then
+				-- Check player ref distance
+				if refX ~= nil then
+					local dx, dy, dz = cx - refX, cy - refY, cz - refZ
+					if (dx * dx + dy * dy + dz * dz) <= maxSq then
+						inRange = true
+					end
+				else
+					inRange = true -- no player ref → draw all
+				end
+				-- Also check cursor ref distance (OR logic)
+				if not inRange and cursorRefX ~= nil then
+					local dx, dy, dz = cx - cursorRefX, cy - cursorRefY, cz - cursorRefZ
+					if (dx * dx + dy * dy + dz * dz) <= maxSq then
+						inRange = true
+					end
+				end
+			else
+				inRange = true -- box without center → draw anyway
 			end
 			if inRange then
 				local n = #box.corners
@@ -3472,3 +3647,4 @@ function IAHelper_registerNpcInManager(npc, npcIndex)
 	IAprintDebug("IAHelper_registerNpcInManager", "Registered NPC at index " .. npcIndex)
 	return true
 end
+

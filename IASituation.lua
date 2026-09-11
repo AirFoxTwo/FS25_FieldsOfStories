@@ -308,6 +308,34 @@ function IASituation:setSituationAttributeOnIANeighbourVehicles()
 	markSituationVehicle(self.vehicle)
 	markSituationVehicle(self.attachmentBack)
 	markSituationVehicle(self.attachmentFront)
+
+	-- When the front attachment is a header with a paired trailer, hide the trailer too.
+	-- The header is in the situation convoy but the trailer stays behind; without this the
+	-- trailer remains visible in the empty homebase slot while its header is in the field.
+	if self.attachmentFront ~= nil
+		and self.attachmentFront.headerTrailerExternalId ~= nil
+		and self.neighbour ~= nil
+		and self.neighbour.vehicles ~= nil
+		and IAEquipmentPresence ~= nil
+		and IAEquipmentPresence.State ~= nil
+		and IAEquipmentPresence.Reconcile ~= nil then
+		local trailerExtId = tostring(self.attachmentFront.headerTrailerExternalId)
+		for _, ia in pairs(self.neighbour.vehicles) do
+			if ia ~= nil and tostring(ia.externalId) == trailerExtId then
+				IAprintDebug("IASituation:setSituationAttributeOnIANeighbourVehicles()", "Hiding header trailer: " .. tostring(ia.externalId or ia.uniqueId or "?"), self.neighbour, ia, self)
+				IAEquipmentPresence.State.stripHomebaseDesiredForSituationMember(ia)
+				IAEquipmentPresence.State.setDesiredHidden(ia)
+				-- Clear ia-level parking fields too, otherwise tryTrustSavedHomebaseSlot
+				-- reclaims the old slot and re-spawns the trailer in the same tick.
+				ia.parkingPlaceId = nil
+				ia.parkingPlaceSemantic = nil
+				if IAEquipmentPresence.Reconcile.reconcileVehicle ~= nil then
+					IAEquipmentPresence.Reconcile.reconcileVehicle(ia)
+				end
+				break
+			end
+		end
+	end
 end
 
 --- New situation: hide all convoy wrappers immediately (main + attachments). Attachment attach desired state is set later in loadStep 3.
@@ -437,30 +465,37 @@ end
 -- When ignorePlayerDistance is false, an otherwise-expired situation is not considered expired while the player is nearby.
 -- @return boolean - true if expired, false otherwise
 function IASituation:isExpired()
-	-- Minimum real-time guard: situations must exist for at least 2 real minutes
-	-- before game-time expiration can apply. This prevents mass-expiration when the
-	-- player exits fast-forward (timeScale > 500) where weeks of game-time elapsed
-	-- in seconds of real time.
-	local realSeconds = nil
-	if self.createdWallClockSec ~= nil and IANeighbours._wallClockSec ~= nil then
-		realSeconds = IANeighbours._wallClockSec - self.createdWallClockSec
-		if realSeconds < 120 then
-			return false
-		end
-	end
-
 	-- If startedAt is not set, cannot check expiration
 	if self.startedAt == nil then
 		return false
 	end
+
+	local realSeconds = nil
+	if self.createdWallClockSec ~= nil and IANeighbours._wallClockSec ~= nil then
+		realSeconds = IANeighbours._wallClockSec - self.createdWallClockSec
+	end
+
 	local timeExpired = false
 	if self.jobType ~= nil then
+		-- Fieldwork: expires as soon as the AI job completes (loaded == true).
+		-- Do NOT gate this behind a realtime minimum — the AI genuinely finished,
+		-- and delaying expiration would strand the farmer at the field across
+		-- fast-forwarded day/month boundaries.
 		timeExpired = (self.loaded == true)
 	else
 		-- If config or maxDuration is not set, situation doesn't expire
 		if self.config == nil or self.config.maxDuration == nil then
 			return false
 		end
+
+		-- Minimum real-time guard: situations must exist for at least 2 real minutes
+		-- before game-time maxDuration expiration can apply. This prevents mass-expiration
+		-- when the player exits fast-forward (timeScale > 500) where weeks of game-time
+		-- elapsed in seconds of real time.
+		if realSeconds ~= nil and realSeconds < 120 then
+			return false
+		end
+
 		local currentGameHours = getCurrentGameHours()
 		local elapsedHours = currentGameHours - self.startedAt
 		-- Add the per-situation random jitter (0..59 min) so expirations (and regenerations) are staggered.
@@ -480,8 +515,12 @@ function IASituation:isExpired()
 	if not timeExpired then
 		return false
 	end
-	-- Time-expired: do not consider expired while player is nearby unless ignorePlayerDistance is set
-	if not self.ignorePlayerDistance and self:isPlayerNearbyAtPosition() then
+	-- Time-expired: do not consider expired while player is nearby unless ignorePlayerDistance is set,
+	-- or unless this is a completed fieldwork situation (loaded == true) — the farmer genuinely
+	-- finished and an empty vehicle sitting on the field looks broken.
+	if not self.ignorePlayerDistance
+		and self:isPlayerNearbyAtPosition()
+		and not (self.jobType ~= nil and self.loaded == true) then
 		return false
 	end
 	return true
@@ -1105,9 +1144,9 @@ function IASituation:managePositioning()
 				end
 			end
 			
-			if g_currentMission.missionInfo.timeScale > 500 then
+			if g_currentMission.missionInfo.timeScale >= 500 then
 				if IANeighbours ~= nil and IANeighbours.debug then
-					print("--- IASituation:update() "..self.id.." - TimeScale is greater than 500, remove AI Job and complete fieldwork")
+					print("--- IASituation:update() "..self.id.." - TimeScale is >= 500, remove AI Job and complete fieldwork")
 				end
 				self:safePcall("loadStep5 timeScale resume stop", function()
 					self.vehicle:resumeAIJob(self.farmlandId)
@@ -1400,8 +1439,13 @@ function IASituation:applyVehicleCharacterStyle()
 end
 
 -- True if encounter should use stop/resume (restart job when player leaves); false to use block/pause (aiBlock, aiContinue).
--- Use stop when jobType is CULTIVATE, HARROW, HARVEST, or PLOW; otherwise use block.
+-- Use stop when the vehicle has a front attachment (Weight / Header / Cutter): blocking (aiBlock) does not
+-- reliably hold a combination with a front implement, so we fully stop the AI and restart the job on resume.
+-- Also stop for jobTypes CULTIVATE, HARROW, HARVEST, or PLOW (heavy rear implements); otherwise use block.
 function IASituation:checkAIStopOrBlock()
+	if self.attachmentFront ~= nil then
+		return true
+	end
 	if self.jobType == IAFieldwork.JobType.CULTIVATE or self.jobType == IAFieldwork.JobType.HARVEST or self.jobType == IAFieldwork.JobType.PLOW or self.jobType == IAFieldwork.JobType.HARROW then
 		return true
 	end

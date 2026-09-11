@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+	<translationContributors/>
+	<texts>
+            <text name="gui_dialog_title" text="Samtale med"/>
+            <text name="gui_dialog_answerlabel" text="Dig:"/>
+            <text name="gui_dialog_button_ok" text="OK"/>
+            <text name="gui_dialog_button_cancel" text="Annuller"/>
+            <text name="ui_ingameMenuFieldsOfStories" text="Fields of Stories"/>
+            <text name="input_IAStartConversation" text="Samtale / Telefon"/>
+            <text name="input_IAUsePhone" text="Brug telefon"/>
+            <text name="gui_hud_start_conversation" text="Start samtale"/>
+            <text name="gui_voice_pack_warn_title" text="Fields of Stories – Stemmepakke"/>
+            <text name="gui_voice_pack_warn_message" text="Du spiller Fields of Stories uden stemmepakke (valgfrit). Påkrævet version: %s"/>
+            <text name="gui_voice_pack_warn_recheck" text="Tjek igen"/>
+            <text name="gui_voice_pack_warn_ok_notification" text="Stemmepakke OK: versionen passer til Fields of Stories."/>
+            <text name="ia_homebase_setup_warning" text="Fields of Stories: Hjemmebaserne er ikke komplette. Placer de nødvendige hjemmebaseområder for at færdiggøre opsætningen."/>
+            <text name="gui_dialog_button_ignore" text="Ignorer"/>
+            <text name="gui_mapplaces_gen_title" text="Fields of Stories – Genererer kortplaceringer"/>
+            <text name="gui_mapplaces_gen_message" text="Eksperimentelt: Der blev ikke fundet nogen gemt konfiguration til dette kort. Hvis du fortsætter, vil «Fields of Stories» automatisk oprette hundreder til tusinder af placeringer på kortet. Spillet vil se frosset ud, indtil genereringen er færdig."/>
+            <text name="gui_mapplaces_gen_message2" text="For en bedre oplevelse kan du køre rundt på kortet og tilføje dine egne placeringer (Shift + F3) eller fjerne forkerte.&#10;&#10;For mere information kan du åbne Hjælp-menuen i spillet og læse Fields of Stories-emnerne."/>
+            <text name="gui_mapplaces_gen_before_load" text="Tryk på OK for at starte indlæsning og generering af kortplaceringer. Spillet kan se frosset ud, indtil det er færdigt. Det er normalt."/>
+            <text name="gui_firstload_tutorial_title" text="Fields of Stories – Guide"/>
+            <text name="gui_firstload_tutorial_message" text="Følg denne guide for at få mest muligt ud af mod'et. For alle detaljer om hver funktion kan du åbne Hjælp-menuen i spillet og læse Fields of Stories-emnerne."/>
+            <text name="gui_firstload_tutorial_message2" text="1. Mod-aktivering: Mod'et indlæses automatisk. I de første minutter kan der være ydelsesbegrænsninger, da mange køretøjer og data indlæses."/>
+            <text name="gui_firstload_tutorial_message3" text="2. Placeringsgenerering: På mod-kort er den automatiske placeringsgenerering allerede startet for at genkende huse, veje og skove. Følg guiden i Hjælp-menuen (kategorien Opsætning) for den bedste oplevelse på mod-kort."/>
+            <text name="gui_firstload_tutorial_message4" text="3. Lad oplevelserne komme til dig: Det er bedst ikke at trække alt ud af Fields of Stories på én gang. Du oplever selv, hvordan du møder figurer i verden, modtager opkald, når du mindst venter det, og kører over kortet og opdager gårdene."/>
+            <text name="gui_firstload_tutorial_message5" text="4. Støt landmændene: Vær venlig og hjælpsom, så får du på lang sigt gode relationer og mange fordele."/>
+            <text name="gui_firstload_tutorial_message6" text="5. Bemærk køreplanen: Mod'et er stadig en lille del af projektets vision:&#10;-hjælpere og entreprenører,&#10;-figurer der bevæger sig og kører,&#10;-store begivenheder,&#10;-dusinvis af missionstyper; alt dette er muligt, men det tager tid og din støtte."/>
+            <text name="gui_phone_title" text="%s"/>
+            <text name="gui_phone_title_default" text="Telefon"/>
+            <text name="construction_foS_category" text="Fields of Stories"/>
+            <text name="construction_foS_tab_placeables" text="Generelle placeringer"/>
+            <text name="construction_foS_tab_character_homebase" text="Figur-hjem"/>
+            <text name="fos_char_homebase_name" text="Figur-hjemmebase: %s"/>
+            <text name="fos_char_homebase_desc" text="Hjemmebase-objekt for figur #%s. Placerer en silo og en gårdsplads."/>
+            <text name="fos_char_homebase_name_1" text="Mary Carter (Familiemedlem, Landmand)"/>
+            <text name="fos_char_homebase_desc_1" text="Hjemsted for Mary Carter."/>
+            <text name="fos_char_homebase_name_2" text="John Carter (Familiemedlem, Landmand)"/>
+            <text name="fos_char_homebase_desc_2" text="Hjemsted for John Carter."/>
+            <text name="fos_char_homebase_name_10" text="Sharon Whitaker (Embedsmand)"/>
+            <text name="fos_char_homebase_desc_10" text="Hjemsted for Sharon Whitaker."/>
+            <text name="fos_char_homebase_name_11" text="Kyle Bennett (Civil)"/>
+            <text name="fos_char_homebase_desc_11" text="Hjemsted for Kyle Bennett."/>
+            <text name="fos_char_homebase_name_13" text="Lukas Brenner (Nabo, Skovfoged)"/>
+            <text name="fos_char_homebase_desc_13" text="Hjemsted for Lukas Brenner."/>
+            <text name="fos_char_homebase_name_14" text="Martin Walker (Embedsmand, Borgmester)"/>
+            <text name="fos_char_homebase_desc_14" text="Hjemsted for Martin Walker."/>
+            <text name="fos_char_homebase_name_15" text="Susan Keller (Forretningspartner, Kornhandler)"/>
+            <text name="fos_char_homebase_desc_15" text="Hjemsted for Susan Keller."/>
+            <text name="fos_char_homebase_name_16" text="Andy Hoffman (Forretningspartner, Landbrugsmaskinforhandler)"/>
+            <text name="fos_char_homebase_desc_16" text="Hjemsted for Andy Hoffman."/>
+            <text name="fos_char_homebase_name_17" text="Paul Meyer (Forretningspartner, Landbrugsentreprenør)"/>
+            <text name="fos_char_homebase_desc_17" text="Hjemsted for Paul Meyer."/>
+            <text name="fos_char_homebase_name_18" text="Marcus Brown (Nabo, Landmand)"/>
+            <text name="fos_char_homebase_desc_18" text="Hjemsted for Marcus Brown."/>
+            <text name="fos_char_homebase_name_19" text="Jacob Miller (Nabo, Landmand)"/>
+            <text name="fos_char_homebase_desc_19" text="Hjemsted for Jacob Miller."/>
+            <text name="fos_char_homebase_name_20" text="Emma Kensington (Nabo, Landmand)"/>
+            <text name="fos_char_homebase_desc_20" text="Hjemsted for Emma Kensington."/>
+            <text name="fos_char_homebase_name_21" text="Brian Winter (Nabo, Landmand)"/>
+            <text name="fos_char_homebase_desc_21" text="Hjemsted for Brian Winter."/>
+            <text name="gui_phone_message" text="Indgående opkald"/>
+            <text name="gui_phone_answer" text="Besvar"/>
+            <text name="gui_phone_decline" text="Afvis"/>
+            <text name="gui_phone_close" text="Luk"/>
+            <text name="gui_phone_no_incoming" text="Intet indgående opkald."/>
+            <text name="gui_phone_caller_unknown" text="Nogen"/>
+            <text name="gui_phone_incoming_notification" text="Indgående opkald fra %s. Åbn din telefon for at besvare eller afvise."/>
+            <text name="gui_mapinit_dialog_title" text="Konfigurer placeringer"/>
+            <text name="gui_mapinit_dialog_message" text="Tilføj og fjern placeringer til figursituationer. Bemærk den anbefalede mængde vist i listen. Vælg først placeringsstørrelsen øverst (til fods, med køretøj eller køretøj med redskab)."/>
+            <text name="gui_mapinit_dialog_first_title" text="Konfigurer placeringer"/>
+            <text name="gui_mapinit_dialog_first_message" text="Åbn byggemenuen for at oprette placeringer over hele kortet, eller aktiver klassisk tilstand fra version 1.0, som kræver at køre rundt for at gemme placeringer."/>
+            <text name="gui_mapinit_characters_title" text="Figurdetaljer"/>
+            <text name="gui_mapinit_characters_message" text="Gennemgå figurdetaljerne og konfigurer dem."/>
+            <text name="gui_mapinit_general_actions_title" text="Generelle handlinger"/>
+            <text name="gui_mapinit_general_actions_message" text="Funktioner til at hjælpe dig med at konfigurere eller rydde op på dit kort."/>
+            <text name="gui_mapinit_tab_story" text="Historie"/>
+            <text name="gui_mapinit_tab_settings" text="Indstillinger"/>
+            <text name="gui_mapinit_story_relationship" text="Relation"/>
+            <text name="gui_mapinit_story_relationship_level" text="Relationsniveau"/>
+            <text name="gui_mapinit_story_relationship_points" text="Relationspoint"/>
+            <text name="gui_mapinit_story_relationship_points_fmt" text="%d / %d"/>
+            <text name="gui_relationship_family" text="Familie"/>
+            <text name="gui_relationship_known" text="Kendt"/>
+            <text name="gui_relationship_friend" text="Ven"/>
+            <text name="gui_relationship_close_friend" text="Nær ven"/>
+            <text name="gui_relationship_strained" text="Anspændt"/>
+            <text name="gui_mapinit_tab_help" text="Hjælp"/>
+            <text name="gui_mapinit_help_info_title" text="Hvor finder du hjælp"/>
+            <text name="gui_mapinit_help_info_body" text="Den fulde Fields of Stories-guide findes i Hjælp-menuen i spillet. Tryk på Esc for at åbne menuen, gå til Hjælp, og se under kategorierne «Roleplay» og «Opsætning» for at læse om hver funktion – at møde naboer, samtaler, relationer, markkontrakter, hjemmebaser, oprettelse af kortplaceringer og mere.&#10;Fanebladet Indstillinger i denne dialog indeholder placerings- og figurværktøjerne til at sætte et kort op."/>
+            <text name="gui_help_category_title" text="Roleplay"/>
+            <text name="gui_help_category_setup_title" text="Opsætning"/>
+            <text name="gui_help_overview_title" text="Overblik"/>
+            <text name="gui_help_overview_body" text="Fields of Stories gør din spilverden til et levende nabolag. Menneskerne omkring dig er ikke anonyme NPC'er: de bor i deres egne hjem, følger daglige rutiner, arbejder på deres marker og har forskellige relationer til dig.&#10;&#10;Hvad du kan gøre:&#10;- Møde naboer ude i verden og tale med dem ansigt til ansigt.&#10;- Tage opkald, når en landmand har brug for hjælp med markarbejde.&#10;- Acceptere markkontrakter, eventuelt ved at låne naboens maskiner.&#10;- Forbedre din personlige relation til hver figur over tid.&#10;&#10;Dette Hjælp-afsnit forklarer hver funktion i detaljer."/>
+            <text name="gui_help_characters_title" text="Figurer"/>
+            <text name="gui_help_characters_body" text="Dette er naboerne i din verden. Hver har sin egen personlighed, rolle og job samt sin egen baggrundshistorie.&#10;&#10;Roller du kan møde omfatter landmænd, en skovfoged, borgmesteren, en maskinforhandler, en landbrugsentreprenør, en kornhandler, familiemedlemmer og almindelige civile. En figurs rolle og job bestemmer, hvad de laver hele dagen, og hvad du kan tale med dem om.&#10;&#10;Tilbring tid med de figurer, hvis historier interesserer dig mest."/>
+            <text name="gui_help_places_title" text="Opret kortplaceringer"/>
+            <text name="gui_help_places_body" text="Placeringer er de ankre, der bringer et kort til live. De fortæller mod'et, hvor figurer kan stå, parkere, shoppe, slappe af og bo. På de understøttede kort er dette allerede sat op; dette emne er til dine egne kort.&#10;&#10;Sådan opretter du en placering (byggemenu, anbefalet):&#10;1. Åbn byggemenuen (byggeværktøj), og vælg kategorien «Fields of Stories».&#10;2. Åbn fanebladet «Generelle placeringer», og vælg en placeringsmarkør (f.eks. Offentlig plads, Butik, Tankstation, ...).&#10;3. Flyt markøren til det ønskede sted, drej den, og klik for at placere den. Markøren omdannes til en rigtig placering og fjernes automatisk igen.&#10;4. Mens du placerer, skal du trykke på Shift+Q for at skifte placeringsstørrelse. En grøn omrids viser fodaftrykket, og et panel på skærmen viser størrelserne, og hvor mange placeringer der stadig mangler.&#10;5. For at fjerne placeringer skal du placere værktøjet «Fjern placering» nær en eksisterende placering (fjerner den nærmeste inden for 5 m), eller trykke på Shift+Delete for at fjerne alle placeringer af den valgte type på én gang.&#10;&#10;Klassisk måde (køre rundt): åbn menuen med Shift+F3, gå til fanebladet Indstillinger, vælg en placeringsstørrelse øverst, stå (eller parker dit køretøj) præcis hvor placeringen skal være, og klik på den ønskede placeringstype. Den aktuelle position gemmes, og du får bekræftelsen «Placering gemt». Jo flere placeringer du gemmer, desto mere dynamisk og unik bliver gameplayet.&#10;&#10;Placeringsstørrelser:&#10;- Figur: kun til fods, til stående situationer uden køretøjer.&#10;- Køretøj: plads til én bil eller traktor.&#10;- Køretøj med redskab: et køretøj plus en trailer eller et redskab (valgfrit).&#10;- Overdimensioneret køretøj (kun hjemmebase): en ekstra bred parkeringsplads til mejetærskere og selvkørende maskiner.&#10;- Stort område: et bredt, åbent område til situationer, der har brug for plads, som forberedelse af maskiner, markeder eller begivenheder.&#10;- Silo: markerer stedet for landmandens silo (kun hjemmebase-landbrug). Silobygningen opstår her og bruges som leverings- og påfyldningspunkt.&#10;&#10;Almindelige placeringstyper og deres formål:&#10;- Figur-hjemmebase: hvor en nabo bor (se «Hjemmebaser»).&#10;- Butik, tankstation, værksted, skur, salgssted, industri, offentlig infrastruktur: funktionelle offentlige steder.&#10;- Vejkant, grusvej, træer: møder langs vejen.&#10;- Offentlig plads og offentligt afslapningssted: sociale og fritidssteder; det private afslapningssted er til roligere rutiner.&#10;- Spillerens gård: begivenheder på din egen gård.&#10;&#10;Kortgenerator til nye kort:&#10;På et ukendt kort kan generatoren oprette mange placeringer automatisk ud fra kortdataene. Vær tålmodig: der kan blive oprettet mange placeringer, og spillet kan se frosset ud et øjeblik, mens det arbejder.&#10;&#10;Klargjorte kortkonfigurationer: til mange kort kan du downloade en færdig opsætning eller uploade og dele din egen via mod'ets officielle hjemmeside, som findes via mod'ets GitHub-side."/>
+            <text name="gui_help_char_age" text="Alder"/>
+            <text name="gui_help_char_gender" text="Køn"/>
+            <text name="gui_help_char_gender_male" text="Mand"/>
+            <text name="gui_help_char_gender_female" text="Kvinde"/>
+            <text name="gui_help_char_relationship" text="Relation"/>
+            <text name="gui_help_char_role" text="Rolle"/>
+            <text name="gui_help_char_job" text="Job"/>
+            <text name="gui_help_char_belongsToFarm" text="Hører til gården"/>
+            <text name="gui_help_char_behaviour" text="Adfærd"/>
+            <text name="gui_help_char_yes" text="Ja"/>
+            <text name="gui_help_char_no" text="Nej"/>
+            <text name="gui_help_char_name_21" text="Brian Winter"/>
+            <text name="gui_help_char_name_20" text="Emma Kensington"/>
+            <text name="gui_help_char_name_19" text="Jacob Miller"/>
+            <text name="gui_help_char_name_18" text="Marcus Brown"/>
+            <text name="gui_help_char_name_17" text="Paul Meyer"/>
+            <text name="gui_help_char_name_16" text="Andy Hoffman"/>
+            <text name="gui_help_char_name_15" text="Susan Keller"/>
+            <text name="gui_help_char_name_14" text="Martin Walker"/>
+            <text name="gui_help_char_name_13" text="Lukas Brenner"/>
+            <text name="gui_help_char_name_11" text="Kyle Bennett"/>
+            <text name="gui_help_char_name_10" text="Sharon Whitaker"/>
+            <text name="gui_help_char_name_2" text="John Carter"/>
+            <text name="gui_help_char_name_1" text="Mary Carter"/>
+            <text name="gui_help_char_desc_21" text="Rolle: Nabo | Job: Landmand&#10;Alder: 31–50 | Relation: Kendt | Adfærd: Stresset, Professionel&#10;&#10;Brian er en forholdsvis ung gård-ejer, der har overtaget familievirksomheden og forsøger at omstille den med moderne metoder og teknologier. Hans fokus ligger på effektivitet, dyresundhed og datadrevet ledelse – strategier der fører til, at han støtter sig kraftigt til sensorteknologi, digitale systemer og optimerede arbejdsgange.&#10;&#10;I sin hverdag virker Brian ofte anspændt, da han både skal bevare virksomhedens stabilitet og gennemføre dens omfattende modernisering. Denne overgang indebærer organisatorisk pres, økonomisk belastning og – ret ofte – modstand fra dem omkring ham eller fra hans egen familie. Derfor har han ofte ringe tålmodighed med forsinkelser eller traditionelle arbejdsmetoder.&#10;&#10;I sin omgang med naboer og forretningspartnere holder han en professionel og forretningsmæssig fremtoning. Han kommunikerer klart, forventer pålidelighed og foretrækker direkte aftaler uden unødige omveje. Tvetydige eller ineffektive arbejdsmetoder frustrerer ham hurtigt – en reaktion der af og til får ham til at virke fjern eller utålmodig."/>
+            <text name="gui_help_char_desc_20" text="Rolle: Nabo | Job: Landmand&#10;Alder: 31–50 | Relation: Kendt | Adfærd: Venlig, Hjælpsom&#10;&#10;Sammen med sin mand driver Emma en diversificeret landbrugsbedrift med speciale i dyrkning af grøntsager og korn. En del af høsten sælges direkte på lokale markeder, mens større mængder afsættes gennem grossister og regionale opkøbere. Deres gård er velorganiseret og stærkt fokuseret på effektivitet og kvalitet.&#10;&#10;I sin omgang med naboer og forretningspartnere er Emma åben, venlig og hjælpsom. Hun anses for at være en, der kommunikerer ligefremt og foretrækker at finde løsninger sammen frem for endeløst at diskutere problemer. Hun er særligt godt forbundet inden for den regionale landbrugssektor, hvor hun opretholder stabile og fair relationer.&#10;&#10;Hendes hjælpsomme natur er især tydelig i stressede perioder som såning eller høst. Når det er muligt, giver hun en hånd til andre gårde – eller tager selv imod hjælp – uden tøven. Hun lægger stor vægt på gensidig støtte i landbrugssamfundet og ser samarbejde som en essentiel del af sin hverdag."/>
+            <text name="gui_help_char_desc_19" text="Rolle: Nabo | Job: Landmand&#10;Alder: 50+ | Relation: Ven | Adfærd: Forsigtig, Neutral&#10;&#10;Jacob er en erfaren mælkeproducent i tredje generation, der driver en mellemstor familiegård, som han leder sammen med sine to sønner. Gården er vokset gennem mange år og er solidt forankret i traditionelle strukturer, som han har udviklet gennem omhyggelige tilpasninger for at møde moderne krav.&#10;&#10;I sin omgang med andre virker Jacob rolig, fattet og ret reserveret. Han lytter, før han taler, og træffer sjældent impulsive beslutninger. Især i forretningsanliggender eller omgang med naboer sørger han for at undgå unødige risici og holde sig fri af konflikter, når det er muligt.&#10;&#10;Hans forsigtige natur er tydeligst, når det gælder investeringer, nye teknologier eller store ændringer i driften. Han foretrækker gennemprøvede metoder og gransker innovationer grundigt, før han integrerer dem i bedriften. Denne tilgang har gjort det muligt for ham at drive gården stabilt – selvom han derfor nogle gange opfattes som for langsom eller konservativ."/>
+            <text name="gui_help_char_desc_18" text="Rolle: Nabo | Job: Landmand&#10;Alder: 31–50 | Relation: Ven | Adfærd: Stresset, Uvillig&#10;&#10;Marcus er en lokal landmand, der i mange år har drevet en forholdsvis lille, meget traditionel gård. Det meste af hans maskinpark er gammel; han reparerer den og bliver ved med at bruge den så længe som muligt – en praksis der i stigende grad besværliggør og forsinker hans daglige arbejde.&#10;&#10;I sin daglige omgang virker Marcus ofte anspændt og noget utilnærmelig. Det konstante pres fra reparationer, den tid arbejdet kræver og de stadigt stigende krav i moderne landbrug har gennem årene gjort ham træt og irritabel. Han ser ofte med skepsis på nye metoder eller moderne teknologi efter dårlige erfaringer med tidligere investeringer eller driftsændringer.&#10;&#10;Han er ikke altid samarbejdsvillig i omgangen med naboer og andre landmænd. Aftaler kan være svære at nå, da han hurtigt føler sig presset eller modsætter sig ændringer af etablerede procedurer. Hans konflikter skyldes mindre personlig fjendtlighed og mere en følelse af at være overvældet – af at miste kontrollen over situationen."/>
+            <text name="gui_help_char_desc_17" text="Rolle: Forretningspartner | Job: Landbrugsentreprenør&#10;Alder: 31–50 | Relation: Kendt | Adfærd: Uvillig, Stresset&#10;&#10;Paul driver en landbrugsentreprenørvirksomhed og tilbyder lokale gårde tjenester som høst, gylleudbringning, jordbearbejdning og andet markarbejde. Hans virksomhed er stærkt afhængig af tidsfrister, vejrforhold og sæsonbestemte spidsbelastninger – faktorer der ofte gør hans hverdag hektisk og meget krævende planlægningsmæssigt.&#10;&#10;I sin omgang med kunder virker Paul ofte kort for hovedet og utålmodig. Han er helt fokuseret på at afslutte opgaver hurtigt og sikre effektiv udnyttelse af sine maskiner. Han afviser typisk lange diskussioner eller ændringer i sidste øjeblik, da de lægger yderligere pres på hans i forvejen stramme tidsplan.&#10;&#10;På grund af hans store arbejdsbyrde og konstante pres for at overholde deadlines virker han ofte stresset og anspændt. Især under høstsæsonen eller i perioder med kritisk vejr kan han virke usamarbejdsvillig, hvis arbejdet ikke forløber nøjagtigt efter planen. I sådanne tilfælde handler det mindre om personlige konflikter og mere om den absolutte nødvendighed af at holde virksomheden kørende.&#10;&#10;På trods af sin bryske fremtoning er Paul meget kompetent og erfaren inden for alle aspekter af markarbejde. Forudsat at aftaler er etableret klart og i god tid, arbejder han pålideligt og effektivt. Han forventer dog samme grad af klarhed og engagement fra sine forretningspartnere."/>
+            <text name="gui_help_char_desc_16" text="Rolle: Forretningspartner | Job: Landbrugsmaskinforhandler&#10;Alder: 31–50 | Relation: Nær ven | Adfærd: Professionel, Venlig&#10;&#10;Andy ejer en landbrugsmaskinforretning og er særdeles vel forbundet i hele den regionale landbrugssektor. Hans virksomhed omfatter salg, vedligeholdelse og reparation af landbrugsmaskiner samt indkøb af reservedele. Gennem sit daglige arbejde holder han tæt kontakt med landmænd, værksteder og producenter, hvilket giver ham en præcis forståelse af den moderne landbrugs praktiske krav.&#10;&#10;I sin omgang med kunder og forretningspartnere virker han åben, venlig og løsningsorienteret. Han ved, hvordan man kommunikerer på lige fod, og opbygger tillid hos bedrifter af alle størrelser – fra små familiegårde til store landbrugsgodser. Hans primære fokus er at finde praktiske, virkelige løsninger frem for lange diskussioner om teoretiske muligheder.&#10;&#10;Som forretningspartner anses Andy for at være både pålidelig og fair. Han overholder sine forpligtelser, udviser fleksibilitet og velvilje, når situationen tillader det, og bestræber sig på at løse problemer hurtigt og uden unødigt bureaukrati. Især ved tekniske nedbrud eller akutte reparationsbehov er han ofte tilgængelig med kort varsel og engageret i at minimere stilstand for sine kunder."/>
+            <text name="gui_help_char_desc_15" text="Rolle: Forretningspartner | Job: Kornhandler&#10;Alder: 31–50 | Relation: Kendt | Adfærd: Neutral, Mistænksom&#10;&#10;Susan arbejder som selvstændig kornhandler og rejser jævnligt rundt i regionen for at købe korn fra lokale gårde og derefter videresælge det til regionale møller og forarbejdningsvirksomheder. Hun kender markedet godt, følger priser og udbytter nøje og reagerer hurtigt på ændringer i udbud og efterspørgsel.&#10;&#10;I sin omgang med landmænd og forretningspartnere virker hun saglig, reserveret og følelsesmæssigt kølig. Hun lægger stor vægt på klare aftaler, verificerbar kvalitet og gennemsigtige mængdeangivelser. Hun opbygger kun langsomt tillid, da hun støtter sig til fakta og pålidelige tal i sit forretningsmiljø – frem for løfter eller personlige indtryk.&#10;&#10;Susan er meget opmærksom og opdager hurtigt uoverensstemmelser i tilbud eller leverancer. Derfor opfatter nogle hende som streng eller mistænksom, selvom det blot er en del af hendes professionelle forsigtighed. Hun foretrækker klare kontrakter og tillægger uformelle aftaler eller spontane ændringer ringe værdi."/>
+            <text name="gui_help_char_desc_14" text="Rolle: Embedsmand | Job: Borgmester&#10;Alder: 50+ | Relation: Kendt | Adfærd: Professionel, Autoritær&#10;&#10;Martin har været kommunens borgmester i mange år og anses for at være en erfaren og indflydelsesrig skikkelse i byen. Han har kendt de fleste af regionens familier, virksomheder og udviklinger i årtier, og han lægger stor vægt på, at lokalsamfundet udadtil fremstår ordentligt, stabilt og velorganiseret. Han tager især forhold som kommunale finanser, infrastruktur og byens offentlige omdømme alvorligt.&#10;&#10;I sin omgang med andre fremstår Martin typisk fattet, saglig og beslutsom. Han taler roligt, men med autoritet, og han er vant til, at hans beslutninger bliver respekteret. Han fører ofte diskussioner diplomatisk; han kan dog være ret fast, hvis regler tilsidesættes, eller hans beslutninger åbent anfægtes."/>
+            <text name="gui_help_char_desc_13" text="Rolle: Nabo | Job: Skovfoged&#10;Alder: 31–50 | Relation: Ven | Adfærd: Forsigtig, Professionel&#10;&#10;Lukas arbejder som skovfoged og er ansvarlig for pleje og forvaltning af de omkringliggende skovområder. Hans opgaver omfatter blandt andet kontrol af genplantning, vedligeholdelse af skovstier, overvågning af naturbeskyttelsesforanstaltninger samt organisering og kontrol af jagttilladelser. Han kender regionens skove indgående og tilbringer en stor del af sin hverdag udendørs i naturen.&#10;&#10;På trods af sin ret reserverede natur anses han for at være pålidelig og retfærdig. Han deler gerne sin viden med venner, især når det gælder skovarbejde, træ, jagt eller naturbeskyttelse. Han værdsætter ærlige og ligefremme mennesker og kommer godt ud af det med dem, der handler ansvarligt og holder deres ord."/>
+            <text name="gui_help_char_desc_11" text="Rolle: Civil&#10;Alder: 31–50 | Relation: Nær ven | Adfærd: Neutral, Venlig&#10;&#10;Kyle arbejder som personlig træner og tilbringer en stor del af sin hverdag i fitnesscentret eller med sportslige aktiviteter. Fysisk form, disciplin og en sund livsstil er vigtige for ham – uden at han nogensinde virker belærende. Han kan lide at motivere andre og formår som regel hurtigt at vinde folk over med sin åbne og afslappede væremåde.&#10;&#10;Som god ven af Joe er han pålidelig og hjælpsom – især når nogen har brug for praktisk støtte eller motivation. Han hælder til at løfte folk op og tilbyde afledning frem for at dvæle længe ved vanskeligheder. Han undgår generelt konflikter og foretrækker at holde stemningen let."/>
+            <text name="gui_help_char_desc_10" text="Rolle: Embedsmand&#10;Alder: 50+ | Relation: Anspændt | Adfærd: Autoritær, Forsigtig&#10;&#10;Sharon arbejder i den kommunale forvaltning, hvor hun sikrer klare procedurer og et harmonisk samliv. For landmænd handler det ofte om forhold som nattero, renlighed og gener relateret til lugt eller støj. Uden for arbejdet forsøger hun generelt at distancere sig fra konstant organisering og tilsyn; hun afslår at indgå i sådanne diskussioner i sin fritid.&#10;&#10;Hun anses for at være stille, saglig og ret reserveret, selvom hun kan være venlig og humoristisk, når hun lærer nogen bedre at kende. Hun går typisk til diskussioner på en nøgtern og direkte måde. I sin fritid nyder hun at læse, gå ture eller tilbringe tid i sin have. Hun undgår gerne store menneskemængder og travle omgivelser. Orden og pålidelighed er vigtige for hende, både professionelt og privat. Ikke desto mindre gør hun en bevidst indsats for at være mere afslappet efter arbejdstid og for ikke hele tiden at tage arbejdet med hjem."/>
+            <text name="gui_help_char_desc_2" text="Rolle: Familiemedlem | Job: Landmand | Hører til gården: Ja&#10;Alder: 21–30 | Relation: Familie | Adfærd: Stresset&#10;&#10;John Carter er bror til Joe Carter – spillerfiguren – og voksede op ved siden af ham på familiegården. Fra en tidlig alder var landbruget en naturlig og integreret del af hans liv; derfor stræber han fortsat efter at bidrage til den daglige gårdsrutine så meget, som hans evner tillader. På grund af en medicinsk tilstand, der i flere år har begrænset ham fysisk, kan han dog nu kun udføre lettere og enklere opgaver. Dette tynger ham mere, end han åbent viser.&#10;&#10;Tidligere var John væsentligt mere aktiv på markerne og i fysisk krævende arbejde. I dag kæmper han med at affinde sig med, at mange ting ikke længere fungerer som før. Han føler sig især ubrugelig – eller som en byrde for sin familie – når andre må tage det tunge arbejde, selvom ingen bevidst får ham til at føle det sådan."/>
+            <text name="gui_help_char_desc_1" text="Rolle: Familiemedlem | Job: Landmand | Hører til gården: Ja&#10;Alder: 31–50 | Relation: Familie | Adfærd: Venlig, Professionel, Hjælpsom&#10;&#10;Mary Carter er gift med Joe Carter (spilleren) og er dybt integreret i både familielivet og gårdens daglige rutine. Selvom hun ikke er uddannet landmand, træder hun regelmæssigt til med gårdspligter – i stalden eller på markerne – når der er brug for en hjælpende hånd. Især i travle perioder træder hun naturligt til og bestræber sig på at støtte sin mand og familie ved at tage sig af tingene bag kulisserne.&#10;&#10;Hun anses for at være en rolig, varmhjertet og pålidelig person, der typisk griber konflikter an på en rolig, objektiv og tålmodig måde. Hun er åben og hjælpsom over for andre, men forventer også ærlighed og gensidig respekt til gengæld. Over for fremmede kan hun i starten virke noget reserveret, men hun tøer hurtigt op, når hun mødes med venlighed.&#10;&#10;I sin hverdag tager hun sig ofte af organisatoriske forhold omkring husholdningen, familien og gården. Hun sørger for, at der trods den tunge arbejdsbyrde opretholdes en følelse af sammenhold i familien og en behagelig atmosfære. Hun forsøger generelt at navigere gennem stressede situationer med fatning og pragmatiske løsninger, selvom hun af og til påtager sig for meget ansvar selv."/>
+            <text name="gui_help_conversations_title" text="Møder og samtaler"/>
+            <text name="gui_help_conversations_body" text="Naboerne er spredt rundt på kortet og lever deres liv. At møde dem og tale med dem er, sammen med de realistiske adfærdsmønstre, en central del af mod'et.&#10;&#10;Sådan starter du en samtale:&#10;1. Gå hen til en figur til fods. Når du er tæt nok på (ca. 5 meter), kan du udføre handlingen «Start samtale».&#10;2. Tryk på Shift+R for at begynde samtalen.&#10;3. Lyt til samtalen, eller læs underteksterne.&#10;4. Når flere svar vises, skal du vælge den replik, du vil sige. Dit valg former samtalen, og hvordan din relation ændrer sig.&#10;5. I fremtiden kan du både tale om hverdagsting og reelle handlinger (f.eks. at låne maskiner).&#10;&#10;Finde folk: figurer dukker op overalt på kortet. En landmand i et køretøj er som regel svær at nå, men hvis du nærmer dig til fods inden for ca. 20 meter, stopper han, slukker maskinen og stiger ud efter kort tid, så du kan tale med ham.&#10;&#10;Indtalte samtaler afspilles, når en stemmepakke er installeret; hvis ikke, kan du blot læse teksten."/>
+            <text name="gui_help_controls_title" text="Styring"/>
+            <text name="gui_help_controls_body" text="Shift+R: Start en samtale med en person i nærheden. Hvis ingen er i nærheden, åbnes din telefon i stedet.&#10;Shift+F3: Åbn historie- og indstillingsmenuen for Fields of Stories.&#10;&#10;I byggemenuen (mens du placerer en Fields of Stories-markør):&#10;Shift+Q: Skift placeringsstørrelse.&#10;Shift+Delete: Fjern alle placeringer af den valgte type."/>
+            <text name="gui_help_relationships_title" text="Relationer"/>
+            <text name="gui_help_relationships_body" text="Hver nabo husker, hvad de føler om dig. Gode møder opbygger tillid over tid; dårlige koster dig.&#10;&#10;Sådan fungerer det:&#10;- Hver figur har et relationsniveau (starter ved 1) og point, der fylder mod næste niveau.&#10;- En venlig samtale giver point (og en lille tilsvarende pengebelønning).&#10;- Når pointbjælken er fuld, stiger relationsniveauet, og pointene nulstilles til næste niveau. Højere niveauer kræver flere point, men giver også større bonusser, når du når niveauet.&#10;- Uforskammede eller afvisende svar kan koste point. Nogle gange kan selv et tilsyneladende venligt svar udløse en negativ følelse og forværre din relation. Point falder aldrig under nul og sænker aldrig et niveau, du allerede har nået.&#10;&#10;Markkontrakter tæller også: en fuldført kontrakt forbedrer din relation til den pågældende landmand, mens fejl, annullering eller udløb sænker den med samme mængde.&#10;&#10;Ved slutningen af en samtale vises beskeder som «Relation forbedret» eller «Relationsniveau øget»."/>
+            <text name="gui_help_story_title" text="Fanebladet Historie"/>
+            <text name="gui_help_story_body" text="Fanebladet Historie giver dig et hurtigt overblik over hver figur og din relation til dem. Åbn menuen med Shift+F3, og vælg fanebladet Historie.&#10;&#10;Til venstre er en rulleliste over alle naboer – klik på et navn for at vælge det. Til højre ser du den valgte figurs portræt, din aktuelle relation (som Kendt, Ven eller Familie), relationsniveauet og en fremskridtsbjælke, der viser, hvor mange relationspoint du har optjent mod næste niveau.&#10;&#10;Brug det til hurtigt at se, hvem du allerede kender godt, og hvem du bør besøge oftere. Se emnet Relationer for, hvordan point og niveauer optjenes og mistes."/>
+            <text name="gui_help_contracts_title" text="Markkontrakter og opkald"/>
+            <text name="gui_help_contracts_body" text="Landmænd har nogle gange mere markarbejde, end de kan nå, og ringer til dig for at få hjælp. Disse tilbud er ægte, betalte opgaver på deres marker. De kan give dig en hel række marker at færdiggøre.&#10;&#10;Opkaldet:&#10;1. En landmand kan ringe til dig i løbet af dagen (omtrent mellem 08:00 og 15:00). Du hører en ringetone og ser en opkaldsmeddelelse.&#10;2. Åbn din telefon, og tryk på Besvar for at høre tilbuddet, eller Afvis / Esc for at afvise det.&#10;3. Den samme landmand kan prøve igen senere. Der er en daglig grænse for kontraktopkald (kan konfigureres i spilindstillingerne). Hvis du slet ikke besvarer et opkald, vil der være i alt tre yderligere forsøg på at ringe til dig.&#10;&#10;Vælge arbejdet: i telefonsamtalen kan du normalt acceptere hele markarealet eller kun den første halvdel, og du kan vælge, om du vil bruge dit eget udstyr eller låne naboens maskiner. Dette kræver, at landmanden kan undvære sine maskiner. Du kan selvfølgelig også blot afvise anmodningen.&#10;&#10;Uden lån: du fuldfører kontrakten med dine egne maskiner. Arbejdet betales pr. hektar og er udført, så snart marken når den krævede tilstand. Marken kontrolleres med målepunkter, og fuldførelsestærsklen kan konfigureres i spilindstillingerne.&#10;&#10;Disse kontrakter anmodes altid om telefonisk og bliver først synlige i den sædvanlige missionsmenu efter accept.&#10;&#10;Belønning og omdømme: en fuldført kontrakt udbetaler dig og forbedrer din relation til landmanden. Fejl, annullering eller udløb gør det modsatte."/>
+            <text name="gui_help_contracts_body2" text="Med lån: naboen låner dig præcis de nødvendige redskaber (vægte og traktor udlånes dog ikke). Når det er nødvendigt, starter lånte maskiner allerede fyldt med såsæd, sprøjtemiddel, gødning, gylle eller husdyrgødning, som kan genopfyldes på naboens gård efter behov.&#10;At låne betyder lidt mindre løn end at bruge dit eget udstyr. Vigtigt: en kontrakt med lånt udstyr forbliver på 99 procent, indtil du kører hver lånt maskine tilbage til naboens gård og afkobler den der. Først da anses kontrakten for fuldført.&#10;&#10;Hvis du låner udstyret, finder du en markering på kortet, der viser, hvor maskinerne kan hentes. Der kan du genopfylde forbrugsstofferne (f.eks. gylle, såsæd eller herbicid) og ved kontraktens afslutning parkere maskinerne igen."/>
+            <text name="gui_help_contracts_body3" text="Høst- og leveringskontrakter&#10;&#10;Nogle markarbejdskontrakter kræver også, at du leverer høsten:&#10;&#10;Høstlevering: høst en afgrøde (f.eks. majs, hvede, raps), og lever kornet til landmandens silo. Spillet registrerer, hvad din mejetærsker indsamler, og sammenligner det med det, du leverer. Du skal levere mindst 99 % af det, du har høstet.&#10;&#10;Levering af græsslåning: slå græs, og lever det (som baller eller løst) til landmandens silo.&#10;&#10;Afhentning og levering: høst eller slå afgrøden, og bring den til landmandens silo, som er markeret på kortet med en rød cirkel. Siloen er midlertidigt tilgængelig for dig i kontraktens varighed – at losse andre steder (f.eks. sælge afgrøden) tæller ikke.&#10;&#10;Forbrugsopgaver (kalk, gødning, gylle, sprøjtemiddel, såsæd, husdyrgødning): landmandens silo er fyldt med det nødvendige forbrugsstof, så du kan genopfylde dit redskab der i stedet for at købe det.&#10;&#10;Hvis flere leveringskontrakter deler samme silo og afgrødetype, fordeles leveringerne forholdsmæssigt mellem dem.&#10;&#10;Opgaveliste: missionsdetaljerne viser Markarbejde, Levering og (hvis du lånte maskiner) Returner udstyr som separate opgaver med den aktuelle leveringsfremgang.&#10;&#10;Gennemtving fuldførelse: en knap «Gennemtving fuldførelse» i kontraktmenuen afslutter en næsten fuldført kontrakt (over 70 %).&#10;&#10;Fremgangsvisning:&#10;0-80 % dækker markarbejdet, 80-99 % betyder, at markarbejdet er udført, men leveringen stadig afventer. Ved 100 % er begge færdige – hent kontrakten i missionsmenuen for at få din betaling.&#10;&#10;Ekstra leveringsbonus:&#10;landmanden forventer, at hele høsten leveres – behold intet for dig selv. Du kan fortsætte med at levere, efter at kontrakten har nået 100 %. Når du henter den, giver ethvert overskud ud over det, der var i siloen ved fuldførelsen, en relationsbonus på +50."/>
+            <text name="gui_help_contract_cap_call_info" text="Når en landmand har brug for en hånd, hører du en ringetone og ser en meddelelse om indgående opkald (omtrent mellem 08:00 og 15:00)."/>
+            <text name="gui_help_contract_cap_call" text="Åbn din telefon, og tryk på Besvar for at høre tilbuddet, eller Afvis / Esc for at afvise det.&#10;&#10;Du kan justere antallet af opgaveopkald i spilindstillingerne. Dette henviser til antallet af landmænd, der søger hjælp, ikke antallet af opkald.&#10;&#10;Vigtigt: Hvis du slet ikke besvarer et opkald, vil der være i alt tre yderligere forsøg på at ringe til dig."/>
+            <text name="gui_help_contract_cap_choices" text="I opkaldet vælger du arbejdet: hele marken eller kun den første halvdel, og om du bruger dit eget udstyr eller låner naboens maskiner."/>
+            <text name="gui_help_contract_cap_borrow_map" text="Hvis du låner udstyr, viser en kortmarkering, hvor maskinerne kan hentes, og hvor de skal returneres bagefter."/>
+            <text name="gui_help_contract_cap_borrow_attach" text="På gården kobler du de lånte redskaber til og genopfylder såsæd, sprøjtemiddel, gødning eller gylle der efter behov."/>
+            <text name="gui_help_contract_cap_fieldwork" text="Udfør markarbejdet. Med lånt udstyr forbliver kontrakten på 99 %, indtil du kører hver maskine tilbage til gården og afkobler den."/>
+            <text name="gui_help_schedule_title" text="Landmænd og deres markarbejde"/>
+            <text name="gui_help_schedule_body" text="AI-landmændene er ikke blot animerede hjælpere. De planlægger og udfører reelt markarbejde på deres eget land, dag for dag og sæson for sæson.&#10;&#10;Dagsplanen: én gang pr. spildag ser hver landmand på den faktiske tilstand af sine marker og opbygger en opgaveliste. De arbejder sig igennem den i dagslys, omtrent fra 06:00 til om aftenen: kører ud, udfører arbejdet og vender hjem bagefter.&#10;&#10;Hvad de laver, i prioriteret rækkefølge: høste modne afgrøder, derefter så, derefter sprøjte, derefter sprede gødning, husdyrgødning eller gylle, og derefter pløje, harve og kultivere. En opgave vælges kun, når marken virkelig har brug for det (den rigtige afgrøde, vækststadie, jordtilstand eller ukrudt).&#10;&#10;Følge sæsonerne: såning følger hver afgrødes reelle plantekalender, og andre opgaver er knyttet til fornuftige måneder, så det synlige arbejde passer til årstiden. Ved såning roterer landmændene fornuftige afgrøder (som raps, hvede, byg, havre og soja) og forsøger at undgå den foregående afgrøde.&#10;&#10;Udlægning: hver dag kan en landmand tilbyde en bestemt opgave som telefonkontrakt. Disse kontrakter anmodes om telefonisk og er, når de er accepteret, synlige i den sædvanlige missionsmenu. Hvis du ikke accepterer den inden eftermiddagen, udfører han den selv.&#10;&#10;Du kan se en landmands plan for dagen i menuen Indstillinger under Figurer, herunder hvilke opgaver der er reserveret til dig, tilbydes som kontrakt eller håndteres af landmandens egen AI."/>
+            <text name="gui_help_privatelife_title" text="Privatliv"/>
+            <text name="gui_help_privatelife_body" text="Uden for arbejdet har figurerne deres eget liv. Hver nabo har et hjem, de vender tilbage til, og mange følger personlige rutiner i løbet af dagen.&#10;&#10;Ting du kan fange dem i at lave:&#10;- Slappe af derhjemme eller rydde op i huset.&#10;- Tilbringe tid med venner, holde picnic eller lege med børnene.&#10;- Gå en tur, lufte hunden eller læse en bog.&#10;- Klare hverdagsærinder eller tanke bilen.&#10;- Tjekke køretøjet ved vejkanten eller køre til værkstedet for reparationer.&#10;&#10;Rutiner afhænger af tidspunktet på dagen (morgen, dag, aften og nat) samt figurens rolle og job, så en landmand, borgmesteren og en civil tilbringer deres fritid forskelligt.&#10;&#10;Det er netop det, der får verden til at føles levende: hvis du strejfer rundt på kortet på forskellige tidspunkter, møder du folk i alle mulige situationer. Ved at nærme dig dem til fods kan du starte en samtale og lære dem bedre at kende."/>
+            <text name="gui_help_homebases_title" text="Hjemmebaser"/>
+            <text name="gui_help_homebases_body" text="En hjemmebase er en figurs hjem: det sted, hvor de bor, vender tilbage til om aftenen og kan findes, når de har fri. Uden en hjemmebase eksisterer en figur ikke rigtigt i spillet – hver nabo har brug for mindst én.&#10;&#10;To spawnpunkter pr. figur: hver figur bør have mindst to hjemmeplaceringer – én med placeringsstørrelsen «Figur» (til fods; det er her, personen står og sover) og én med placeringsstørrelsen «Køretøj» (hvor deres bil parkerer). På den måde har hver nabo både et til-fods- og et køretøjs-spawnpunkt.&#10;&#10;Oprette hjemmeplaceringer (byggemenu, anbefalet):&#10;1. Åbn byggemenuen (byggeværktøj), og vælg kategorien «Fields of Stories» og derefter fanebladet «Figur-hjem».&#10;2. Vælg objektet for den ønskede figur (f.eks. «Mary Carter»).&#10;3. Placer det ved boligen. Brug Shift+Q til at skifte størrelse («Figur» for personen, «Køretøj» for deres bil, «Stort område» for gården, «Silo» for siloen).&#10;&#10;Klassisk måde: åbn menuen med Shift+F3, gå til fanebladet Indstillinger, vælg den passende placeringsstørrelse øverst («Figur» eller «Køretøj»), stå til fods eller parker dit køretøj præcis på det ønskede sted ved boligen, og vælg «Hjem for [Navn]» i placeringslisten for at gemme positionen. Alternativt kan du i afsnittet Figurer bruge «Tilføj nærmeste hjemmebase» for at tildele den nærmeste placering direkte til den valgte figur.&#10;&#10;Fjerne eksisterende hjemmeplaceringer: hvis du vil nulstille en figurs boliger, skal du vælge dem i afsnittet Figurer og bruge knappen «Fjern hjemmeplaceringer». Dette frigør alle hjemmeplaceringer, der er tildelt den pågældende figur – placeringerne selv forbliver og kan tildeles igen bagefter.&#10;&#10;Hjemmebaser er et godt sted at finde nogen, især tidligt om morgenen eller sent om aftenen.&#10;&#10;Landmænd: for dem er hjemmebasen også gården og har desuden brug for plads til maskiner. Du kan lære at designe en gård ordentligt i kapitlet «Design af gårde»."/>
+            <text name="gui_help_homebasedesign_title" text="Design af gårde"/>
+            <text name="gui_help_homebasedesign_body" text="Dette kapitel handler om gårdene tilhørende landmandsfigurerne. For en landmand er hjemmebasen også hans gård: når maskinerne ikke er i brug eller er på kontrakt, er de parkeret der. Planlæg derfor gården generøst, for en landmand ejer mange køretøjer og redskaber (i øjeblikket omkring 10 redskaber, 1 mejetærsker, 2 traktorer og en bil; landbrugsentreprenøren endda 23 redskaber, 6 selvkørende maskiner, 2 traktorer og en bil).&#10;&#10;Sådan opretter du pladserne: åbn menuen med Shift+F3, gå til fanebladet Indstillinger, vælg den passende placeringsstørrelse øverst, og gem en «Figur-hjemmebase» på det ønskede sted (du finder den nøjagtige fremgangsmåde i kapitlet «Opret kortplaceringer»).&#10;&#10;Hvilke placeringsstørrelser en gård har brug for:&#10;- «Figur» (til fods): til landmanden selv.&#10;- «Køretøj»: til biler og traktorer.&#10;- «Overdimensioneret køretøj»: til mejetærskere og selvkørende maskiner.&#10;- «Køretøj + redskab»: til redskaber og trailere.&#10;- «Stort område»: til rummelige situationer på gården, som forberedelse af maskiner.&#10;- «Silo»: til landmandens silo, som fungerer som leverings- og påfyldningspunkt for høst- og græsslåningskontrakter.&#10;Hvis du ikke kan finde en plads til hver maskine, er det ikke et problem – afhængigt af brugen parkeres eller skjules de."/>
+            <text name="gui_help_homebasedesign_body2" text="Gør gården tilgængelig: for at låne en landmands maskiner skal hans gård kunne befærdes. Du skal kunne køre et køretøj hen til de parkerede maskiner og ud igen. Sørg derfor ved placering af gårde for, at ingen hegn, porte, mure, træer eller andre objekter blokerer ind- og udkørsel.&#10;&#10;Fjerne en port: hvis en port eller dør blokerer adgangen, kan du fjerne den direkte i Fields of Stories. Stå eller kør tæt på porten (inden for ca. 20 m), åbn menuen med Shift+F3 på fanebladet Indstillinger, og klik på «Fjern nærmeste port». Det nærmeste objekt, hvis knudepunktsnavn indeholder «gate», slettes permanent fra kortet og forbliver væk efter genindlæsning. De følgende billeder viser, hvordan fjernelsen af porten rydder adgangen, så maskinerne kan lånes."/>
+            <text name="gui_help_voices_title" text="Stemmer og sprog"/>
+            <text name="gui_help_voices_body" text="Samtaler kan være fuldt indtalte. Den talte lyd kommer som en separat stemmepakke, så mod'et selv forbliver lille.&#10;&#10;Installere en stemmepakke: download stemmepakken (se mod'ets GitHub-side for den nøjagtige downloadplacering: AirFoxTwo/FS25_FieldsOfStories), og pak den ud, så dens «conversations»-mappe ligger i mod'ets modSettings-mappe (modSettings/FS25_FIELDS_OF_STORIES). Hvis pakken mangler eller er forældet, vises en advarselsdialog med knapperne «Tjek igen» og «Ignorer». Du kan fortsætte med at spille uden den; samtaler vil så stadig vise undertekster, blot uden talt lyd.&#10;&#10;Sprog: mod'et er fuldt oversat til engelsk og tysk. Den viste tekst følger automatisk dit spilssprog. Stemmepakker findes i matchende engelske og tyske versioner, og mod'et afspiller den lyd, der matcher den installerede pakke, ellers spilssproget.&#10;&#10;Samtalegenerering (avanceret): hver figur har individuelle samtaletekster med dig. I alt løber dette op i over 10.000 skrevne og indtalte samtaledele. Hver samtale er kontrolleret manuelt (i det mindste for plausibilitet). Formulerings- eller grammatikfejl kan dog ikke udelukkes.&#10;&#10;Stemmegenerering (avanceret): hver figur har sin egen stemme, genereret ud fra et text-to-speech stemmedesign. Disse stemmer optages derefter til alle samtaletekster via stemmekloning på en lokal NVIDIA RTX 5080. Planen er at forbedre kvaliteten gennem yderligere optimering eller endda rigtige stemmeskuespillere, hvilket dog indebærer betydelig indsats."/>
+            <text name="gui_help_support_title" text="Support og feedback"/>
+            <text name="gui_help_support_body" text="Fundet en fejl, eller har du en idé til at gøre mod'et bedre? Din feedback er meget velkommen.&#10;&#10;Feedback, fejlrapporter og funktionsønsker sendes bedst via mod'ets GitHub-side: AirFoxTwo/FS25_FieldsOfStories&#10;&#10;Ved rapportering af et problem hjælper det meget at inkludere:&#10;- en kort beskrivelse af, hvad der skete, og hvad du forventede,&#10;- trinene til at genskabe det,&#10;- det kort, du spiller på,&#10;- din logfil, hvis du kan vedhæfte den.&#10;&#10;Klare, detaljerede rapporter fremskynder rettelser enormt. Tak fordi du hjælper med at forbedre Fields of Stories."/>
+            <text name="gui_mapinit_remove_mod_disclaimer" text="Bemærk: Efter dette skal spillet gemmes."/>
+            <text name="gui_mapinit_remove_mod" text="Fjern mod-data"/>
+            <text name="gui_mapinit_open_construction_menu" text="Åbn byggemenu"/>
+            <text name="gui_mapinit_classic_init_mode" text="Klassisk init-tilstand"/>
+            <text name="gui_mapinit_place_size_label" text="Placeringsstørrelse:"/>
+            <text name="gui_mapinit_place_size_character" text="Figur"/>
+            <text name="gui_mapinit_place_size_vehicle" text="Køretøj"/>
+            <text name="gui_mapinit_place_size_vehicle_attachment" text="Køretøj + redskab"/>
+            <text name="gui_mapinit_place_size_oversize_vehicle" text="Overdimensioneret køretøj"/>
+            <text name="gui_mapinit_place_size_large_area" text="Stort område"/>
+            <text name="gui_mapinit_place_size_silo" text="Silo"/>
+            <text name="gui_mapinit_place_type_label" text="Placeringstype:"/>
+            <text name="gui_mapinit_place_type_shop" text="Butik"/>
+            <text name="gui_mapinit_place_type_gas_station" text="Tankstation"/>
+            <text name="gui_mapinit_place_type_character_homebase" text="Figur-hjemmebase"/>
+            <text name="gui_mapinit_place_type_roadside" text="Vejkant"/>
+            <text name="gui_mapinit_place_type_dirt_road" text="Grusvej"/>
+            <text name="gui_mapinit_place_type_public_place" text="Offentlig plads"/>
+            <text name="gui_mapinit_place_type_player_farm" text="Spillerens gård"/>
+            <text name="gui_mapinit_place_type_public_relax_place" text="Offentligt afslapningssted"/>
+            <text name="gui_mapinit_place_type_private_relax_place" text="Privat afslapningssted"/>
+            <text name="gui_mapinit_place_type_sell_point" text="Salgssted"/>
+            <text name="gui_mapinit_place_type_other" text="Andet"/>
+            <text name="gui_mapinit_place_type_church" text="Kirke"/>
+            <text name="gui_mapinit_place_type_public_infrastructure" text="Offentlig infrastruktur"/>
+            <text name="gui_mapinit_place_type_roadside_trees" text="Træer ved vejkanten"/>
+            <text name="gui_mapinit_place_type_industry" text="Industri"/>
+            <text name="gui_mapinit_place_type_workshop" text="Værksted"/>
+            <text name="gui_mapinit_place_type_shed" text="Skur"/>
+            <text name="gui_mapinit_place_type_fieldwork" text="Markarbejde"/>
+            <text name="fos_place_character_public_place" text="Placering: Markør for offentlig plads"/>
+            <text name="fos_place_character_public_place_desc" text="Fields of Stories - En travl offentlig plads, hvor NPC'er samles, snakker og tilbringer deres fritid"/>
+            <text name="fos_place_character_shop" text="Placering: Butiksmarkør"/>
+            <text name="fos_place_character_shop_desc" text="Fields of Stories - Et butiksområde, hvor NPC'er kigger og køber varer"/>
+            <text name="fos_place_character_gas_station" text="Placering: Tankstationmarkør"/>
+            <text name="fos_place_character_gas_station_desc" text="Fields of Stories - En tankstation, hvor NPC'er tanker deres køretøjer og møder andre"/>
+            <text name="fos_place_character_roadside" text="Placering: Vejkantmarkør"/>
+            <text name="fos_place_character_roadside_desc" text="Fields of Stories - Et sted ved vejen, hvor NPC'er stopper for en snak eller en kørepause"/>
+            <text name="fos_place_character_dirt_road" text="Placering: Grusvejsmarkør"/>
+            <text name="fos_place_character_dirt_road_desc" text="Fields of Stories - En stille grusvej, hvor NPC'er nyder gåture og rustikke møder"/>
+            <text name="fos_place_character_player_farm" text="Placering: Markør for spillerens gård"/>
+            <text name="fos_place_character_player_farm_desc" text="Fields of Stories - Markerer spillerens gård, hjertet i dine landbrugsaktiviteter"/>
+            <text name="fos_place_character_public_relax_place" text="Placering: Markør for afslapningsområde"/>
+            <text name="fos_place_character_public_relax_place_desc" text="Fields of Stories - Et offentligt afslapningsområde, hvor NPC'er slapper af og nyder deres fritid"/>
+            <text name="fos_place_character_private_relax_place" text="Placering: Markør for privat afslapningsområde"/>
+            <text name="fos_place_character_private_relax_place_desc" text="Fields of Stories - Et afsides tilflugtssted, hvor NPC'er søger privatliv og stille eftertanke"/>
+            <text name="fos_place_character_sell_point" text="Placering: Salgsstedsmarkør"/>
+            <text name="fos_place_character_sell_point_desc" text="Fields of Stories - Et handelspunkt, hvor NPC'er afleverer varer og gør forretninger"/>
+            <text name="fos_place_character_church" text="Placering: Kirkemarkør"/>
+            <text name="fos_place_character_church_desc" text="Fields of Stories - Et gudshus, hvor NPC'er deltager i gudstjenester og fællesskabsarrangementer"/>
+            <text name="fos_place_character_public_infrastructure" text="Placering: Infrastrukturmarkør"/>
+            <text name="fos_place_character_public_infrastructure_desc" text="Fields of Stories - Et knudepunkt for offentlige forsyninger og infrastruktur for lokalsamfundet"/>
+            <text name="fos_place_character_industry" text="Placering: Industrimarkør"/>
+            <text name="fos_place_character_industry_desc" text="Fields of Stories - En industrizone, hvor NPC'er arbejder og producerer varer"/>
+            <text name="fos_place_character_workshop" text="Placering: Værkstedsmarkør"/>
+            <text name="fos_place_character_workshop_desc" text="Fields of Stories - Et reparationsværksted, hvor NPC'er vedligeholder og reparerer deres udstyr"/>
+            <text name="fos_place_character_shed" text="Placering: Skurmarkør"/>
+            <text name="fos_place_character_shed_desc" text="Fields of Stories - Et opbevaringsskur, hvor NPC'er opbevarer deres værktøj og udstyr"/>
+            <text name="fos_place_character_remove" text="Værktøj: Fjern placering"/>
+            <text name="fos_place_character_remove_desc" text="Fields of Stories - Fjerner den nærmeste placeringsmarkør inden for 5 meter, når den placeres"/>
+            <text name="gui_fos_place_created" text="Placering oprettet: %s (%s)"/>
+            <text name="gui_fos_bulk_remove_title" text="Bulkfjern placeringer"/>
+            <text name="gui_fos_bulk_remove_confirm" text="Fjern %d placering(er) af typen «%s»?"/>
+            <text name="gui_fos_bulk_remove_confirm_char" text="Fjern %d placering(er) for «%s»?"/>
+            <text name="gui_fos_bulk_remove_btn_yes" text="Fjern alle"/>
+            <text name="gui_fos_bulk_remove_btn_no" text="Annuller"/>
+            <text name="gui_fos_bulk_remove_none" text="Ingen placeringer af denne type at fjerne."/>
+            <text name="gui_fos_bulk_remove_done" text="Fjernede %d placering(er)."/>
+            <text name="input_IAMapInitDialog" text="Fields of Stories-menu"/>
+            <text name="input_IAI3DReferencesDebug" text="Fields of Stories - Vis debugpunkter ved alle i3d-referenceknudepunkter"/>
+            <text name="input_IADumpUserAttributes" text="Fields of Stories - Skriv brugerattributter for kortknudepunkter til loggen"/>
+            <text name="input_IAPlaceSizeSelect" text="Valg af placeringsstørrelse (Fields of Stories)"/>
+            <text name="input_IAPlaceBulkRemove" text="Bulkfjern placeringer (Fields of Stories)"/>
+            <text name="gui_fos_place_size_select" text="Placeringsstørrelse"/>
+            <text name="gui_mapinit_add_nearest_homebase" text="Tilføj nærmeste hjemmebase"/>
+            <text name="gui_mapinit_add_nearest_homebase_info" text="Den nærmeste placering blev tildelt figur %s."/>
+            <text name="gui_mapinit_notify_place_saved" text="Placering gemt: %s"/>
+            <text name="gui_mapinit_notify_remove_nearest_ok" text="Nærmeste placering fjernet."/>
+            <text name="gui_mapinit_notify_remove_nearest_none" text="Ingen placering fundet at fjerne."/>
+            <text name="gui_mapinit_notify_end_init" text="Init-fasen sluttede."/>
+            <text name="gui_mapinit_notify_remove_mod" text="Fields of Stories-mod-data blev ryddet. Gem spillet."/>
+            <text name="gui_mapinit_notify_reset_character" text="Figur %s blev nulstillet."/>
+            <text name="gui_mapinit_notify_delete_character" text="%s blev fjernet fra mod'et."/>
+            <text name="gui_mapinit_notify_remove_homeplaces" text="Hjemmeplaceringer blev fjernet for %s."/>
+            <text name="gui_mapinit_remove_nearest" text="Fjern nærmeste placering"/>
+            <text name="gui_mapinit_show_place_markers" text="Vis placeringsmarkører"/>
+            <text name="gui_mapinit_hide_place_markers" text="Skjul placeringsmarkører"/>
+            <text name="gui_mapinit_hide_nearest_gate" text="Fjern nærmeste port"/>
+            <text name="gui_mapinit_notify_hide_gate_ok" text="Nærmeste port fjernet: %s"/>
+            <text name="gui_mapinit_notify_hide_gate_none" text="Intet portobjekt fundet i nærheden."/>
+            <text name="gui_mapinit_end_init" text="Afslut init-fase"/>
+            <text name="gui_mapinit_nudge_vehicle_left" text="Køretøj: 5 m til højre"/>
+            <text name="gui_mapinit_notify_nudge_vehicle_no_vehicle" text="Stig ind i et køretøj for at bruge dette."/>
+            <text name="gui_mapinit_notify_nudge_vehicle_ai" text="Stop køretøjets AI, før du flytter det."/>
+            <text name="gui_mapinit_notify_nudge_vehicle_failed" text="Kunne ikke flytte køretøjet: %s"/>
+            <text name="gui_mapinit_reset_character" text="Nulstil figur"/>
+            <text name="gui_mapinit_delete_character" text="Slet figur"/>
+            <text name="gui_mapinit_remove_homeplaces" text="Fjern hjemmeplaceringer"/>
+            <text name="gui_mapinit_detail_name" text="Navn"/>
+            <text name="gui_mapinit_detail_job" text="Job"/>
+            <text name="gui_mapinit_detail_role" text="Rolle"/>
+            <text name="gui_mapinit_detail_relationship" text="Relation"/>
+            <text name="gui_mapinit_detail_relationship_fmt" text="%s (Niveau %d, %d / %d pt)"/>
+            <text name="gui_mapinit_detail_vehicles" text="Køretøjer"/>
+            <text name="gui_mapinit_detail_current_situation" text="Aktuel situation"/>
+            <text name="gui_mapinit_detail_schedule" text="Planlagt markarbejde for i dag"/>
+            <text name="gui_mapinit_detail_at_place_fmt" text="ved %s"/>
+            <text name="ingame_relationship_improved" text="Relation forbedret med %s (+%s point)"/>
+            <text name="ingame_relationship_levelup" text="Relationsniveau øget med %s (Niveau %s)"/>
+            <text name="ingame_relationship_decreased" text="Relation forværret med %s (-%s point)"/>
+            <text name="ingame_situation_at_player_farm" text="%s venter på din gård."/>
+            <text name="ia_field_outcome_mission_title_for_neighbour" text="%s for %s"/>
+            <text name="ia_field_outcome_mission_desc_short" text="Brug en %s til at afslutte denne opgave."/>
+            <text name="ia_field_outcome_mission_desc_seed" text="Brug en %s til at så %s."/>
+            <text name="ia_field_outcome_neighbour_generic" text="din nabo"/>
+            <text name="ia_field_outcome_task_done" text="Udført"/>
+            <text name="ia_field_outcome_task_open" text="Åben"/>
+            <text name="ia_field_outcome_task_fieldwork" text="Markarbejde: %s"/>
+            <text name="ia_field_outcome_task_delivery" text="Levering"/>
+            <text name="ia_field_outcome_task_return" text="Returner udstyr"/>
+            <text name="ia_field_outcome_task_delivery_progress" text="%s / %s leveret"/>
+            <text name="ia_field_outcome_task_delivery_not_started" text="Ikke startet"/>
+            <text name="ia_field_outcome_task_return_after_fieldwork" text="Efter markarbejde"/>
+            <text name="ia_fieldwork_label_harvest_corn" text="Høst majs"/>
+            <text name="ia_force_complete_button" text="Gennemtving fuldførelse"/>
+            <text name="ia_force_complete_no_mission" text="Ingen aktiv Fields of Stories-kontrakt valgt."/>
+            <text name="ia_field_outcome_target_fertilizer" text="Mål: mineralsk gødning i trin %d på marken."/>
+            <text name="ia_field_outcome_target_slurry" text="Mål: udbringning af gylle (flydende husdyrgødning) eller gæringsrester (afgasset biomasse) til gødningstrin %d."/>
+            <text name="ia_field_outcome_target_manure" text="Mål: udbringning af fast husdyrgødning til gødningstrin %d."/>
+            <text name="ia_field_outcome_target_lime" text="Mål: kalkudbringning (gødningstrin %d)."/>
+            <text name="ia_field_outcome_target_lime_deliver" text="Mål: påfør kalk jævnt over hele marken."/>
+            <text name="ia_field_outcome_target_stone_picking" text="Mål: fjern alle sten fra marken."/>
+            <text name="ia_field_outcome_target_grass_mowing" text="Mål: slå græsset, og lever det til gården."/>
+            <text name="ia_field_outcome_target_harvest_deliver_corn" text="Mål: høst majsen, og lever kornet til gården."/>
+            <text name="ia_field_outcome_target_herbicide" text="Mål: sprøjt herbicid, indtil ukrudtet matcher den aftalte tilstand."/>
+            <text name="ia_field_outcome_target_seed" text="Mål: %s etableret på hele marken."/>
+            <text name="ia_fieldwork_equip_cultivate" text="kultivator"/>
+            <text name="ia_fieldwork_equip_harrow" text="harve"/>
+            <text name="ia_fieldwork_equip_stubble_cultivation" text="tallerkensharve eller stubkultivator"/>
+            <text name="ia_fieldwork_equip_harvest" text="høster"/>
+            <text name="ia_fieldwork_equip_mineral_fertilizer" text="mineralsk gødningsspreder"/>
+            <text name="ia_fieldwork_equip_slurry" text="gyllespreder"/>
+            <text name="ia_fieldwork_equip_manure" text="husdyrgødningsspreder"/>
+            <text name="ia_fieldwork_equip_lime" text="kalkspreder"/>
+            <text name="ia_fieldwork_equip_stone_picker" text="stensamler"/>
+            <text name="ia_fieldwork_equip_grass_mower" text="slåmaskine og foder- eller ballepresser"/>
+            <text name="ia_fieldwork_equip_harvest_deliver_corn" text="høster og korntrailer"/>
+            <text name="ia_fieldwork_equip_herbicide" text="marksprøjte med herbicid"/>
+            <text name="ia_fieldwork_equip_seed" text="såmaskine"/>
+            <text name="ia_fieldwork_equip_plow" text="plov"/>
+            <text name="ia_fieldwork_equip_generic" text="traktor og det rigtige redskab"/>
+            <text name="ia_fieldwork_label_cultivate" text="Kultivere"/>
+            <text name="ia_fieldwork_label_harrow" text="Harve"/>
+            <text name="ia_fieldwork_label_stubble_cultivation" text="Stubbehandling"/>
+            <text name="ia_fieldwork_label_harvest" text="Høste"/>
+            <text name="ia_fieldwork_label_fertilize_mineral" text="Mineralsk gødskning"/>
+            <text name="ia_fieldwork_label_slurry" text="Gylleudbringning"/>
+            <text name="ia_fieldwork_label_manure" text="Husdyrgødningsudbringning"/>
+            <text name="ia_fieldwork_label_lime" text="Kalkning"/>
+            <text name="ia_fieldwork_label_stone_picking" text="Stensamling"/>
+            <text name="ia_fieldwork_label_grass_mowing" text="Slå græs og lever"/>
+            <text name="ia_fieldwork_label_grass_mowing_short" text="Slå græs"/>
+            <text name="ia_fieldwork_label_harvest_deliver_corn" text="Høst majs og lever"/>
+            <text name="ia_fieldwork_label_harvest_deliver_with_crop" text="Høst %s og lever"/>
+            <text name="ia_fieldwork_label_spray" text="Sprøjte"/>
+            <text name="ia_fieldwork_label_seed" text="Så"/>
+            <text name="ia_fieldwork_label_seed_with_crop" text="%s-såning"/>
+            <text name="ia_fieldwork_label_plow" text="Pløje"/>
+            <text name="ia_fieldwork_label_condition" text="Marktilstand"/>
+            <text name="ia_field_outcome_mission_finished" text="Fields of Stories-markkontrakt fuldført."/>
+            <text name="ia_field_outcome_mission_failed" text="Fields of Stories-markkontrakten sluttede uden succes."/>
+            <text name="ia_field_outcome_deliver_wrong_location" text="Du skal levere høsten til gården, ikke sælge den andre steder!"/>
+            <text name="ia_delivery_marker_label" text="Gårdens leveringspunkt"/>
+            <text name="ia_field_outcome_mission_deliver_note" text="Lever høsten til gården (markeret på kortet)."/>
+            <text name="ia_field_outcome_delivery_complete" text="Levering fuldført! Varerne er ankommet til gården."/>
+            <text name="ia_mission_borrow_refill_at_farm" text="Det lånte udstyr er tomt — genopfyld det på %s's gård."/>
+            <text name="ia_mission_borrow_return_to_farm" text="Markarbejdet er udført — returner det lånte udstyr til %s's gård (afkobl det på gårdspladsen)."/>
+            <text name="ia_mission_borrow_pickup_marker" text="Afhentning af lånt udstyr"/>
+            <text name="ia_mission_borrow_yard_marker" text="Lånt udstyr — afhentning og returnering"/>
+            <text name="ia_settings_section_title" text="Fields of Stories"/>
+            <text name="ia_settings_contractCallsPerDay_title" text="Kontraktopkald pr. dag"/>
+            <text name="ia_settings_contractCallsPerDay_info" text="Maksimalt antal kontraktopkald pr. spildag på tværs af alle naboer."/>
+            <text name="ia_settings_contractCallsPerDay_none" text="Ingen"/>
+            <text name="ia_settings_contractCallsPerDay_1" text="1"/>
+            <text name="ia_settings_contractCallsPerDay_2" text="2"/>
+            <text name="ia_settings_contractCallsPerDay_3" text="3"/>
+            <text name="ia_settings_contractCallsPerDay_4" text="4"/>
+            <text name="ia_settings_contractCallsPerDay_unlimited" text="Ubegrænset"/>
+            <text name="ia_settings_missionOfferMode_title" text="Missionstilbud-tilstand"/>
+            <text name="ia_settings_missionOfferMode_info" text="Klassisk: vanilla-missioner forbliver på kortet, ingen kontraktopkald. Realistisk: kun nabokontraktopkald, vanilla-missioner fjernet."/>
+            <text name="ia_settings_missionOfferMode_classic" text="Klassisk"/>
+            <text name="ia_settings_missionOfferMode_realistic" text="Realistisk"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_title" text="Kontraktmarker pr. nabo"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_info" text="Maksimalt antal marker/jordlodder, som en nabo kan udlægge som kontrakter pr. dag."/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_1" text="1"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_2" text="2"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_3" text="3"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_4" text="4"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_5" text="5"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_unlimited" text="Ubegrænset"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_title" text="Fuldførelsestærskel for markarbejde"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_info" text="Procentdel af markmålepunkter, der skal matche den forventede tilstand, før en markarbejdsmission anses for fuldført."/>
+            <text name="ia_settings_fieldworkCompletionThreshold_60" text="60 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_65" text="65 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_70" text="70 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_75" text="75 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_80" text="80 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_85" text="85 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_90" text="90 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_95" text="95 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_100" text="100 %"/>
+            <text name="ia_settings_voiceVolume_title" text="Stemmevolumen"/>
+            <text name="ia_settings_voiceVolume_info" text="Lydstyrke for de indtalte nabo-dialoglinjer."/>
+            <text name="ia_settings_voiceVolume_10" text="10 %"/>
+            <text name="ia_settings_voiceVolume_20" text="20 %"/>
+            <text name="ia_settings_voiceVolume_30" text="30 %"/>
+            <text name="ia_settings_voiceVolume_40" text="40 %"/>
+            <text name="ia_settings_voiceVolume_50" text="50 %"/>
+            <text name="ia_settings_voiceVolume_60" text="60 %"/>
+            <text name="ia_settings_voiceVolume_70" text="70 %"/>
+            <text name="ia_settings_voiceVolume_80" text="80 %"/>
+            <text name="ia_settings_voiceVolume_90" text="90 %"/>
+            <text name="ia_settings_voiceVolume_100" text="100 %"/>
+            <text name="ia_npc_unavailable" text=" (Utilgængelig)"/>
+            <text name="gui_language" text="da"/>
+	</texts>
+</l10n>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="110">
-    <version>1.0.0.3</version>
+<modDesc descVersion="111">
+    <version>1.0.0.5</version>
 	<author>AirFoxTwo</author>
 	<title>
 		<de>Fields Of Stories - Rollenspiel</de>
@@ -65,6 +65,7 @@ All mod maps (locations are created automatically and may need to be added or re
 Controls:
 SHIFT + R: Start conversation.
 SHIFT + F3: Fields of Stories menu.
+Construction menu: Create map places in the "Fields of Stories" category. SHIFT + Q switches the place size, SHIFT + DELETE removes all places of the selected type.
 Story tab: Overview of all characters with relationship, relationship level, and relationship points.
 Map locations: Place encounter locations (on foot, with a vehicle, or with a vehicle + implement) of various categories on the map.
 Character settings: Individual characters can be reset or removed, and their home locations can be removed.
@@ -108,6 +109,26 @@ Missions: In later versions, the current conversations will be expanded with mis
 - Bugfix: Added compatibility with manual attach mod.
 - Bugfix: Fixed performances issues in combination with courseplay.
 - Added missing translations.
+
+1.0.0.4:
+- Bugfix: Ensured that vehicles do not remain on fields the following day if fieldwork was only recently started (real-time timer).
+- Bugfix: Corrected roadside spawns on Zielonka.
+
+1.0.0.5:
+- New: Create map places directly in the construction menu ("Fields of Stories" category with "General Places" and "Character Home" tabs). Placing a marker converts it into a real place and removes the temporary marker again.
+- New: Live placement preview with a green outline and an on-screen setup HUD showing the selected tool, the place size and required vs. existing places.
+- New: SHIFT + Q switches the place size while placing; SHIFT + DELETE removes all places of the selected type (with confirmation).
+- New: "Remove Place" item in the construction menu deletes the nearest place within 5 m, including farmer silos.
+- New: Character homebases and farmer silos can be placed via the construction menu. The silo spawns at a dedicated place size and serves as delivery and refill point.
+- New: Harvest and grass-mowing contracts are now available and require delivering the crop to the farmer's silo (pickup from the field, delivery to the marked silo). Mission details show Fieldwork, Delivery and Return equipment as separate tasks with the remaining delivery amount.
+- New: "Force Complete" button in the contracts menu finishes a nearly completed (over 70 %) Fields of Stories contract. This should only be used when contract cannot be fully completed.
+- New: The farmer's silo is topped up with lime, fertilizer, slurry, spray, seed and manure so borrowed equipment can be refilled there.
+- New: Map hotspot at the delivery/refill silo.
+- New: Voice volume setting added.
+- New: Added Translations.
+- Bugfix: Farmers now auto-complete their scheduled fieldwork at day end, including fast-forwarding fields to the seeded state when the seed month is reached.
+- Bugfix: Fixed the daily schedule rebuild so all fields are captured across day changes.
+- Performance: Optimized field probing for missions.
 ]]></en>
 		<de><![CDATA[Fields of Stories – Lebendige Charaktere im Landwirtschafts-Simulator
 
@@ -166,6 +187,7 @@ Alle Mod-Karten (Orte werden automatisch erstellt und müssen ggf. ergänzt oder
 Steuerung:
 SHIFT + R: Gespräch starten.
 SHIFT + F3: Einrichtungs-Menü.
+Baumenü: Karten-Orte in der Kategorie "Fields of Stories" erstellen. SHIFT + Q wechselt die Ortsgröße, SHIFT + ENTF entfernt alle Orte des gewählten Typs.
 Story-Tab: Übersicht aller Charaktere mit Beziehung, Beziehungsstufe und Beziehungspunkten.
 Karten-Orte: Platzieren von Ereignis-Orten (zu Fuß, mit Fahrzeug oder Fahrzeug mit Anbaugerät) verschiedener Kategorien auf der Karte.
 Charakter-Einstellungen: Einzelne Charaktere können zurückgesetzt oder entfernt werden, sowie dessen Heimat-Orte entfernt werden.
@@ -211,9 +233,69 @@ Missionen: In späteren Versionen werden die bisherigen Gespräche um Missionen 
 - Bugfix: Kompatibilität mit Manual Attach Mod ergänzt.
 - Bugfix: Performanceprobleme in Kombination mit Courseplay gelöst.
 - Fehlende Übersetzungen ergänzt.
+
+1.0.0.4:
+- Bugfix: Absicherung, dass Geräte nicht am Folgetag auf den Feldern stehen, wenn die Feldarbeit erst kurz vorher begonnen wurde. (Realzeit-Timer)
+- Bugfix: Straßenrand-Spawns auf Zielonka korrigiert.
+
+1.0.0.5:
+- Neu: Karten-Orte direkt im Baumenü erstellen (Kategorie "Fields of Stories" mit den Tabs "Allgemeine Orte" und "Heimatorte"). Das Platzieren einer Markierung wandelt sie in einen echten Ort um und entfernt die temporäre Markierung wieder.
+- Neu: Live-Platzierungsvorschau mit grünem Umriss und Setup-HUD, das das gewählte Werkzeug, die Ortsgröße sowie benötigte vs. vorhandene Orte anzeigt.
+- Neu: SHIFT + Q wechselt beim Platzieren die Ortsgröße; SHIFT + ENTF entfernt alle Orte des gewählten Typs (mit Bestätigung).
+- Neu: Werkzeug "Ort entfernen" im Baumenü löscht den nächstgelegenen Ort innerhalb von 5 m, inklusive Landwirt-Silos.
+- Neu: Charakter-Heimatbasen und Landwirt-Silos können über das Baumenü platziert werden. Das Silo entsteht auf der Ortsgröße "Silo" und dient als Liefer- und Nachfüllpunkt.
+- Neu: Ernte- und Grasmäh-Aufträge sind nun verfügbar und verlangen die Lieferung der Ernte zum Silo des Landwirts (vom Feld abholen, zum markierten Silo liefern). Die Auftragsdetails zeigen Feldarbeit, Ablieferung und Geräterückgabe als getrennte Aufgaben mit der verbleibenden Liefermenge.
+- Neu: Schaltfläche "Abschluss erzwingen" im Auftragsmenü schließt einen fast fertigen (über 70 %) Fields-of-Stories-Auftrag ab. Die Verwendung soll nur für Ausnahmefälle erfolgen, in dem die Liefermenge nicht erreicht werden kann.
+- Neu: Das Silo des Landwirts wird mit Kalk, Dünger, Gülle, Spritzmittel, Saatgut und Mist aufgefüllt, damit geliehene Geräte dort nachgefüllt werden können.
+- Neu: Karten-Markierung am Liefer-/Nachfüll-Silo.
+- Neu: Lautstärke für Stimmen einstellbar.
+- Neu: Übersetzungen hinzugefügt.
+- Bugfix: Landwirte schließen ihre geplante Feldarbeit am Tagesende automatisch ab, inklusive des Vorziehens von Feldern in den gesäten Zustand, wenn der Saatmonat erreicht ist.
+- Bugfix: Neuaufbau des Tagesplans, damit alle Felder über Tageswechsel hinweg erfasst werden.
+- Performance: Feldabfrage optimiert für Missionen.
 ]]></de>
 	</description>
 	<iconFilename>icon_FieldsOfStories.dds</iconFilename>
+	<placeableSpecializations>
+		<specialization name="placeableFOSTool" className="PlaceableFOSTool" filename="placeables/PlaceableFOSTool.lua" />
+	</placeableSpecializations>
+	<placeableTypes>
+		<type name="placeableFOSTool" parent="placeable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua">
+			<specialization name="placement" />
+			<specialization name="placeableFOSTool" />
+		</type>
+	</placeableTypes>
+	<storeItems>
+		<storeItem xmlFilename="placeables/farma400modified/farma400modified.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_public_place.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_shop.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_gas_station.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_roadside.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_dirt_road.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_player_farm.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_public_relax_place.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_private_relax_place.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_sell_point.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_church.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_public_infrastructure.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_industry.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_workshop.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_shed.xml"/>
+		<storeItem xmlFilename="placeables/place_character/place_character_remove.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_18_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_19_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_20_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_21_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_1_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_2_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_10_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_11_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_13_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_14_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_15_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_16_homebase.xml"/>
+		<storeItem xmlFilename="placeables/character_homebase/char_17_homebase.xml"/>
+    </storeItems>
 	<l10n filenamePrefix="languages/l10n" />
 	<helpLines>
 		<category title="$l10n_gui_help_category_title">
@@ -375,6 +457,9 @@ Missionen: In späteren Versionen werden die bisherigen Gespräche um Missionen 
 					<text text="$l10n_gui_help_contract_cap_fieldwork"/>
 					<image filename="images/help/help_fieldwork.png" size="1024 1024" uvs="0px 0px 1024px 1024px" aspectRatio="1" displaySize="512px 512px"/>
 				</paragraph>
+				<paragraph>
+					<text text="$l10n_gui_help_contracts_body3"/>
+				</paragraph>
 			</page>
 			<page title="$l10n_gui_help_schedule_title" iconSliceId="helpline.icon_shop">
 				<paragraph>
@@ -452,10 +537,18 @@ Missionen: In späteren Versionen werden die bisherigen Gespräche um Missionen 
         <actionBinding action="IAMapInitDialog">
 			    <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_f3" />
         </actionBinding>
+        <actionBinding action="IAPlaceSizeSelect">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_q" />
+        </actionBinding>
+        <actionBinding action="IAPlaceBulkRemove">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_delete" />
+        </actionBinding>
     </inputBinding>
 
     <actions>
         <action name="IAStartConversation" />
         <action name="IAMapInitDialog" />
+        <action name="IAPlaceSizeSelect" />
+        <action name="IAPlaceBulkRemove" />
     </actions>
 </modDesc>

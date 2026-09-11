@@ -595,10 +595,7 @@ function IAMissionBorrow.startSession(neighbour, missions, borrowedUnits, openLi
 			if ia.vehicle ~= nil and IABorrowAccess ~= nil and IABorrowAccess.setBorrowedForGameVehicle ~= nil then
 				IABorrowAccess.setBorrowedForGameVehicle(ia.vehicle, true)
 			end
-			if not isRestore then
-				local seedIdx = ia.uniqueId ~= nil and seedByUid[tostring(ia.uniqueId)] or nil
-				IAMissionBorrow.fillBorrowedUnitIfNeeded(ia, seedIdx)
-			end
+			-- Equipment is left empty on borrow — the player fills it from the NPC silo.
 		end
 	end
 	if missions ~= nil then
@@ -613,6 +610,26 @@ function IAMissionBorrow.startSession(neighbour, missions, borrowedUnits, openLi
 	end
 	IAMissionBorrow.sessions[sessionId] = session
 	IAMissionBorrow.refreshSessionReturnDebugMarkers(session)
+	-- Initial consumable silo fill on borrow: top up the NPC silo with the required
+	-- consumable (lime, fertilizer, slurry, herbicide, seeds, manure) so the player
+	-- can immediately load their borrowed implement.
+	if missions ~= nil and IAFieldOutcomeMission ~= nil and IAFieldOutcomeMission.getConsumableFillTypeForJob ~= nil then
+		for _, mission in ipairs(missions) do
+			if mission ~= nil and type(mission.iaGetNeighbourSilo) == "function" and type(mission.iaRefillSiloConsumable) == "function" then
+				local jt = IAFieldwork.normalizeFieldworkJobType(tostring(mission.iaFoSFieldworkJob or ""))
+			local consumableFt = nil
+			if IAFieldOutcomeMission.CONSUMABLE_JOB_FILL_TYPES[jt] ~= nil or jt == "seed" then
+				consumableFt = IAFieldOutcomeMission.getConsumableFillTypeForJob(jt, mission)
+			end
+				if consumableFt ~= nil then
+					local silo = mission:iaGetNeighbourSilo()
+					if silo ~= nil then
+						mission:iaRefillSiloConsumable(silo, consumableFt)
+					end
+				end
+			end
+		end
+	end
 	IAprintDebug("IAMissionBorrow.startSession()", string.format(
 		"id=%s units=%d missions=%d",
 		tostring(sessionId), #session.borrowedUnits, #session.missions
@@ -776,8 +793,7 @@ function IAMissionBorrow.updateSession(session, dt)
 		if ia ~= nil then
 			if IAMissionBorrow.isNearReturnPose(ia, IAMissionBorrow.REFILL_RADIUS_M) then
 				anyNearReturn = true
-				local seedIdx = ia.uniqueId ~= nil and session.seedByUid[tostring(ia.uniqueId)] or nil
-				IAMissionBorrow.fillBorrowedUnitIfNeeded(ia, seedIdx)
+				-- Equipment is NOT auto-refilled near parking spot — player fills from silo.
 			end
 			if not (IAMissionBorrow.isVehicleUnattached(ia) and IAMissionBorrow.isNearReturnPose(ia, IAMissionBorrow.RETURN_RADIUS_M)) then
 				allReturned = false

@@ -1,0 +1,9 @@
+<texture>
+  <meta>
+    <filename>../images/fos_construction_menu.dds</filename>
+    <size width="512" height="512"/>
+  </meta>
+  <slices>
+    <slice id="icon_category" uvs="0px 0px 512px 512px"/>
+  </slices>
+</texture>

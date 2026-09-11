@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+	<translationContributors/>
+	<texts>
+            <text name="gui_dialog_title" text="会話:"/>
+            <text name="gui_dialog_answerlabel" text="あなた:"/>
+            <text name="gui_dialog_button_ok" text="OK"/>
+            <text name="gui_dialog_button_cancel" text="キャンセル"/>
+            <text name="ui_ingameMenuFieldsOfStories" text="Fields of Stories"/>
+            <text name="input_IAStartConversation" text="会話 / 電話"/>
+            <text name="input_IAUsePhone" text="電話を使う"/>
+            <text name="gui_hud_start_conversation" text="会話を始める"/>
+            <text name="gui_voice_pack_warn_title" text="Fields of Stories – ボイスパック"/>
+            <text name="gui_voice_pack_warn_message" text="ボイスパック（任意）なしで Fields of Stories をプレイしています。必要なバージョン: %s"/>
+            <text name="gui_voice_pack_warn_recheck" text="再確認"/>
+            <text name="gui_voice_pack_warn_ok_notification" text="ボイスパック OK: バージョンは Fields of Stories と一致しています。"/>
+            <text name="ia_homebase_setup_warning" text="Fields of Stories: 拠点がまだ完成していません。必要な拠点エリアを配置してセットアップを完了してください。"/>
+            <text name="gui_dialog_button_ignore" text="無視"/>
+            <text name="gui_mapplaces_gen_title" text="Fields of Stories – マップ地点の生成"/>
+            <text name="gui_mapplaces_gen_message" text="実験的: このマップには保存された設定が見つかりません。続行すると、「Fields of Stories」がマップ上に数百から数千の地点を自動的に作成します。生成が終わるまでゲームはフリーズしたように見えます。"/>
+            <text name="gui_mapplaces_gen_message2" text="より良い体験のため、マップを巡って自分の地点を追加する（Shift + F3）か、誤った地点を削除してください。&#10;&#10;詳しくは、ゲーム内のヘルプメニューを開き、Fields of Stories のトピックをお読みください。"/>
+            <text name="gui_mapplaces_gen_before_load" text="OK を押すと、マップ地点の読み込みと生成を開始します。完了するまでゲームがフリーズしたように見える場合があります。これは正常です。"/>
+            <text name="gui_firstload_tutorial_title" text="Fields of Stories – ガイド"/>
+            <text name="gui_firstload_tutorial_message" text="このガイドに従って、この MOD を最大限に活用してください。各機能の詳細は、ゲーム内のヘルプメニューを開き、Fields of Stories のトピックをお読みください。"/>
+            <text name="gui_firstload_tutorial_message2" text="1. MOD の有効化: MOD は自動的に読み込まれます。最初の数分間は、多くの車両とデータが読み込まれるため、パフォーマンスが制限される場合があります。"/>
+            <text name="gui_firstload_tutorial_message3" text="2. 地点の生成: MOD マップでは、自動地点生成がすでに家屋、道路、森の認識を始めています。MOD マップで最高の体験を得るには、ヘルプメニュー（セットアップカテゴリ）のガイドに従ってください。"/>
+            <text name="gui_firstload_tutorial_message4" text="3. 体験があなたのところに来るのを許す: Fields of Stories から一度にすべてを引き出さないのが最善です。世界でキャラクターに出会い、最も予期しないときに電話を受け、マップを巡って農場を発見する体験をあなた自身がします。"/>
+            <text name="gui_firstload_tutorial_message5" text="4. 農家を支える: 友好的で親切にすれば、長期的には良好な関係と多くの恩恵が得られます。"/>
+            <text name="gui_firstload_tutorial_message6" text="5. ロードマップに注意: この MOD はまだプロジェクト構想のごく一部です:&#10;-ヘルパーと請負業者&#10;-動き運転するキャラクター&#10;-大きなイベント&#10;-数十種類のミッション。すべて可能ですが、時間とあなたの支援が必要です。"/>
+            <text name="gui_phone_title" text="%s"/>
+            <text name="gui_phone_title_default" text="電話"/>
+            <text name="construction_foS_category" text="Fields of Stories"/>
+            <text name="construction_foS_tab_placeables" text="一般地点"/>
+            <text name="construction_foS_tab_character_homebase" text="キャラクターの家"/>
+            <text name="fos_char_homebase_name" text="キャラクター拠点: %s"/>
+            <text name="fos_char_homebase_desc" text="キャラクター #%s の拠点オブジェクト。サイロと農場の中庭を配置します。"/>
+            <text name="fos_char_homebase_name_1" text="メアリー・カーター（家族、農家）"/>
+            <text name="fos_char_homebase_desc_1" text="メアリー・カーターの家。"/>
+            <text name="fos_char_homebase_name_2" text="ジョン・カーター（家族、農家）"/>
+            <text name="fos_char_homebase_desc_2" text="ジョン・カーターの家。"/>
+            <text name="fos_char_homebase_name_10" text="シャロン・ウィテカー（役人）"/>
+            <text name="fos_char_homebase_desc_10" text="シャロン・ウィテカーの家。"/>
+            <text name="fos_char_homebase_name_11" text="カイル・ベネット（民間人）"/>
+            <text name="fos_char_homebase_desc_11" text="カイル・ベネットの家。"/>
+            <text name="fos_char_homebase_name_13" text="ルーカス・ブレナー（隣人、林務官）"/>
+            <text name="fos_char_homebase_desc_13" text="ルーカス・ブレナーの家。"/>
+            <text name="fos_char_homebase_name_14" text="マーティン・ウォーカー（役人、市長）"/>
+            <text name="fos_char_homebase_desc_14" text="マーティン・ウォーカーの家。"/>
+            <text name="fos_char_homebase_name_15" text="スーザン・ケラー（ビジネスパートナー、穀物商）"/>
+            <text name="fos_char_homebase_desc_15" text="スーザン・ケラーの家。"/>
+            <text name="fos_char_homebase_name_16" text="アンディ・ホフマン（ビジネスパートナー、農業機械ディーラー）"/>
+            <text name="fos_char_homebase_desc_16" text="アンディ・ホフマンの家。"/>
+            <text name="fos_char_homebase_name_17" text="ポール・マイヤー（ビジネスパートナー、農業請負業者）"/>
+            <text name="fos_char_homebase_desc_17" text="ポール・マイヤーの家。"/>
+            <text name="fos_char_homebase_name_18" text="マーカス・ブラウン（隣人、農家）"/>
+            <text name="fos_char_homebase_desc_18" text="マーカス・ブラウンの家。"/>
+            <text name="fos_char_homebase_name_19" text="ジェイコブ・ミラー（隣人、農家）"/>
+            <text name="fos_char_homebase_desc_19" text="ジェイコブ・ミラーの家。"/>
+            <text name="fos_char_homebase_name_20" text="エマ・ケンジントン（隣人、農家）"/>
+            <text name="fos_char_homebase_desc_20" text="エマ・ケンジントンの家。"/>
+            <text name="fos_char_homebase_name_21" text="ブライアン・ウィンター（隣人、農家）"/>
+            <text name="fos_char_homebase_desc_21" text="ブライアン・ウィンターの家。"/>
+            <text name="gui_phone_message" text="着信中"/>
+            <text name="gui_phone_answer" text="応答"/>
+            <text name="gui_phone_decline" text="拒否"/>
+            <text name="gui_phone_close" text="閉じる"/>
+            <text name="gui_phone_no_incoming" text="着信はありません。"/>
+            <text name="gui_phone_caller_unknown" text="誰か"/>
+            <text name="gui_phone_incoming_notification" text="%s から着信があります。電話を開いて応答または拒否してください。"/>
+            <text name="gui_mapinit_dialog_title" text="地点を設定"/>
+            <text name="gui_mapinit_dialog_message" text="キャラクター状況の地点を追加・削除します。リストに表示される推奨数に注意してください。まず、上部で地点サイズ（徒歩、車両、または装備付き車両）を選択します。"/>
+            <text name="gui_mapinit_dialog_first_title" text="地点を設定"/>
+            <text name="gui_mapinit_dialog_first_message" text="建設メニューを開いてマップ全体に地点を作成するか、地点を保存するためにマップを巡る必要があるバージョン 1.0 のクラシックモードを有効にします。"/>
+            <text name="gui_mapinit_characters_title" text="キャラクター詳細"/>
+            <text name="gui_mapinit_characters_message" text="キャラクターの詳細を確認して設定します。"/>
+            <text name="gui_mapinit_general_actions_title" text="一般操作"/>
+            <text name="gui_mapinit_general_actions_message" text="マップの設定やクリーンアップに役立つ機能。"/>
+            <text name="gui_mapinit_tab_story" text="ストーリー"/>
+            <text name="gui_mapinit_tab_settings" text="設定"/>
+            <text name="gui_mapinit_story_relationship" text="関係"/>
+            <text name="gui_mapinit_story_relationship_level" text="関係レベル"/>
+            <text name="gui_mapinit_story_relationship_points" text="関係ポイント"/>
+            <text name="gui_mapinit_story_relationship_points_fmt" text="%d / %d"/>
+            <text name="gui_relationship_family" text="家族"/>
+            <text name="gui_relationship_known" text="知人"/>
+            <text name="gui_relationship_friend" text="友人"/>
+            <text name="gui_relationship_close_friend" text="親友"/>
+            <text name="gui_relationship_strained" text="ぎくしゃく"/>
+            <text name="gui_mapinit_tab_help" text="ヘルプ"/>
+            <text name="gui_mapinit_help_info_title" text="ヘルプの場所"/>
+            <text name="gui_mapinit_help_info_body" text="Fields of Stories の完全なガイドはゲーム内のヘルプメニューにあります。Esc を押してメニューを開き、ヘルプへ進み、「ロールプレイ」と「セットアップ」のカテゴリで各機能について読んでください: 隣人との出会い、会話、関係、圃場契約、拠点、マップ地点の作成など。&#10;このダイアログの「設定」タブには、マップをセットアップするための地点とキャラクターのツールが含まれています。"/>
+            <text name="gui_help_category_title" text="ロールプレイ"/>
+            <text name="gui_help_category_setup_title" text="セットアップ"/>
+            <text name="gui_help_overview_title" text="概要"/>
+            <text name="gui_help_overview_body" text="Fields of Stories は、ゲーム世界を生きた近隣へと変えます。周囲の人々は名無しの NPC ではありません。彼らは自分の家に住み、日々のルーティンをこなし、自分の畑を耕し、あなたと様々な関係を持っています。&#10;&#10;できること:&#10;- 世界で隣人と出会い、直接話す。&#10;- 農家が農作業の手助けを必要とするときに電話を受ける。&#10;- 必要に応じて隣人の機械を借りて、圃場契約を引き受ける。&#10;- 時間をかけて各キャラクターとの個人的な関係を深める。&#10;&#10;このヘルプセクションでは、各機能を詳しく説明します。"/>
+            <text name="gui_help_characters_title" text="キャラクター"/>
+            <text name="gui_help_characters_body" text="彼らはあなたの世界の隣人です。それぞれが独自の性格、役割、仕事、そして生い立ちを持っています。&#10;&#10;出会う役割には、農家、林務官、市長、機械ディーラー、農業請負業者、穀物商、家族、一般市民が含まれます。キャラクターの役割と仕事が、その日何をしているか、そして彼らと何を話せるかを決めます。&#10;&#10;最も興味のあるストーリーを持つキャラクターと時間を過ごしましょう。"/>
+            <text name="gui_help_places_title" text="マップ地点の作成"/>
+            <text name="gui_help_places_body" text="地点は、マップに命を吹き込む錨です。キャラクターがどこに立ち、駐車し、買い物し、くつろぎ、暮らせるかを MOD に伝えます。対応マップでは既に設定済みです。このトピックはあなた自身のマップ向けです。&#10;&#10;地点の作成方法（建設メニュー、推奨）:&#10;1. 建設メニュー（建設ツール）を開き、「Fields of Stories」カテゴリを選択します。&#10;2. 「一般地点」タブを開き、地点マーカー（例: 公共の場所、店、ガソリンスタンド、...）を選びます。&#10;3. マーカーを目的の場所へ動かし、回転させてクリックで配置します。マーカーは実際の地点に変換され、自動的に削除されます。&#10;4. 配置中に Shift+Q を押すと地点サイズを変更できます。緑の輪郭が占有範囲を示し、画面上のパネルがサイズとあと何地点必要かを表示します。&#10;5. 地点を削除するには、「地点を削除」ツールを既存の地点の近くに配置する（5 m 以内の最寄りを削除）か、Shift+Delete を押して選択した種類の地点をすべて一度に削除します。&#10;&#10;クラシック方式（マップを巡る）: Shift+F3 でメニューを開き、「設定」タブへ進み、上部で地点サイズを選び、地点を置きたい場所にちょうど立ち（または車両を駐車し）、希望の地点タイプをクリックします。現在位置が保存され、「地点を保存しました」という確認が表示されます。保存する地点が多いほど、ゲームはより動的でユニークになります。&#10;&#10;地点サイズ:&#10;- キャラクター: 徒歩のみ。車両なしで立つ状況用。&#10;- 車両: 車またはトラクター 1 台分のスペース。&#10;- 装備付き車両: 車両 1 台とトレーラーまたは装備 1 台（任意）。&#10;- 大型車両（拠点のみ）: コンバインや自走機械用の超ワイド駐車スペース。&#10;- 広いエリア: 機械準備、市場、イベントなど、スペースを必要とする状況のための広い開放エリア。&#10;- サイロ: 農家のサイロの位置を示します（拠点農場のみ）。サイロ建物がここに現れ、納入および補充ポイントとして機能します。&#10;&#10;一般的な地点タイプと目的:&#10;- キャラクター拠点: 隣人が住む場所（「拠点」参照）。&#10;- 店、ガソリンスタンド、工房、小屋、販売所、産業、公共インフラ: 機能的な公共の場所。&#10;- 道端、未舗装路、木々: 道端での出会い。&#10;- 公共の場所と公共のくつろぎ場: 社交とレジャーの場所。私的なくつろぎ場はより静かな日常のため。&#10;- プレイヤーの農場: 自分の農場でのイベント。&#10;&#10;新しいマップのためのマップジェネレーター:&#10;未知のマップでは、ジェネレーターがマップデータから多数の地点を自動的に作成できます。辛抱強く: 多くの地点が作成され、動作中はゲームが一瞬フリーズしたように見えることがあります。&#10;&#10;既製マップ設定: 多くのマップでは、完成した設定をダウンロードするか、MOD の GitHub ページからアクセスできる公式サイトを通じて自分自身の設定をアップロード・共有できます。"/>
+            <text name="gui_help_char_age" text="年齢"/>
+            <text name="gui_help_char_gender" text="性別"/>
+            <text name="gui_help_char_gender_male" text="男性"/>
+            <text name="gui_help_char_gender_female" text="女性"/>
+            <text name="gui_help_char_relationship" text="関係"/>
+            <text name="gui_help_char_role" text="役割"/>
+            <text name="gui_help_char_job" text="仕事"/>
+            <text name="gui_help_char_belongsToFarm" text="農場に所属"/>
+            <text name="gui_help_char_behaviour" text="行動"/>
+            <text name="gui_help_char_yes" text="はい"/>
+            <text name="gui_help_char_no" text="いいえ"/>
+            <text name="gui_help_char_name_21" text="ブライアン・ウィンター"/>
+            <text name="gui_help_char_name_20" text="エマ・ケンジントン"/>
+            <text name="gui_help_char_name_19" text="ジェイコブ・ミラー"/>
+            <text name="gui_help_char_name_18" text="マーカス・ブラウン"/>
+            <text name="gui_help_char_name_17" text="ポール・マイヤー"/>
+            <text name="gui_help_char_name_16" text="アンディ・ホフマン"/>
+            <text name="gui_help_char_name_15" text="スーザン・ケラー"/>
+            <text name="gui_help_char_name_14" text="マーティン・ウォーカー"/>
+            <text name="gui_help_char_name_13" text="ルーカス・ブレナー"/>
+            <text name="gui_help_char_name_11" text="カイル・ベネット"/>
+            <text name="gui_help_char_name_10" text="シャロン・ウィテカー"/>
+            <text name="gui_help_char_name_2" text="ジョン・カーター"/>
+            <text name="gui_help_char_name_1" text="メアリー・カーター"/>
+            <text name="gui_help_char_desc_21" text="役割: 隣人 | 仕事: 農家&#10;年齢: 31～50 | 関係: 知人 | 行動: 緊張気味、プロフェッショナル&#10;&#10;ブライアンは、家業を引き継ぎ、現代的な手法と技術で方向転換しようとしている比較的若い農場主です。効率、家畜の健康、データ主導の管理に重点を置いており、センサー技術、デジタルシステム、最適化された作業フローに大きく依存しています。&#10;&#10;日常生活では、ビジネスの安定維持と全面近代化の両立が求められるため、ブライアンはしばしば緊張しているように見えます。この移行には組織的なプレッシャー、金銭的負担、そして周囲や自身の家族からの抵抗が伴うことがよくあります。そのため、遅延や伝統的な作業方法に対して忍耐を欠くことが少なくありません。&#10;&#10;隣人やビジネスパートナーとのやり取りでは、プロフェッショナルでビジネスライクな態度を保ちます。明確にコミュニケーションし、信頼性を期待し、無駄な回り道のない直接的な合意を好みます。曖昧または非効率な作業方法はすぐに不満を募らせ、時に彼をよそよそしく、または短気に見せる反応となります。"/>
+            <text name="gui_help_char_desc_20" text="役割: 隣人 | 仕事: 農家&#10;年齢: 31～50 | 関係: 知人 | 行動: 友好的、親切&#10;&#10;エマは夫とともに、野菜と穀物の栽培を専門とする多角的な農業経営を営んでいます。収穫の一部は地元の市場で直接販売され、より大きな量は卸売業者や地域の買い手を通じて販売されます。彼らの農場はよく組織され、効率と品質に強く重点を置いています。&#10;&#10;隣人やビジネスパートナーとのやり取りでは、エマは開放的で友好的、そして親切です。彼女は率直にコミュニケーションし、問題を延々と議論するよりも一緒に解決策を探ることを好む人物と見なされています。地域の農業セクターで特につながりが強く、安定した公正な関係を保っています。&#10;&#10;彼女の親切な性格は、種まきや収穫などの忙しい時期に特に顕著です。可能なときはいつでも、ためらうことなく他の農場を助け、あるいは自ら助けを受け入れます。彼女は農家コミュニティ内での相互支援を非常に大切にし、協力を日常生活の重要な一部と考えています。"/>
+            <text name="gui_help_char_desc_19" text="役割: 隣人 | 仕事: 農家&#10;年齢: 50+ | 関係: 友人 | 行動: 慎重、中立&#10;&#10;ジェイコブは経験豊富な3代目の酪農家で、中規模の家族農場を2人の息子とともに経営しています。農場は長年にわたって成長し、現代の要求に応えるために慎重な調整で発展させてきた伝統的な構造にしっかりと根ざしています。&#10;&#10;他者とのやり取りでは、ジェイコブは穏やかで、落ち着いており、かなり控えめに見えます。彼は話す前に聞き、めったに性急な決定を下しません。特にビジネスや隣人との関係では、不必要なリスクを避け、可能な限り争いから距離を置くよう心がけています。&#10;&#10;彼の慎重な性格は、投資、新技術、または農場運営の大きな変更に関して最も顕著です。実績のある方法を好み、革新を事業に取り入れる前に入念に検討します。このアプローチにより安定した経営が可能になっています。ただし、そのため時に遅すぎる、または保守的だと見なされることもあります。"/>
+            <text name="gui_help_char_desc_18" text="役割: 隣人 | 仕事: 農家&#10;年齢: 31～50 | 関係: 友人 | 行動: 緊張気味、非協力的&#10;&#10;マーカスは、比較的小さく、非常に伝統的な農場を長年経営している地元農家です。設備の大半は古く、できるだけ長く修理して使い続けています。この習慣は日々の仕事をますます複雑にし、遅らせています。&#10;&#10;日常のやり取りでは、マーカスはしばしば緊張していて、やや近寄りがたい印象を与えます。修理による絶え間ないプレッシャー、仕事に必要な時間、そして現代農業の増え続ける要求が、長年のうちに彼を疲れさせ、いらだたせてきました。過去の投資や変更での悪い経験から、新しい方法や現代技術に懐疑的になることも少なくありません。&#10;&#10;隣人や他の農家との付き合いでは、必ずしも協力的ではありません。すぐにプレッシャーを感じたり、確立された手順の変更に抵抗したりするため、合意に達するのが難しい場合があります。彼の衝突は個人的な敵意というよりも、圧倒されている感覚、つまり状況の制御を失っている感覚から生じています。"/>
+            <text name="gui_help_char_desc_17" text="役割: ビジネスパートナー | 仕事: 農業請負業者&#10;年齢: 31～50 | 関係: 知人 | 行動: 非協力的、緊張気味&#10;&#10;ポールは農業請負事業を営み、地元の農場に収穫、堆肥散布、耕耘、その他の農作業などのサービスを提供しています。彼の活動は納期、気象条件、季節的なピークに大きく左右され、その日は慌ただしく、計画面で非常に厳しいものになります。&#10;&#10;顧客とのやり取りでは、ポールはしばしば素っ気なく、せっかちに見えます。彼は仕事を素早く完了し、機械を効率的に使うことに専念しています。通常、長い議論や土壇場の変更は、すでにぎっしり詰まった予定にさらに負担をかけるため拒否します。&#10;&#10;作業量の多さと納期を守らなければならない絶え間ないプレッシャーのため、彼はしばしばストレスを感じ、緊張しています。特に収穫期や厳しい天候の際、作業が計画どおりに進まないと非協力的に見えることがあります。そのような場合、彼の関心は個人的な衝突というより、事業を順調に続けるという絶対的な必要性にあります。&#10;&#10;ぶっきらぼうな態度にもかかわらず、ポールは農作業のあらゆる面で非常に有能で経験豊富です。合意が明確かつ事前に行われていれば、信頼性が高く効率的に働きます。ただし、ビジネスパートナーにも同レベルの明確さとコミットメントを期待します。"/>
+            <text name="gui_help_char_desc_16" text="役割: ビジネスパートナー | 仕事: 農業機械ディーラー&#10;年齢: 31～50 | 関係: 親友 | 行動: プロフェッショナル、友好的&#10;&#10;アンディは農業機械ディーラーを所有し、地域の農業セクター全体で非常によいつながりを持っています。彼の事業は、農業機械の販売、メンテナンス、修理、部品供給を網羅しています。日々の仕事を通じて農家、工房、メーカーと緊密な連絡を保ち、現代農業の実務的な要求を正確に理解しています。&#10;&#10;顧客やビジネスパートナーとのやり取りでは、彼は開放的で友好的、そして解決志向に見えます。対等にコミュニケーションする術を知っており、小規模な家族農場から大規模農園まで、あらゆる規模の経営の信頼を勝ち取ります。主な焦点は、理論的な可能性についての長い議論ではなく、実用的で現実的な解決策を見つけることです。&#10;&#10;ビジネスパートナーとして、アンディは信頼でき、公正だと見なされています。約束を守り、状況が許す限り柔軟性と善意を示し、不必要な官僚主義なしに問題を迅速に解決しようと努めます。特に技術的な故障や緊急の修理では、短時間で対応できることが多く、顧客のダウンタイムを最小限に抑えることに尽力しています。"/>
+            <text name="gui_help_char_desc_15" text="役割: ビジネスパートナー | 仕事: 穀物商&#10;年齢: 31～50 | 関係: 知人 | 行動: 中立、懐疑的&#10;&#10;スーザンは独立した穀物商として働き、地域の農場から穀物を買い付け、地域の製粉所や加工工場へ転売するために定期的に地域を回っています。彼女は市場をよく知り、価格と収量を注意深く追跡し、需要と供給の変化に素早く反応します。&#10;&#10;農家やビジネスパートナーとの関係では、彼女は事務的で、控えめで、感情を出さない印象を与えます。明確な合意、検証可能な品質、透明な数量を非常に重視します。ビジネス環境では約束や個人的な印象ではなく、事実と信頼できる数字に基づいて、信頼をゆっくりと築きます。&#10;&#10;スーザンは非常に観察力があり、見積もりや納品の矛盾にすぐ気づきます。そのため、一部の人は彼女を厳格または懐疑的だと見なしますが、これは単に職業上の慎重さの一部です。彼女は明確な契約を好み、非公式な取り決めや急な変更をあまり重視しません。"/>
+            <text name="gui_help_char_desc_14" text="役割: 役人 | 仕事: 市長&#10;年齢: 50+ | 関係: 知人 | 行動: プロフェッショナル、権威的&#10;&#10;マーティンは長年コミュニティの市長を務めており、町で経験豊富で影響力のある人物と見なされています。彼は地域の大半の家族、企業、出来事を何十年も前から知っており、コミュニティが外部に対して秩序、安定、良好な組織のイメージを示すことを非常に重視しています。市の財政、インフラ、町の評判といった問題を特に真剣に扱います。&#10;&#10;他者とのやり取りでは、マーティンは通常、落ち着いていて、事務的で、決断力があります。彼は静かだが権威をもって話し、自分の決定が注目されることに慣れています。しばしば外交的に議論を導きますが、ルールが無視されたり、彼の決定が公然と異議を唱えられたりすると、かなり断固とした態度を取ることがあります。"/>
+            <text name="gui_help_char_desc_13" text="役割: 隣人 | 仕事: 林務官&#10;年齢: 31～50 | 関係: 友人 | 行動: 慎重、プロフェッショナル&#10;&#10;ルーカスは林務官として働き、周辺の森林地域の手入れと管理を担当しています。彼の任務には、植林の点検、林道の維持、自然保護対策の監視、狩猟許可の手配と確認などが含まれます。彼は地域の森を熟知しており、日常生活の大半を屋外の自然の中で過ごしています。&#10;&#10;かなり控えめな性格にもかかわらず、彼は信頼でき公正だと見なされています。特に林業、木材、狩猟、自然保護について、友人と知識を共有することをいつも喜んでいます。彼は正直で率直な人を評価し、責任を持って行動し約束を守る人とよく気が合います。"/>
+            <text name="gui_help_char_desc_11" text="役割: 民間人&#10;年齢: 31～50 | 関係: 親友 | 行動: 中立、友好的&#10;&#10;カイルはパーソナルトレーナーとして働き、日常生活の大半をジムやスポーツ活動に費やしています。体力、規律、健康的なライフスタイルは彼にとって重要です。ただし、説教じみた印象を与えることはありません。彼は他人をやる気にさせるのが好きで、開放的で気楽な態度でたいていすぐに人々の心をつかみます。&#10;&#10;ジョーの親友として、彼は信頼でき親切です。特に誰かが実務的なサポートやモチベーションを必要としているときに。彼は困難について長くくよくよするよりも、人を元気づけ、気晴らしを提供する傾向があります。一般に争いを避け、軽やかな雰囲気を保つことを好みます。"/>
+            <text name="gui_help_char_desc_10" text="役割: 役人&#10;年齢: 50+ | 関係: ぎくしゃく | 行動: 権威的、慎重&#10;&#10;シャロンは市の行政で働き、明確な手続きと調和のとれたコミュニティ生活を確保しています。農家にとって、これは夜間の静けさ、清潔さ、臭いや騒音に関する迷惑などの問題をしばしば意味します。仕事以外では、彼女はたいてい絶え間ない整理や監督から距離を置こうとし、自由時間にそのような議論に参加することを断ります。&#10;&#10;彼女は物静かで事務的、かなり控えめだと思われていますが、誰かをよりよく知るようになると友好的でユーモアもあります。彼女は通常、冷静かつ率直な方法で議論に臨みます。自由時間には、読書、散歩、庭仕事を楽しみます。大勢の集まりや慌ただしい環境を避ける傾向があります。秩序と信頼性は、仕事でも私生活でも彼女にとって重要です。それでも、彼女は勤務時間後はよりリラックスし、常に仕事を持ち帰らないよう意識的に努めています。"/>
+            <text name="gui_help_char_desc_2" text="役割: 家族 | 仕事: 農家 | 農場に所属: はい&#10;年齢: 21～30 | 関係: 家族 | 行動: 緊張気味&#10;&#10;ジョン・カーターは、プレイヤーキャラクターであるジョー・カーターの弟で、家族農場で彼のそばで育ちました。幼い頃から農業は彼の人生の自然で不可欠な一部でした。そのため、能力の許す限り農場の日々のルーティンに貢献し続けようと努めています。しかし、数年前から身体を制限する病状のため、今ではより軽く簡単な作業しかこなせません。これは彼が表に出す以上に彼を苦しめています。&#10;&#10;かつてジョンは畑や体力的にきつい作業ではるかに活発でした。今では、多くのことが以前のようには機能しないという現実を受け入れるのに苦労しています。誰かが重労働を引き継がなければならないとき、たとえ誰も故意にそう感じさせなくても、彼は特に自分が役に立たない、あるいは家族の重荷だと感じます。"/>
+            <text name="gui_help_char_desc_1" text="役割: 家族 | 仕事: 農家 | 農場に所属: はい&#10;年齢: 31～50 | 関係: 家族 | 行動: 友好的、プロフェッショナル、親切&#10;&#10;メアリー・カーターはジョー・カーター（プレイヤー）の妻で、家庭生活と農場の日々のルーティンの両方に深く関わっています。正式な訓練を受けた農家ではありませんが、助けが必要なときは納屋でも畑でも、農場の仕事を定期的に手伝います。特に忙しい時期には自然と加わり、舞台裏のことをこなして夫と家族を支えようと努めます。&#10;&#10;彼女は穏やかで、心温かく、信頼できる人と見なされており、通常は冷静に、客観的に、そして忍耐強く争いに対処します。他人に対して開放的で親切ですが、その代わりに誠実さと相互の尊重を期待します。見知らぬ人には最初はやや控えめに見えるかもしれませんが、友好的に接せられるとすぐに打ち解けます。&#10;&#10;日常生活では、家事、家族、農場に関する取りまとめを担当することがよくあります。仕事量が多くても、家族の結束感と心地よい雰囲気が保たれるよう気を配っています。時には自分に過剰な責任を背負い込むこともありますが、たいていは冷静さと現実的な解決策でストレスの多い状況を乗り切ろうとします。"/>
+            <text name="gui_help_conversations_title" text="出会いと会話"/>
+            <text name="gui_help_conversations_body" text="隣人はマップのあちこちに散らばって生活しています。彼らと出会い、話すことは、リアルな行動パターンと並んで、この MOD の中心的な部分です。&#10;&#10;会話の始め方:&#10;1. キャラクターに徒歩で近づきます。十分近づくと（約 5 メートル）、「会話を始める」アクションを実行できます。&#10;2. Shift+R を押して会話を始めます。&#10;3. 会話を聞くか、字幕を読みます。&#10;4. 複数のセリフが表示されたら、自分が言いたいものを選びます。選択によって会話と関係の変化が形作られます。&#10;5. 将来的には、雑談と実際の行動（例: 機械を借りる）の両方について話せるようになります。&#10;&#10;人を探す: キャラクターはマップ全体に現れます。車両に乗った農家には通常近づきにくいですが、徒歩で約 20 メートルまで近づくと、停止してエンジンを切り、しばらくして降りてくるので話すことができます。&#10;&#10;音声付き会話は、ボイスパックがインストールされているときに再生されます。ない場合は、テキストを読むだけで済みます。"/>
+            <text name="gui_help_controls_title" text="操作"/>
+            <text name="gui_help_controls_body" text="Shift+R: 近くの人と会話を始めます。近くに誰もいない場合は、代わりに電話が開きます。&#10;Shift+F3: Fields of Stories のストーリーと設定メニューを開きます。&#10;&#10;建設メニュー内（Fields of Stories のマーカーを配置中）:&#10;Shift+Q: 地点サイズを変更します。&#10;Shift+Delete: 選択した種類の地点をすべて削除します。"/>
+            <text name="gui_help_relationships_title" text="関係"/>
+            <text name="gui_help_relationships_body" text="各隣人は、あなたについてどう感じているかを覚えています。良い出会いは時間とともに信頼を築き、悪い出会いはあなたに代償をもたらします。&#10;&#10;仕組み:&#10;- 各キャラクターには関係レベル（1 から開始）と、次のレベルへ向けて貯まるポイントがあります。&#10;- 友好的な会話はポイントを獲得します（そしてそれに見合う小さな現金報酬）。&#10;- ポイントバーが満杯になると関係レベルが上がり、ポイントは次のレベルのためにリセットされます。より高いレベルはより多くのポイントを必要としますが、到達時にはより大きなボーナスも与えられます。&#10;- 失礼または軽蔑的な返答はポイントを失うことがあります。時には、一見友好的な返答でも否定的な感情を引き起こし、関係を悪化させることがあります。ポイントは決して 0 未満にはならず、すでに到達したレベルを下げることもありません。&#10;&#10;圃場契約も関係します: 完了した契約はその農家との関係を改善し、失敗・キャンセル・期限切れは同じ量だけ低下させます。&#10;&#10;会話の終わりには、「関係が改善されました」や「関係レベルが上がりました」などのメッセージが表示されます。"/>
+            <text name="gui_help_story_title" text="ストーリータブ"/>
+            <text name="gui_help_story_body" text="ストーリータブでは、各キャラクターと彼らとの関係をすばやく確認できます。Shift+F3 でメニューを開き、ストーリータブを選択します。&#10;&#10;左側には全隣人のスクロール可能なリストがあり、名前をクリックして選択します。右側には、選択したキャラクターのポートレート、現在の関係（知人、友人、家族など）、関係レベル、次のレベルまでに獲得した関係ポイントを示す進行バーが表示されます。&#10;&#10;すでに誰と仲が良く、誰をもっと頻繁に訪ねるべきかを一目で把握するために使います。ポイントとレベルの獲得・喪失の仕組みについては「関係」トピックをご覧ください。"/>
+            <text name="gui_help_contracts_title" text="圃場契約と電話"/>
+            <text name="gui_help_contracts_body" text="農家は時に、処理できる以上の農作業を抱えており、助けを求めて電話してきます。これらの申し出は、彼らの畑での実際の有償作業です。完了すべき一連の畑を任せてくれることもあります。&#10;&#10;電話:&#10;1. 農家は日中（おおよそ 08:00 から 15:00 の間）に電話してくることがあります。着信音が聞こえ、着信通知が表示されます。&#10;2. 電話を開いて「応答」を押すと申し出を聞けます。「拒否」/ Esc で断ります。&#10;3. 同じ農家が後で再試行することがあります。契約電話には 1 日の上限があります（ゲーム設定で設定可能）。まったく応答しない場合、合計 3 回の追加の電話試行があります。&#10;&#10;仕事の選択: 電話の会話では、通常、畑の全面積または前半分だけを受け入れ、自分の装備を使うか隣人の機械を借りるかを選べます。これには農家が自分の機械を手放せる必要があります。もちろん、単に依頼を断ることもできます。&#10;&#10;借りない場合: 自分の機械で契約を遂行します。仕事はヘクタール単位で支払われ、畑が必要な状態に達した時点で完了と見なされます。畑はサンプリングポイントで確認され、完了しきい値はゲーム設定で設定できます。&#10;&#10;これらの契約は常に電話で依頼され、承諾後にのみ通常のミッションメニューに表示されます。&#10;&#10;報酬と評判: 完了した契約は報酬を支払い、その農家との関係を改善します。失敗、キャンセル、期限切れはその逆です。"/>
+            <text name="gui_help_contracts_body2" text="借りる場合: 隣人は必要な装備を正確に貸してくれます（ただしウェイトとトラクターは貸し出されません）。必要な場合、借りた機械は種子、散布液、肥料、堆肥、スラリーで満たされた状態で開始され、必要に応じて隣人の農場で補充できます。&#10;借りることは、自分の装備を使うよりもわずかに低い報酬を意味します。重要: 借りた装備での契約は、借りた各機械を隣人の農場へ戻してそこで切り離すまで 99 パーセントのままです。そのとき初めて契約は完了と見なされます。&#10;&#10;装備を借りる場合、マップ上に機械をどこで受け取れるかを示すマーカーがあります。そこで消耗品（スラリー、種子、除草剤など）を補充し、契約の最後に機械を再び駐車できます。"/>
+            <text name="gui_help_contracts_body3" text="収穫と納入の契約&#10;&#10;一部の農作業契約では、収穫物の納入も必要です:&#10;&#10;収穫物の納入: 作物（トウモロコシ、小麦、菜種など）を収穫し、穀物を農家のサイロへ納入します。ゲームはコンバインが集めたものを追跡し、納入したものと比較します。収穫した量の少なくとも 99 % を納入する必要があります。&#10;&#10;草刈りの納入: 草を刈り、（ベールまたはばらで）農家のサイロへ納入します。&#10;&#10;受け取りと納入: 作物を収穫または刈り取り、マップ上で赤い円で示された農家のサイロへ運びます。サイロは契約期間中、一時的にアクセス可能です。別の場所への排出（例: 作物の販売）はカウントされません。&#10;&#10;消耗品の作業（石灰、肥料、スラリー、散布、種子、堆肥）: 農家のサイロには必要な消耗品が満たされているので、購入する代わりにそこで装備を補充できます。&#10;&#10;複数の納入契約が同じサイロと作物タイプを共有する場合、納入はそれらの間で比例配分されます。&#10;&#10;タスクリスト: ミッション詳細には、農作業、納入、（機械を借りた場合は）装備の返却が、現在の納入進捗とともに別々のタスクとして表示されます。&#10;&#10;強制完了: 契約メニューの「強制完了」ボタンは、ほぼ完了した契約（70 % 超）を締めます。&#10;&#10;進捗表示:&#10;0-80 % は農作業をカバーし、80-99 % は農作業が完了したが納入がまだ保留中であることを意味します。100 % で両方が完了です。支払いを受け取るにはミッションメニューで契約を回収してください。&#10;&#10;納入ボーナス:&#10;農家は収穫物がすべて納入されることを期待しています。自分のために何も残さないでください。契約が 100 % に達した後も納入を続けられます。回収時に、完了時点でサイロにあった量を超える余剰は +50 の関係ボーナスを与えます。"/>
+            <text name="gui_help_contract_cap_call_info" text="農家が助けを必要とするとき、着信音が聞こえ、着信通知が表示されます（おおよそ 08:00 から 15:00 の間）。"/>
+            <text name="gui_help_contract_cap_call" text="電話を開いて「応答」を押すと申し出を聞けます。「拒否」/ Esc で断ります。&#10;&#10;仕事の電話の数はゲーム設定で調整できます。これは電話の数ではなく、助けを求めている農家の数を指します。&#10;&#10;重要: 電話にまったく応答しない場合、合計 3 回の追加の電話試行があります。"/>
+            <text name="gui_help_contract_cap_choices" text="電話では仕事を選びます: 畑全体または前半分だけ、そして自分の装備を使うか隣人の機械を借りるか。"/>
+            <text name="gui_help_contract_cap_borrow_map" text="装備を借りる場合、マップ上のマーカーが機械の受け取り場所と後で返却する場所を示します。"/>
+            <text name="gui_help_contract_cap_borrow_attach" text="農場で借りた装備を取り付け、必要に応じてそこで種子、散布液、肥料、スラリーを補充します。"/>
+            <text name="gui_help_contract_cap_fieldwork" text="農作業を行います。借りた装備では、各機械を農場へ戻して切り離すまで契約は 99 % のままです。"/>
+            <text name="gui_help_schedule_title" text="農家と彼らの農作業"/>
+            <text name="gui_help_schedule_body" text="AI 農家は単なるアニメーションのヘルパーではありません。彼らは自分の土地で、日々、季節ごとに、実際に農作業を計画して実行します。&#10;&#10;日次計画: ゲーム内で 1 日に 1 回、各農家は自分の畑の実際の状態を確認し、タスクリストを作成します。日中、おおよそ 06:00 から夕方までそれに取り組みます: 出かけ、作業し、家に戻ります。&#10;&#10;優先順に、彼らは: 熟した作物を収穫し、次に種をまき、次に散布し、次に肥料・堆肥・スラリーを撒き、次に耕起・ハロー・耕耘をします。タスクは、畑が本当に必要としている場合（適切な作物、生育段階、土壌状態、雑草）にのみ選択されます。&#10;&#10;季節に従う: 種まきは各作物の実際の作付けカレンダーに従い、他の作業は妥当な月に結び付けられているため、目に見える作業が季節と一致します。種まきの際、農家は適切な作物（菜種、小麦、大麦、エンバク、大豆など）を輪作し、前作を避けようとします。&#10;&#10;外部委託: 毎日、農家は特定のタスクを電話契約として提供できます。これらの契約は電話で依頼され、承諾後は通常のミッションメニューに表示されます。正午までに承諾しない場合、彼は自分で行います。&#10;&#10;農家のその日の計画は、「設定」メニューの「キャラクター」で確認できます。どのタスクがあなたのために確保されているか、契約として提供されているか、農家自身の AI が処理するかも含まれます。"/>
+            <text name="gui_help_privatelife_title" text="私生活"/>
+            <text name="gui_help_privatelife_body" text="仕事以外では、キャラクターには自分の生活があります。各隣人には帰る家があり、多くの人が日中に個人的なルーティンをこなしています。&#10;&#10;彼らがしているのを見かけること:&#10;- 家でくつろぐ、または片付ける。&#10;- 友人と過ごす、ピクニックをする、子どもと遊ぶ。&#10;- 散歩する、犬の散歩をする、本を読む。&#10;- 日々の用事を済ませる、または車に給油する。&#10;- 道端で車両を点検する、または修理のために工房へ行く。&#10;&#10;ルーティンは時間帯（朝、昼、夕方、夜）とキャラクターの役割・仕事によって異なるため、農家、市長、一般市民は自由時間の過ごし方が異なります。&#10;&#10;まさにこれが世界を生き生きとさせます。異なる時間にマップを巡れば、あらゆる状況の人々に出会えます。徒歩で近づくと、会話を始めて彼らをよりよく知ることができます。"/>
+            <text name="gui_help_homebases_title" text="拠点"/>
+            <text name="gui_help_homebases_body" text="拠点はキャラクターの家です。彼が暮らし、夕方に戻り、勤務外のときに見つかる場所です。拠点がなければ、キャラクターはゲーム内に実在しません。各隣人には少なくとも 1 つ必要です。&#10;&#10;キャラクターごとに 2 つの出現ポイント: 各キャラクターには少なくとも 2 つのホーム地点が必要です。1 つは「キャラクター」サイズ（徒歩。人が立ち、眠る場所）、もう 1 つは「車両」サイズ（車が駐車する場所）です。これにより、各隣人には徒歩と車両の両方の出現ポイントがあります。&#10;&#10;ホーム地点の作成（建設メニュー、推奨）:&#10;1. 建設メニュー（建設ツール）を開き、「Fields of Stories」カテゴリ、次に「キャラクターの家」タブを選択します。&#10;2. 目的のキャラクターのオブジェクトを選びます（例: 「メアリー・カーター」）。&#10;3. 住居に配置します。Shift+Q でサイズを変更します（人の「キャラクター」、車の「車両」、農場の「広いエリア」、サイロの「サイロ」）。&#10;&#10;クラシック方式: Shift+F3 でメニューを開き、「設定」タブへ進み、上部で適切な地点サイズ（「キャラクター」または「車両」）を選び、住居の目的の場所に徒歩で立つか車両を駐車し、地点リストから「[名前] の家」を選択して位置を保存します。あるいは「キャラクター」セクションで「最寄りの拠点を追加」を使うと、選択したキャラクターに最寄りの地点を直接割り当てられます。&#10;&#10;既存のホーム地点の削除: キャラクターの住居をリセットしたい場合は、「キャラクター」セクションでそのキャラクターを選択し、「ホーム地点を削除」ボタンを使います。これにより、そのキャラクターに割り当てられたすべてのホーム地点が解除されます。地点自体は残り、後で再割り当てできます。&#10;&#10;拠点は、特に早朝や深夜に誰かを見つけるのに適した場所です。&#10;&#10;農家: 彼らにとって拠点は農場でもあり、機械用のスペースも必要です。農場の正しい設計方法は「農場の設計」の章で学べます。"/>
+            <text name="gui_help_homebasedesign_title" text="農場の設計"/>
+            <text name="gui_help_homebasedesign_body" text="この章は農家キャラクターの農場についてです。農家にとって拠点は農場でもあります。機械が使われていないときや契約中のとき、それらはそこに駐車されます。そのため、農場は余裕をもって計画してください。農家は多くの車両と装備を所有しているからです（現在、装備約 10、コンバイン 1、トラクター 2、車 1。農業請負業者は装備 23、自走機械 6、トラクター 2、車 1 もあります）。&#10;&#10;地点の作成方法: Shift+F3 でメニューを開き、「設定」タブへ進み、上部で適切な地点サイズを選び、目的の場所に「キャラクター拠点」を保存します（正確な手順は「マップ地点の作成」の章にあります）。&#10;&#10;農場に必要な地点サイズ:&#10;- 「キャラクター」（徒歩）: 農家本人用。&#10;- 「車両」: 車とトラクター用。&#10;- 「大型車両」: コンバインと自走機械用。&#10;- 「装備付き車両」: 装備とトレーラー用。&#10;- 「広いエリア」: 機械準備など農場での広々とした状況用。&#10;- 「サイロ」: 収穫・草刈り契約の納入・補充ポイントとして機能する農家のサイロ用。&#10;各機械の場所が見つからなくても問題ありません。使用状況に応じて、駐車または非表示になります。"/>
+            <text name="gui_help_homebasedesign_body2" text="農場をアクセス可能にする: 農家の機械を借りるには、その農場が通行可能でなければなりません。駐車中の機械まで車両で行き、戻ってこられる必要があります。そのため、農場を配置する際は、フェンス、ゲート、壁、木、その他のオブジェクトが出入りを妨げないようにしてください。&#10;&#10;ゲートの削除: ゲートやドアがアクセスを妨げている場合、Fields of Stories 内で直接削除できます。ゲートの近く（約 20 m 以内）に立つか走行し、「設定」タブで Shift+F3 を使ってメニューを開き、「最寄りのゲートを削除」をクリックします。ノード名に「gate」を含む最寄りのオブジェクトがマップから恒久的に削除され、再読み込み後も消えたままです。以降の画像は、ゲートの削除がアクセスを解放して機械を借りられるようにする様子を示しています。"/>
+            <text name="gui_help_voices_title" text="音声と言語"/>
+            <text name="gui_help_voices_body" text="会話は完全に音声化できます。音声は別のボイスパックとして提供され、MOD 自体を小さく保てます。&#10;&#10;ボイスパックのインストール: ボイスパックをダウンロードし（正確なダウンロード場所は MOD の GitHub ページをご覧ください: AirFoxTwo/FS25_FieldsOfStories）、その「conversations」フォルダーが MOD の modSettings フォルダー（modSettings/FS25_FIELDS_OF_STORIES）に入るように展開します。パックがないか古い場合は、「再確認」と「無視」ボタン付きの警告ダイアログが表示されます。なくてもプレイを続けられます。会話は引き続き字幕を表示します。音声がないだけです。&#10;&#10;言語: MOD は英語とドイツ語に完全に翻訳されています。表示テキストは自動的にゲームの言語に従います。ボイスパックは対応する英語版とドイツ語版があり、MOD はインストールされたパックに一致する音声を再生し、そうでない場合はゲーム言語に一致する音声を再生します。&#10;&#10;会話の生成（上級）: 各キャラクターには、あなたとの独自の会話テキストがあります。合計すると、1 万を超える書き起こし・音声化された会話パートになります。各会話は手動で確認されています（少なくとも妥当性について）。ただし、表現や文法の誤りを完全に排除することはできません。&#10;&#10;音声の生成（上級）: 各キャラクターには、テキスト読み上げの音声設計から生成された独自の声があります。これらの声は、ローカルの NVIDIA RTX 5080 で音声クローンによってすべての会話テキスト用に録音されます。計画では、さらなる最適化、あるいは本物の声優によって品質を向上させる予定ですが、それには多大な労力が必要です。"/>
+            <text name="gui_help_support_title" text="サポートとフィードバック"/>
+            <text name="gui_help_support_body" text="バグを見つけましたか、それとも MOD を改善するアイデアがありますか? フィードバックは大歓迎です。&#10;&#10;フィードバック、バグ報告、機能リクエストは、MOD の GitHub ページから送るのが最適です: AirFoxTwo/FS25_FieldsOfStories&#10;&#10;問題を報告する際は、以下を含めると非常に助かります:&#10;- 何が起き、何を期待していたかの簡単な説明&#10;- 再現手順&#10;- プレイしているマップ&#10;- 添付できるならログファイル&#10;&#10;明確で詳細な報告は修正を大幅に加速します。Fields of Stories の改善にご協力いただきありがとうございます。"/>
+            <text name="gui_mapinit_remove_mod_disclaimer" text="注意: この後、ゲームを保存する必要があります。"/>
+            <text name="gui_mapinit_remove_mod" text="MOD データを削除"/>
+            <text name="gui_mapinit_open_construction_menu" text="建設メニューを開く"/>
+            <text name="gui_mapinit_classic_init_mode" text="クラシック初期化モード"/>
+            <text name="gui_mapinit_place_size_label" text="地点サイズ:"/>
+            <text name="gui_mapinit_place_size_character" text="キャラクター"/>
+            <text name="gui_mapinit_place_size_vehicle" text="車両"/>
+            <text name="gui_mapinit_place_size_vehicle_attachment" text="装備付き車両"/>
+            <text name="gui_mapinit_place_size_oversize_vehicle" text="大型車両"/>
+            <text name="gui_mapinit_place_size_large_area" text="広いエリア"/>
+            <text name="gui_mapinit_place_size_silo" text="サイロ"/>
+            <text name="gui_mapinit_place_type_label" text="地点タイプ:"/>
+            <text name="gui_mapinit_place_type_shop" text="店"/>
+            <text name="gui_mapinit_place_type_gas_station" text="ガソリンスタンド"/>
+            <text name="gui_mapinit_place_type_character_homebase" text="キャラクター拠点"/>
+            <text name="gui_mapinit_place_type_roadside" text="道端"/>
+            <text name="gui_mapinit_place_type_dirt_road" text="未舗装路"/>
+            <text name="gui_mapinit_place_type_public_place" text="公共の場所"/>
+            <text name="gui_mapinit_place_type_player_farm" text="プレイヤーの農場"/>
+            <text name="gui_mapinit_place_type_public_relax_place" text="公共のくつろぎ場"/>
+            <text name="gui_mapinit_place_type_private_relax_place" text="私的なくつろぎ場"/>
+            <text name="gui_mapinit_place_type_sell_point" text="販売所"/>
+            <text name="gui_mapinit_place_type_other" text="その他"/>
+            <text name="gui_mapinit_place_type_church" text="教会"/>
+            <text name="gui_mapinit_place_type_public_infrastructure" text="公共インフラ"/>
+            <text name="gui_mapinit_place_type_roadside_trees" text="道端の木々"/>
+            <text name="gui_mapinit_place_type_industry" text="産業"/>
+            <text name="gui_mapinit_place_type_workshop" text="工房"/>
+            <text name="gui_mapinit_place_type_shed" text="小屋"/>
+            <text name="gui_mapinit_place_type_fieldwork" text="農作業"/>
+            <text name="fos_place_character_public_place" text="地点: 公共の場所マーカー"/>
+            <text name="fos_place_character_public_place_desc" text="Fields of Stories - NPC が集まり、おしゃべりし、自由時間を過ごす賑やかな公共広場"/>
+            <text name="fos_place_character_shop" text="地点: 店マーカー"/>
+            <text name="fos_place_character_shop_desc" text="Fields of Stories - NPC が商品を見て買い物に来るショッピングエリア"/>
+            <text name="fos_place_character_gas_station" text="地点: ガソリンスタンドマーカー"/>
+            <text name="fos_place_character_gas_station_desc" text="Fields of Stories - NPC が車両に給油し、他者と出会う給油所"/>
+            <text name="fos_place_character_roadside" text="地点: 道端マーカー"/>
+            <text name="fos_place_character_roadside_desc" text="Fields of Stories - NPC がおしゃべりのために、または運転の休憩に立ち寄る道端の場所"/>
+            <text name="fos_place_character_dirt_road" text="地点: 未舗装路マーカー"/>
+            <text name="fos_place_character_dirt_road_desc" text="Fields of Stories - NPC が散歩や素朴な出会いを楽しむ静かな未舗装路"/>
+            <text name="fos_place_character_player_farm" text="地点: プレイヤー農場マーカー"/>
+            <text name="fos_place_character_player_farm_desc" text="Fields of Stories - あなたの農業活動の中心であるプレイヤーの農場を示します"/>
+            <text name="fos_place_character_public_relax_place" text="地点: くつろぎエリアマーカー"/>
+            <text name="fos_place_character_public_relax_place_desc" text="Fields of Stories - NPC がくつろぎ、自由時間を楽しむ公共のくつろぎエリア"/>
+            <text name="fos_place_character_private_relax_place" text="地点: 私的くつろぎエリアマーカー"/>
+            <text name="fos_place_character_private_relax_place_desc" text="Fields of Stories - NPC がプライバシーと静かな思索を求める人里離れた隠れ家"/>
+            <text name="fos_place_character_sell_point" text="地点: 販売所マーカー"/>
+            <text name="fos_place_character_sell_point_desc" text="Fields of Stories - NPC が商品を納入し、取引を行う交易ポイント"/>
+            <text name="fos_place_character_church" text="地点: 教会マーカー"/>
+            <text name="fos_place_character_church_desc" text="Fields of Stories - NPC が礼拝や地域の集まりに参加する礼拝所"/>
+            <text name="fos_place_character_public_infrastructure" text="地点: インフラマーカー"/>
+            <text name="fos_place_character_public_infrastructure_desc" text="Fields of Stories - 地域コミュニティのための公共サービスとインフラの中心"/>
+            <text name="fos_place_character_industry" text="地点: 産業マーカー"/>
+            <text name="fos_place_character_industry_desc" text="Fields of Stories - NPC が働き、商品を生産する工業地帯"/>
+            <text name="fos_place_character_workshop" text="地点: 工房マーカー"/>
+            <text name="fos_place_character_workshop_desc" text="Fields of Stories - NPC が装備を整備・修理する修理工房"/>
+            <text name="fos_place_character_shed" text="地点: 小屋マーカー"/>
+            <text name="fos_place_character_shed_desc" text="Fields of Stories - NPC が道具と装備を保管する倉庫小屋"/>
+            <text name="fos_place_character_remove" text="ツール: 地点を削除"/>
+            <text name="fos_place_character_remove_desc" text="Fields of Stories - 配置時に 5 メートル以内の最寄りの地点マーカーを削除します"/>
+            <text name="gui_fos_place_created" text="地点を作成しました: %s (%s)"/>
+            <text name="gui_fos_bulk_remove_title" text="地点の一括削除"/>
+            <text name="gui_fos_bulk_remove_confirm" text="「%s」タイプの地点を %d 件削除しますか?"/>
+            <text name="gui_fos_bulk_remove_confirm_char" text="「%s」の地点を %d 件削除しますか?"/>
+            <text name="gui_fos_bulk_remove_btn_yes" text="すべて削除"/>
+            <text name="gui_fos_bulk_remove_btn_no" text="キャンセル"/>
+            <text name="gui_fos_bulk_remove_none" text="このタイプの削除する地点はありません。"/>
+            <text name="gui_fos_bulk_remove_done" text="%d 件の地点を削除しました。"/>
+            <text name="input_IAMapInitDialog" text="Fields of Stories メニュー"/>
+            <text name="input_IAI3DReferencesDebug" text="Fields of Stories - すべての i3d 参照ノードにデバッグポイントを表示"/>
+            <text name="input_IADumpUserAttributes" text="Fields of Stories - マップノードのユーザー属性をログに書き出す"/>
+            <text name="input_IAPlaceSizeSelect" text="地点サイズの選択 (Fields of Stories)"/>
+            <text name="input_IAPlaceBulkRemove" text="地点の一括削除 (Fields of Stories)"/>
+            <text name="gui_fos_place_size_select" text="地点サイズ"/>
+            <text name="gui_mapinit_add_nearest_homebase" text="最寄りの拠点を追加"/>
+            <text name="gui_mapinit_add_nearest_homebase_info" text="最寄りの地点をキャラクター %s に割り当てました。"/>
+            <text name="gui_mapinit_notify_place_saved" text="地点を保存しました: %s"/>
+            <text name="gui_mapinit_notify_remove_nearest_ok" text="最寄りの地点を削除しました。"/>
+            <text name="gui_mapinit_notify_remove_nearest_none" text="削除する地点が見つかりません。"/>
+            <text name="gui_mapinit_notify_end_init" text="初期化フェーズが終了しました。"/>
+            <text name="gui_mapinit_notify_remove_mod" text="Fields of Stories の MOD データをクリアしました。ゲームを保存してください。"/>
+            <text name="gui_mapinit_notify_reset_character" text="キャラクター %s をリセットしました。"/>
+            <text name="gui_mapinit_notify_delete_character" text="%s を MOD から削除しました。"/>
+            <text name="gui_mapinit_notify_remove_homeplaces" text="%s のホーム地点を削除しました。"/>
+            <text name="gui_mapinit_remove_nearest" text="最寄りの地点を削除"/>
+            <text name="gui_mapinit_show_place_markers" text="地点マーカーを表示"/>
+            <text name="gui_mapinit_hide_place_markers" text="地点マーカーを非表示"/>
+            <text name="gui_mapinit_hide_nearest_gate" text="最寄りのゲートを削除"/>
+            <text name="gui_mapinit_notify_hide_gate_ok" text="最寄りのゲートを削除しました: %s"/>
+            <text name="gui_mapinit_notify_hide_gate_none" text="近くにゲートオブジェクトが見つかりません。"/>
+            <text name="gui_mapinit_end_init" text="初期化フェーズを終了"/>
+            <text name="gui_mapinit_nudge_vehicle_left" text="車両: 右へ 5 m"/>
+            <text name="gui_mapinit_notify_nudge_vehicle_no_vehicle" text="これを使うには車両に乗ってください。"/>
+            <text name="gui_mapinit_notify_nudge_vehicle_ai" text="動かす前に車両の AI を停止してください。"/>
+            <text name="gui_mapinit_notify_nudge_vehicle_failed" text="車両を動かせませんでした: %s"/>
+            <text name="gui_mapinit_reset_character" text="キャラクターをリセット"/>
+            <text name="gui_mapinit_delete_character" text="キャラクターを削除"/>
+            <text name="gui_mapinit_remove_homeplaces" text="ホーム地点を削除"/>
+            <text name="gui_mapinit_detail_name" text="名前"/>
+            <text name="gui_mapinit_detail_job" text="仕事"/>
+            <text name="gui_mapinit_detail_role" text="役割"/>
+            <text name="gui_mapinit_detail_relationship" text="関係"/>
+            <text name="gui_mapinit_detail_relationship_fmt" text="%s (レベル %d、%d / %d ポイント)"/>
+            <text name="gui_mapinit_detail_vehicles" text="車両"/>
+            <text name="gui_mapinit_detail_current_situation" text="現在の状況"/>
+            <text name="gui_mapinit_detail_schedule" text="本日予定の農作業"/>
+            <text name="gui_mapinit_detail_at_place_fmt" text="%s にて"/>
+            <text name="ingame_relationship_improved" text="%s との関係が改善されました (+%s ポイント)"/>
+            <text name="ingame_relationship_levelup" text="%s との関係レベルが上がりました (レベル %s)"/>
+            <text name="ingame_relationship_decreased" text="%s との関係が悪化しました (-%s ポイント)"/>
+            <text name="ingame_situation_at_player_farm" text="%s があなたの農場で待っています。"/>
+            <text name="ia_field_outcome_mission_title_for_neighbour" text="%s のための %s"/>
+            <text name="ia_field_outcome_mission_desc_short" text="このタスクを終えるには %s を使用してください。"/>
+            <text name="ia_field_outcome_mission_desc_seed" text="%s を播くには %s を使用してください。"/>
+            <text name="ia_field_outcome_neighbour_generic" text="あなたの隣人"/>
+            <text name="ia_field_outcome_task_done" text="完了"/>
+            <text name="ia_field_outcome_task_open" text="未完了"/>
+            <text name="ia_field_outcome_task_fieldwork" text="農作業: %s"/>
+            <text name="ia_field_outcome_task_delivery" text="納入"/>
+            <text name="ia_field_outcome_task_return" text="装備を返却"/>
+            <text name="ia_field_outcome_task_delivery_progress" text="%s / %s 納入済み"/>
+            <text name="ia_field_outcome_task_delivery_not_started" text="未開始"/>
+            <text name="ia_field_outcome_task_return_after_fieldwork" text="農作業の後"/>
+            <text name="ia_fieldwork_label_harvest_corn" text="トウモロコシを収穫"/>
+            <text name="ia_force_complete_button" text="強制完了"/>
+            <text name="ia_force_complete_no_mission" text="選択中のアクティブな Fields of Stories 契約はありません。"/>
+            <text name="ia_field_outcome_target_fertilizer" text="目標: 畑に段階 %d の鉱物肥料。"/>
+            <text name="ia_field_outcome_target_slurry" text="目標: スラリー（液肥）または発酵残渣（消化液）を施肥段階 %d まで施用。"/>
+            <text name="ia_field_outcome_target_manure" text="目標: 固形堆肥を施肥段階 %d まで散布。"/>
+            <text name="ia_field_outcome_target_lime" text="目標: 石灰の施用（施肥段階 %d）。"/>
+            <text name="ia_field_outcome_target_lime_deliver" text="目標: 石灰を畑全体に均等に施用する。"/>
+            <text name="ia_field_outcome_target_stone_picking" text="目標: 畑からすべての石を取り除く。"/>
+            <text name="ia_field_outcome_target_grass_mowing" text="目標: 草を刈り、農場へ納入する。"/>
+            <text name="ia_field_outcome_target_harvest_deliver_corn" text="目標: トウモロコシを収穫し、穀物を農場へ納入する。"/>
+            <text name="ia_field_outcome_target_herbicide" text="目標: 雑草が合意した状態に達するまで除草剤を散布する。"/>
+            <text name="ia_field_outcome_target_seed" text="目標: 畑全体に %s が定着。"/>
+            <text name="ia_fieldwork_equip_cultivate" text="カルチベーター"/>
+            <text name="ia_fieldwork_equip_harrow" text="ハロー"/>
+            <text name="ia_fieldwork_equip_stubble_cultivation" text="ディスクハローまたは残根処理機"/>
+            <text name="ia_fieldwork_equip_harvest" text="コンバイン"/>
+            <text name="ia_fieldwork_equip_mineral_fertilizer" text="鉱物肥料散布機"/>
+            <text name="ia_fieldwork_equip_slurry" text="スラリータンク"/>
+            <text name="ia_fieldwork_equip_manure" text="堆肥散布機"/>
+            <text name="ia_fieldwork_equip_lime" text="石灰散布機"/>
+            <text name="ia_fieldwork_equip_stone_picker" text="採石機"/>
+            <text name="ia_fieldwork_equip_grass_mower" text="モアと飼料ワゴンまたはベーラー"/>
+            <text name="ia_fieldwork_equip_harvest_deliver_corn" text="コンバインと穀物トレーラー"/>
+            <text name="ia_fieldwork_equip_herbicide" text="除草剤付き圃場散布機"/>
+            <text name="ia_fieldwork_equip_seed" text="播種機"/>
+            <text name="ia_fieldwork_equip_plow" text="プラウ"/>
+            <text name="ia_fieldwork_equip_generic" text="トラクターと適切な装備"/>
+            <text name="ia_fieldwork_label_cultivate" text="耕耘"/>
+            <text name="ia_fieldwork_label_harrow" text="ハロー掛け"/>
+            <text name="ia_fieldwork_label_stubble_cultivation" text="残根処理"/>
+            <text name="ia_fieldwork_label_harvest" text="収穫"/>
+            <text name="ia_fieldwork_label_fertilize_mineral" text="鉱物施肥"/>
+            <text name="ia_fieldwork_label_slurry" text="スラリー散布"/>
+            <text name="ia_fieldwork_label_manure" text="堆肥散布"/>
+            <text name="ia_fieldwork_label_lime" text="石灰散布"/>
+            <text name="ia_fieldwork_label_stone_picking" text="採石"/>
+            <text name="ia_fieldwork_label_grass_mowing" text="草刈りと納入"/>
+            <text name="ia_fieldwork_label_grass_mowing_short" text="草刈り"/>
+            <text name="ia_fieldwork_label_harvest_deliver_corn" text="トウモロコシの収穫と納入"/>
+            <text name="ia_fieldwork_label_harvest_deliver_with_crop" text="%s の収穫と納入"/>
+            <text name="ia_fieldwork_label_spray" text="散布"/>
+            <text name="ia_fieldwork_label_seed" text="播種"/>
+            <text name="ia_fieldwork_label_seed_with_crop" text="%s の播種"/>
+            <text name="ia_fieldwork_label_plow" text="耕起"/>
+            <text name="ia_fieldwork_label_condition" text="畑の状態"/>
+            <text name="ia_field_outcome_mission_finished" text="Fields of Stories 圃場契約が完了しました。"/>
+            <text name="ia_field_outcome_mission_failed" text="Fields of Stories 圃場契約は失敗に終わりました。"/>
+            <text name="ia_field_outcome_deliver_wrong_location" text="収穫物は農場に納入する必要があります。他の場所で売ってはいけません!"/>
+            <text name="ia_delivery_marker_label" text="農場の納入ポイント"/>
+            <text name="ia_field_outcome_mission_deliver_note" text="収穫物を農場へ納入してください（マップ上に表示）。"/>
+            <text name="ia_field_outcome_delivery_complete" text="納入完了! 商品が農場に到着しました。"/>
+            <text name="ia_mission_borrow_refill_at_farm" text="借りた装備は空です。%s の農場で補充してください。"/>
+            <text name="ia_mission_borrow_return_to_farm" text="農作業が完了しました。借りた装備を %s の農場へ返却してください（中庭で切り離してください）。"/>
+            <text name="ia_mission_borrow_pickup_marker" text="借りた装備の受け取り"/>
+            <text name="ia_mission_borrow_yard_marker" text="借りた装備 — 受け取りと返却"/>
+            <text name="ia_settings_section_title" text="Fields of Stories"/>
+            <text name="ia_settings_contractCallsPerDay_title" text="1 日あたりの契約電話"/>
+            <text name="ia_settings_contractCallsPerDay_info" text="全隣人を合わせた、ゲーム内 1 日あたりの契約電話の最大数。"/>
+            <text name="ia_settings_contractCallsPerDay_none" text="なし"/>
+            <text name="ia_settings_contractCallsPerDay_1" text="1"/>
+            <text name="ia_settings_contractCallsPerDay_2" text="2"/>
+            <text name="ia_settings_contractCallsPerDay_3" text="3"/>
+            <text name="ia_settings_contractCallsPerDay_4" text="4"/>
+            <text name="ia_settings_contractCallsPerDay_unlimited" text="無制限"/>
+            <text name="ia_settings_missionOfferMode_title" text="ミッション提供モード"/>
+            <text name="ia_settings_missionOfferMode_info" text="クラシック: バニラミッションはマップ上に残り、契約電話はありません。リアル: 隣人からの契約電話のみで、バニラミッションは削除されます。"/>
+            <text name="ia_settings_missionOfferMode_classic" text="クラシック"/>
+            <text name="ia_settings_missionOfferMode_realistic" text="リアル"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_title" text="隣人ごとの契約畑"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_info" text="隣人が 1 日に契約として外部委託できる畑/区画の最大数。"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_1" text="1"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_2" text="2"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_3" text="3"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_4" text="4"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_5" text="5"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_unlimited" text="無制限"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_title" text="農作業完了しきい値"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_info" text="農作業ミッションが完了と見なされるために、期待状態と一致する必要がある畑のサンプリングポイントの割合。"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_60" text="60 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_65" text="65 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_70" text="70 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_75" text="75 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_80" text="80 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_85" text="85 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_90" text="90 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_95" text="95 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_100" text="100 %"/>
+            <text name="ia_settings_voiceVolume_title" text="音声ボリューム"/>
+            <text name="ia_settings_voiceVolume_info" text="隣人の音声セリフのボリューム。"/>
+            <text name="ia_settings_voiceVolume_10" text="10 %"/>
+            <text name="ia_settings_voiceVolume_20" text="20 %"/>
+            <text name="ia_settings_voiceVolume_30" text="30 %"/>
+            <text name="ia_settings_voiceVolume_40" text="40 %"/>
+            <text name="ia_settings_voiceVolume_50" text="50 %"/>
+            <text name="ia_settings_voiceVolume_60" text="60 %"/>
+            <text name="ia_settings_voiceVolume_70" text="70 %"/>
+            <text name="ia_settings_voiceVolume_80" text="80 %"/>
+            <text name="ia_settings_voiceVolume_90" text="90 %"/>
+            <text name="ia_settings_voiceVolume_100" text="100 %"/>
+            <text name="ia_npc_unavailable" text=" （利用不可）"/>
+            <text name="gui_language" text="jp"/>
+	</texts>
+</l10n>

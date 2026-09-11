@@ -94,11 +94,15 @@
                 <!-- Column 1 (existing map init content; max width via inner wrapper) -->
                 <BoxLayout profile="ia_mapinit_columnContainer" id="column1">
                     <BoxLayout profile="ia_mapinit_contentWrapper" id="contentWrapperElement">
-                        <Text profile="ia_mapinit_title" text="$l10n_gui_mapinit_dialog_title" id="titleElement" />
-                        <Text profile="ia_mapinit_message" text="$l10n_gui_mapinit_dialog_message" id="messageElement" />
-                        <Button profile="ia_mapinit_sizeButton" id="placeSizeButton" text="$l10n_gui_mapinit_place_size_character" onClick="onClickPlaceSize" />
-                        <Text profile="ia_mapinit_label" text="$l10n_gui_mapinit_place_type_label" />
-                        <GuiElement profile="ia_mapinit_scrollContainer" id="placeButtonsScrollContainer">
+                        <Text profile="ia_mapinit_title" text="$l10n_gui_mapinit_dialog_first_title" id="titleElementFirst" />
+                        <Text profile="ia_mapinit_message" text="$l10n_gui_mapinit_dialog_first_message" id="messageElementFirst" />
+                        <Button profile="ia_mapinit_HighlightButton" id="openConstructionFoSMenuButton" text="$l10n_gui_mapinit_open_construction_menu" onClick="onClickOpenConstructionFoSMenu" />
+                        <Button profile="ia_mapinit_characterActionButton" id="classicInitModeButton" text="$l10n_gui_mapinit_classic_init_mode" onClick="onClickToggleClassicInitMode" />
+                        <Text profile="ia_mapinit_title" text="$l10n_gui_mapinit_dialog_title" id="titleElement" visible="false" />
+                        <Text profile="ia_mapinit_message" text="$l10n_gui_mapinit_dialog_message" id="messageElement" visible="false" />
+                        <Button profile="ia_mapinit_sizeButton" id="placeSizeButton" text="$l10n_gui_mapinit_place_size_character" onClick="onClickPlaceSize" visible="false" />
+                        <Text profile="ia_mapinit_label" text="$l10n_gui_mapinit_place_type_label" id="placeButtonsScrollContainerLabel" visible="false" />
+                        <GuiElement profile="ia_mapinit_scrollContainer" id="placeButtonsScrollContainer" visible="false">
                             <!-- Subtle framed background so it's obvious this list can scroll -->
                             <ThreePartBitmap profile="fs25_textInputBg" position="-15px 0px"/>
                             <Bitmap id="placeButtonsTopClipper" profile="emptyPanel" position="0px 0px" size="100% 6px" imageColor="0 0 0 0"/>
@@ -127,13 +131,12 @@
                                 <Slider profile="fs25_listSlider" dataElementId="placeButtonsScrollingLayout" position="1px 0px" size="8px 100%"/>
                             </ThreePartBitmap>
                         </GuiElement>
-                        <BoxLayout profile="ia_mapinit_actionsColumn" id="mapInitActionsColumn">
+                        <BoxLayout profile="ia_mapinit_actionsColumn" id="mapInitActionsColumn" visible="false">
                             <BoxLayout profile="ia_mapinit_actionsLayout">
                                 <Button profile="ia_mapinit_actionButton" text="$l10n_gui_mapinit_remove_nearest" onClick="onClickRemoveNearestPlace" />
                                 <Button profile="ia_mapinit_actionButton" id="togglePlaceMarkersButton" text="$l10n_gui_mapinit_show_place_markers" onClick="onClickTogglePlaceDebugMarkers" />
                                 <Button profile="ia_mapinit_actionButton" text="$l10n_gui_mapinit_nudge_vehicle_left" onClick="onClickNudgeVehicleLeft" />
                             </BoxLayout>
-                            <Button profile="ia_mapinit_actionButtonFull" text="$l10n_gui_mapinit_end_init" onClick="onClickEndInitPhase" />
                         </BoxLayout>
                     </BoxLayout>
                 </BoxLayout>
@@ -723,6 +726,21 @@
         <Profile name="ia_mapinit_characterActionButton" extends="ia_mapinit_actionButton" with="anchorTopStretchingX">
             <size value="100% 36px"/>
             <handleFocus value="true"/>
+        </Profile>
+
+        <!-- Skip button: visible, right-aligned below conversation box -->
+        <Profile name="ia_mapinit_HighlightButton" extends="wideButton" with="anchorTopStretchingX">
+            <position value="0px 0px"/>
+            <size value="100% 36px"/>
+            <margin value="0px 0px 0px 0px"/>
+            <iconSize value="0px 0px"/>
+            <fitToContent value="false"/>
+            <textAutoWidth value="false"/>
+            <textAlignment value="center"/>
+            <textSize value="20px"/>
+            <textColor value="$preset_fs25_colorMainDark"/>
+            <color value="$preset_fs25_colorGreen_40"/>
+            <imageColor value="$preset_fs25_colorGreen"/>
         </Profile>
 
         <Profile name="ia_mapinit_disclaimerText" extends="baseReference" with="anchorTopStretchingX">

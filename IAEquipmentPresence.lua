@@ -311,6 +311,7 @@ function IAEquipmentPresence.State.endBorrowed(ia)
 		tostring(ia.borrowReturnParkingPlaceId)
 	), ia.neighbour, ia, nil)
 	ia.isBorrowedByPlayer = false
+	ia._cachedReturnPose = nil
 	if IAEquipmentPresence.State.restoreBorrowReturnHomebase(ia) then
 		IAprintDebug("IAEquipmentPresence.State.endBorrowed()", string.format(
 			"[BORROW-CANCEL] restoreBorrowReturnHomebase=true -> presence.owner=%s (setDesiredHomebase already triggered applyVehicleHotspotForPresence)",
@@ -547,6 +548,40 @@ function IAEquipmentPresence.Reconcile.readActual(ia)
 	return actual
 end
 
+--- True when this vehicle is part of a designated header-trailer pair that the
+-- engine's DynamicMountAttacher will mount. Any physics manipulation (detach,
+-- teleport, hide) on either side causes a race with onUpdateTick on save reload.
+local function isInDesignatedHeaderTrailerPair(ia)
+	if ia == nil or ia.neighbour == nil or ia.neighbour.vehicles == nil then
+		return false
+	end
+	-- Only protect header-trailer pairs parked at homebase. When a header
+	-- is in a situation (mounted on a combine) or being returned to homebase
+	-- after a situation ends, normal detach/attach/teleport must work.
+	if ia.activeSituationId ~= nil and tostring(ia.activeSituationId) ~= "" then
+		return false
+	end
+	local ps = ia.presenceState
+	if ps == nil or ps.owner ~= "homebase" then
+		return false
+	end
+	-- Case A: This vehicle is a header that has a designated trailer
+	if ia.headerTrailerExternalId ~= nil then
+		return true
+	end
+	-- Case B: This vehicle is a trailer designated by some header
+	if ia.externalId ~= nil then
+		local thisExtId = tostring(ia.externalId)
+		for _, v in pairs(ia.neighbour.vehicles) do
+			if v ~= nil and v.headerTrailerExternalId ~= nil
+				and tostring(v.headerTrailerExternalId) == thisExtId then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function IAEquipmentPresence.Reconcile.compareDesiredVsActual(ia)
 	local ops = {}
 	local desired = ia.presenceState or IAEquipmentPresence.State.newDefault()
@@ -568,7 +603,17 @@ function IAEquipmentPresence.Reconcile.compareDesiredVsActual(ia)
 	IAprintDebug("IAEquipmentPresence.Reconcile.compareDesiredVsActual()", "Actual ai active: "..tostring(actual.aiActive), ia.neighbour, ia, nil)
 	IAprintDebug("IAEquipmentPresence.Reconcile.compareDesiredVsActual()", "Actual has attached implements: "..tostring(actual.hasAttachedImplements), ia.neighbour, ia, nil)
 	IAprintDebug("IAEquipmentPresence.Reconcile.compareDesiredVsActual()", "Attachment not nil: "..tostring(desired.attachment ~= nil), ia.neighbour, ia, nil)
+
+	-- If this vehicle is part of a designated header-trailer pair, leave it
+	-- completely alone — any detach, teleport, or hide would race with the
+	-- engine's DynamicMountAttacher:onUpdateTick on save reload.
+	local skipPhysicsOps = isInDesignatedHeaderTrailerPair(ia)
+
 	if desired.mode == "hidden" then
+		if skipPhysicsOps then
+			-- Don't hide; leave the pair in physics
+			return ops
+		end
 		if actual.visible then
 			table.insert(ops, "hide")
 		end
@@ -610,7 +655,7 @@ function IAEquipmentPresence.Reconcile.compareDesiredVsActual(ia)
 		return ops
 	end
 
-	if actual.attachedToParentUniqueId ~= nil then
+	if actual.attachedToParentUniqueId ~= nil and not skipPhysicsOps then
 		table.insert(ops, "detachFromAttacher")
 	end
 
@@ -623,7 +668,7 @@ function IAEquipmentPresence.Reconcile.compareDesiredVsActual(ia)
 			table.insert(ops, "show")
 		end
 	else
-		if not actual.visible then
+		if not actual.visible and not skipPhysicsOps then
 			table.insert(ops, "show")
 		end
 	end
@@ -969,8 +1014,14 @@ function IAEquipmentPresence.Reconcile.reconcileNeighbourFleet(neighbour, contex
 	end
 	for _, ia in pairs(neighbour.vehicles) do
 		if ia ~= nil then
-			IAEquipmentPresence.State.syncBorrowedFlag(ia)
-			IAEquipmentPresence.Reconcile.reconcileVehicle(ia)
+			-- Situation convoy vehicles are managed by the situation's own
+			-- reconcileSituationPresence; fleet must not touch them.
+			if ia.activeSituationId ~= nil and tostring(ia.activeSituationId) ~= "" then
+				-- skipped: situation owns this vehicle
+			else
+				IAEquipmentPresence.State.syncBorrowedFlag(ia)
+				IAEquipmentPresence.Reconcile.reconcileVehicle(ia)
+			end
 		end
 	end
 end

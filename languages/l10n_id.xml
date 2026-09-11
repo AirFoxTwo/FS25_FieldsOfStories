@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+	<translationContributors/>
+	<texts>
+            <text name="gui_dialog_title" text="Percakapan dengan"/>
+            <text name="gui_dialog_answerlabel" text="Kamu:"/>
+            <text name="gui_dialog_button_ok" text="OK"/>
+            <text name="gui_dialog_button_cancel" text="Batal"/>
+            <text name="ui_ingameMenuFieldsOfStories" text="Fields of Stories"/>
+            <text name="input_IAStartConversation" text="Percakapan / Telepon"/>
+            <text name="input_IAUsePhone" text="Gunakan Telepon"/>
+            <text name="gui_hud_start_conversation" text="Mulai Percakapan"/>
+            <text name="gui_voice_pack_warn_title" text="Fields of Stories – Paket suara"/>
+            <text name="gui_voice_pack_warn_message" text="Kamu memainkan Fields of Stories tanpa paket suara (opsional). Versi yang diperlukan: %s"/>
+            <text name="gui_voice_pack_warn_recheck" text="Periksa lagi"/>
+            <text name="gui_voice_pack_warn_ok_notification" text="Paket suara OK: versi cocok dengan Fields of Stories."/>
+            <text name="ia_homebase_setup_warning" text="Fields of Stories: Pangkalan belum lengkap. Tempatkan area pangkalan yang diperlukan untuk menyelesaikan penyiapan."/>
+            <text name="gui_dialog_button_ignore" text="Abaikan"/>
+            <text name="gui_mapplaces_gen_title" text="Fields of Stories – Pembuatan tempat di peta"/>
+            <text name="gui_mapplaces_gen_message" text="Eksperimental: Tidak ada konfigurasi tersimpan untuk peta ini. Jika dilanjutkan, «Fields of Stories» akan otomatis membuat ratusan hingga ribuan tempat di peta. Permainan akan tampak membeku hingga pembuatan selesai."/>
+            <text name="gui_mapplaces_gen_message2" text="Untuk pengalaman terbaik, jelajahi peta dan tambahkan tempatmu sendiri (Shift + F3) atau hapus yang salah.&#10;&#10;Untuk info lebih lanjut, buka menu Bantuan dalam game dan baca topik Fields of Stories."/>
+            <text name="gui_mapplaces_gen_before_load" text="Tekan OK untuk mulai memuat dan membuat tempat di peta. Permainan mungkin tampak membeku hingga selesai. Ini normal."/>
+            <text name="gui_firstload_tutorial_title" text="Fields of Stories – Panduan"/>
+            <text name="gui_firstload_tutorial_message" text="Ikuti panduan ini untuk memaksimalkan mod. Untuk detail lengkap tentang setiap fitur, buka menu Bantuan dalam game dan baca topik Fields of Stories."/>
+            <text name="gui_firstload_tutorial_message2" text="1. Aktivasi mod: Mod akan dimuat secara otomatis. Pada menit-menit pertama mungkin ada keterbatasan performa karena banyak kendaraan dan data yang dimuat."/>
+            <text name="gui_firstload_tutorial_message3" text="2. Pembuatan tempat: Di peta mod, pembuatan tempat otomatis sudah mulai mengenali rumah, jalan, dan hutan. Ikuti panduan di menu Bantuan (kategori Penyiapan) untuk pengalaman terbaik di peta mod."/>
+            <text name="gui_firstload_tutorial_message4" text="3. Biarkan pengalaman datang kepadamu: Sebaiknya jangan menarik semuanya sekaligus dari Fields of Stories. Kamu akan mengalami bertemu karakter di dunia, menerima panggilan saat paling tidak kamu duga, dan menjelajahi peta sambil menemukan peternakan."/>
+            <text name="gui_firstload_tutorial_message5" text="4. Dukung para petani: Bersikaplah ramah dan suka membantu, dan dalam jangka panjang kamu akan mendapat hubungan baik serta banyak manfaat."/>
+            <text name="gui_firstload_tutorial_message6" text="5. Perhatikan peta jalan: Mod masih sebagian kecil dari visi proyek:&#10;-pembantu dan kontraktor,&#10;-karakter yang bergerak dan mengemudi,&#10;-acara besar,&#10;-puluhan jenis misi; semuanya mungkin, tetapi butuh waktu dan dukunganmu."/>
+            <text name="gui_phone_title" text="%s"/>
+            <text name="gui_phone_title_default" text="Telepon"/>
+            <text name="construction_foS_category" text="Fields of Stories"/>
+            <text name="construction_foS_tab_placeables" text="Tempat umum"/>
+            <text name="construction_foS_tab_character_homebase" text="Rumah karakter"/>
+            <text name="fos_char_homebase_name" text="Pangkalan karakter: %s"/>
+            <text name="fos_char_homebase_desc" text="Objek pangkalan untuk karakter #%s. Menempatkan silo dan halaman pertanian."/>
+            <text name="fos_char_homebase_name_1" text="Mary Carter (Anggota keluarga, Petani)"/>
+            <text name="fos_char_homebase_desc_1" text="Rumah Mary Carter."/>
+            <text name="fos_char_homebase_name_2" text="John Carter (Anggota keluarga, Petani)"/>
+            <text name="fos_char_homebase_desc_2" text="Rumah John Carter."/>
+            <text name="fos_char_homebase_name_10" text="Sharon Whitaker (Pegawai)"/>
+            <text name="fos_char_homebase_desc_10" text="Rumah Sharon Whitaker."/>
+            <text name="fos_char_homebase_name_11" text="Kyle Bennett (Warga sipil)"/>
+            <text name="fos_char_homebase_desc_11" text="Rumah Kyle Bennett."/>
+            <text name="fos_char_homebase_name_13" text="Lukas Brenner (Tetangga, Rimbawan)"/>
+            <text name="fos_char_homebase_desc_13" text="Rumah Lukas Brenner."/>
+            <text name="fos_char_homebase_name_14" text="Martin Walker (Pegawai, Wali Kota)"/>
+            <text name="fos_char_homebase_desc_14" text="Rumah Martin Walker."/>
+            <text name="fos_char_homebase_name_15" text="Susan Keller (Mitra bisnis, Pedagang gandum)"/>
+            <text name="fos_char_homebase_desc_15" text="Rumah Susan Keller."/>
+            <text name="fos_char_homebase_name_16" text="Andy Hoffman (Mitra bisnis, Dealer mesin pertanian)"/>
+            <text name="fos_char_homebase_desc_16" text="Rumah Andy Hoffman."/>
+            <text name="fos_char_homebase_name_17" text="Paul Meyer (Mitra bisnis, Kontraktor pertanian)"/>
+            <text name="fos_char_homebase_desc_17" text="Rumah Paul Meyer."/>
+            <text name="fos_char_homebase_name_18" text="Marcus Brown (Tetangga, Petani)"/>
+            <text name="fos_char_homebase_desc_18" text="Rumah Marcus Brown."/>
+            <text name="fos_char_homebase_name_19" text="Jacob Miller (Tetangga, Petani)"/>
+            <text name="fos_char_homebase_desc_19" text="Rumah Jacob Miller."/>
+            <text name="fos_char_homebase_name_20" text="Emma Kensington (Tetangga, Petani)"/>
+            <text name="fos_char_homebase_desc_20" text="Rumah Emma Kensington."/>
+            <text name="fos_char_homebase_name_21" text="Brian Winter (Tetangga, Petani)"/>
+            <text name="fos_char_homebase_desc_21" text="Rumah Brian Winter."/>
+            <text name="gui_phone_message" text="Panggilan masuk"/>
+            <text name="gui_phone_answer" text="Jawab"/>
+            <text name="gui_phone_decline" text="Tolak"/>
+            <text name="gui_phone_close" text="Tutup"/>
+            <text name="gui_phone_no_incoming" text="Tidak ada panggilan masuk."/>
+            <text name="gui_phone_caller_unknown" text="Seseorang"/>
+            <text name="gui_phone_incoming_notification" text="Panggilan masuk dari %s. Buka teleponmu untuk menjawab atau menolak."/>
+            <text name="gui_mapinit_dialog_title" text="Konfigurasi tempat"/>
+            <text name="gui_mapinit_dialog_message" text="Tambah dan hapus tempat untuk situasi karakter. Perhatikan jumlah yang disarankan yang ditampilkan di daftar. Pertama, pilih ukuran tempat di atas (berjalan kaki, dengan kendaraan, atau kendaraan dengan peralatan)."/>
+            <text name="gui_mapinit_dialog_first_title" text="Konfigurasi tempat"/>
+            <text name="gui_mapinit_dialog_first_message" text="Buka menu konstruksi untuk membuat tempat di seluruh peta, atau aktifkan mode klasik dari versi 1.0 yang mengharuskan menjelajahi peta untuk menyimpan tempat."/>
+            <text name="gui_mapinit_characters_title" text="Detail karakter"/>
+            <text name="gui_mapinit_characters_message" text="Tinjau detail karakter dan konfigurasikan."/>
+            <text name="gui_mapinit_general_actions_title" text="Tindakan umum"/>
+            <text name="gui_mapinit_general_actions_message" text="Fungsi untuk membantu kamu mengonfigurasi atau membersihkan peta."/>
+            <text name="gui_mapinit_tab_story" text="Cerita"/>
+            <text name="gui_mapinit_tab_settings" text="Pengaturan"/>
+            <text name="gui_mapinit_story_relationship" text="Hubungan"/>
+            <text name="gui_mapinit_story_relationship_level" text="Tingkat hubungan"/>
+            <text name="gui_mapinit_story_relationship_points" text="Poin hubungan"/>
+            <text name="gui_mapinit_story_relationship_points_fmt" text="%d / %d"/>
+            <text name="gui_relationship_family" text="Keluarga"/>
+            <text name="gui_relationship_known" text="Kenal"/>
+            <text name="gui_relationship_friend" text="Teman"/>
+            <text name="gui_relationship_close_friend" text="Teman dekat"/>
+            <text name="gui_relationship_strained" text="Tegang"/>
+            <text name="gui_mapinit_tab_help" text="Bantuan"/>
+            <text name="gui_mapinit_help_info_title" text="Tempat menemukan bantuan"/>
+            <text name="gui_mapinit_help_info_body" text="Panduan lengkap Fields of Stories ada di menu Bantuan dalam game. Tekan Esc untuk membuka menu, buka Bantuan, lalu cari kategori «Roleplay» dan «Penyiapan» untuk membaca tentang setiap fitur: bertemu tetangga, percakapan, hubungan, kontrak ladang, pangkalan, pembuatan tempat peta, dan banyak lagi.&#10;Tab Pengaturan di dialog ini berisi alat tempat dan karakter untuk menyiapkan peta."/>
+            <text name="gui_help_category_title" text="Roleplay"/>
+            <text name="gui_help_category_setup_title" text="Penyiapan"/>
+            <text name="gui_help_overview_title" text="Ringkasan"/>
+            <text name="gui_help_overview_body" text="Fields of Stories mengubah dunia permainanmu menjadi lingkungan yang hidup. Orang-orang di sekitarmu bukan NPC tanpa nama: mereka tinggal di rumah mereka, mengikuti rutinitas harian, menggarap ladang mereka, dan memiliki hubungan yang berbeda-beda denganmu.&#10;&#10;Yang bisa kamu lakukan:&#10;- Bertemu tetangga di dunia dan berbicara dengan mereka langsung.&#10;- Menjawab panggilan saat seorang petani butuh bantuan pekerjaan ladang.&#10;- Menerima kontrak ladang, opsional meminjam mesin tetangga.&#10;- Meningkatkan hubungan pribadimu dengan setiap karakter seiring waktu.&#10;&#10;Bagian Bantuan ini menjelaskan setiap fitur secara rinci."/>
+            <text name="gui_help_characters_title" text="Karakter"/>
+            <text name="gui_help_characters_body" text="Mereka adalah tetangga di duniamu. Masing-masing punya kepribadian, peran, dan pekerjaan sendiri, serta cerita latar masing-masing.&#10;&#10;Peran yang bisa kamu temui meliputi petani, seorang rimbawan, wali kota, dealer mesin, kontraktor pertanian, pedagang gandum, anggota keluarga, dan warga sipil biasa. Peran dan pekerjaan karakter menentukan apa yang mereka lakukan sepanjang hari dan apa yang bisa kamu bicarakan dengan mereka.&#10;&#10;Luangkan waktu dengan karakter yang ceritanya paling menarik bagimu."/>
+            <text name="gui_help_places_title" text="Pembuatan tempat di peta"/>
+            <text name="gui_help_places_body" text="Tempat adalah jangkar yang menghidupkan peta. Mereka memberi tahu mod di mana karakter dapat berdiri, parkir, berbelanja, bersantai, dan tinggal. Di peta yang didukung ini sudah diatur; topik ini untuk petamu sendiri.&#10;&#10;Cara membuat tempat (menu konstruksi, disarankan):&#10;1. Buka menu konstruksi (alat bangun) dan pilih kategori «Fields of Stories».&#10;2. Buka tab «Tempat umum» dan pilih penanda tempat (mis. Tempat umum, Toko, Pom bensin, ...).&#10;3. Pindahkan penanda ke lokasi yang diinginkan, putar, lalu klik untuk menempatkannya. Penanda diubah menjadi tempat nyata dan otomatis dihapus.&#10;4. Saat menempatkan, tekan Shift+Q untuk mengubah ukuran tempat. Garis hijau menunjukkan tapak, dan panel di layar mencantumkan ukuran serta berapa banyak tempat yang masih dibutuhkan.&#10;5. Untuk menghapus tempat, tempatkan alat «Hapus tempat» di dekat tempat yang ada (menghapus yang terdekat dalam 5 m) atau tekan Shift+Delete untuk menghapus semua tempat dari jenis yang dipilih sekaligus.&#10;&#10;Cara klasik (menjelajah): buka menu dengan Shift+F3, buka tab Pengaturan, pilih ukuran tempat di atas, berdiri (atau parkir kendaraanmu) tepat di lokasi yang diinginkan, lalu klik jenis tempat yang diinginkan. Posisi saat ini disimpan dan kamu mendapat konfirmasi «Tempat disimpan». Semakin banyak tempat yang kamu simpan, semakin dinamis dan unik permainannya.&#10;&#10;Ukuran tempat:&#10;- Karakter: hanya berjalan kaki, untuk situasi berdiri tanpa kendaraan.&#10;- Kendaraan: ruang untuk satu mobil atau traktor.&#10;- Kendaraan dengan peralatan: satu kendaraan ditambah trailer atau peralatan (opsional).&#10;- Kendaraan besar (hanya pangkalan): tempat parkir ekstra lebar untuk pemanen dan mesin swagerak.&#10;- Area luas: area terbuka luas untuk situasi yang butuh ruang, seperti persiapan mesin, pasar, atau acara.&#10;- Silo: menandai lokasi silo petani (hanya pertanian pangkalan). Bangunan silo muncul di sini dan menjadi titik pengiriman dan pengisian ulang.&#10;&#10;Jenis tempat umum dan tujuannya:&#10;- Pangkalan karakter: tempat tinggal tetangga (lihat «Pangkalan»).&#10;- Toko, pom bensin, bengkel, gudang, titik jual, industri, infrastruktur publik: tempat umum fungsional.&#10;- Pinggir jalan, jalan tanah, pepohonan: pertemuan pinggir jalan.&#10;- Tempat umum dan tempat santai umum: tempat sosial dan rekreasi; tempat santai pribadi untuk rutinitas yang lebih tenang.&#10;- Peternakan pemain: acara di peternakanmu sendiri.&#10;&#10;Generator peta untuk peta baru:&#10;Di peta yang tidak dikenal, generator dapat otomatis membuat banyak tempat dari data peta. Bersabarlah: banyak tempat dapat dibuat, dan permainan mungkin tampak membeku sesaat saat bekerja.&#10;&#10;Konfigurasi peta siap pakai: untuk banyak peta kamu dapat mengunduh pengaturan jadi atau mengunggah dan membagikan milikmu sendiri melalui situs web resmi mod, yang dapat diakses lewat halaman GitHub mod."/>
+            <text name="gui_help_char_age" text="Usia"/>
+            <text name="gui_help_char_gender" text="Jenis kelamin"/>
+            <text name="gui_help_char_gender_male" text="Laki-laki"/>
+            <text name="gui_help_char_gender_female" text="Perempuan"/>
+            <text name="gui_help_char_relationship" text="Hubungan"/>
+            <text name="gui_help_char_role" text="Peran"/>
+            <text name="gui_help_char_job" text="Pekerjaan"/>
+            <text name="gui_help_char_belongsToFarm" text="Milik pertanian"/>
+            <text name="gui_help_char_behaviour" text="Perilaku"/>
+            <text name="gui_help_char_yes" text="Ya"/>
+            <text name="gui_help_char_no" text="Tidak"/>
+            <text name="gui_help_char_name_21" text="Brian Winter"/>
+            <text name="gui_help_char_name_20" text="Emma Kensington"/>
+            <text name="gui_help_char_name_19" text="Jacob Miller"/>
+            <text name="gui_help_char_name_18" text="Marcus Brown"/>
+            <text name="gui_help_char_name_17" text="Paul Meyer"/>
+            <text name="gui_help_char_name_16" text="Andy Hoffman"/>
+            <text name="gui_help_char_name_15" text="Susan Keller"/>
+            <text name="gui_help_char_name_14" text="Martin Walker"/>
+            <text name="gui_help_char_name_13" text="Lukas Brenner"/>
+            <text name="gui_help_char_name_11" text="Kyle Bennett"/>
+            <text name="gui_help_char_name_10" text="Sharon Whitaker"/>
+            <text name="gui_help_char_name_2" text="John Carter"/>
+            <text name="gui_help_char_name_1" text="Mary Carter"/>
+            <text name="gui_help_char_desc_21" text="Peran: Tetangga | Pekerjaan: Petani&#10;Usia: 31–50 | Hubungan: Kenal | Perilaku: Tegang, Profesional&#10;&#10;Brian adalah pemilik pertanian yang relatif muda yang mengambil alih bisnis keluarga dan berusaha mengarahkannya kembali menggunakan metode dan teknologi modern. Fokusnya adalah efisiensi, kesehatan hewan, dan manajemen berbasis data – strategi yang membuatnya sangat bergantung pada teknologi sensor, sistem digital, dan alur kerja yang dioptimalkan.&#10;&#10;Dalam kehidupan sehari-hari, Brian sering tampak tegang karena ia harus menjaga stabilitas bisnis sekaligus menjalankan modernisasi totalnya. Transisi ini melibatkan tekanan organisasi, beban finansial, dan – cukup sering – resistensi dari lingkungannya atau keluarganya sendiri. Karena itu, ia sering kurang sabar menghadapi penundaan atau cara kerja tradisional.&#10;&#10;Dalam interaksi dengan tetangga dan mitra bisnis, ia mempertahankan sikap profesional dan berorientasi bisnis. Ia berkomunikasi dengan jelas, mengharapkan keandalan, dan lebih suka kesepakatan langsung tanpa basa-basi. Cara kerja yang ambigu atau tidak efisien membuatnya cepat frustrasi – reaksi yang kadang membuatnya tampak berjarak atau tidak sabar."/>
+            <text name="gui_help_char_desc_20" text="Peran: Tetangga | Pekerjaan: Petani&#10;Usia: 31–50 | Hubungan: Kenal | Perilaku: Ramah, Suka membantu&#10;&#10;Bersama suaminya, Emma menjalankan usaha pertanian yang terdiversifikasi dan khusus menanam sayuran serta biji-bijian. Sebagian panen dijual langsung di pasar lokal, sementara jumlah yang lebih besar dipasarkan melalui pedagang grosir dan pembeli regional. Peternakan mereka terorganisir dengan baik dan sangat berfokus pada efisiensi serta kualitas.&#10;&#10;Dalam interaksi dengan tetangga dan mitra bisnis, Emma terbuka, ramah, dan suka membantu. Ia dianggap sebagai orang yang berkomunikasi langsung dan lebih suka mencari solusi bersama daripada berdebat tanpa henti tentang masalah. Ia sangat terhubung dengan sektor pertanian regional, di mana ia menjaga hubungan yang stabil dan adil.&#10;&#10;Sifat suka membantu ini terutama terlihat di masa-masa penuh tekanan, seperti musim tanam atau panen. Kapan pun memungkinkan, ia membantu pertanian lain – atau menerima bantuan – tanpa ragu. Ia sangat menghargai dukungan timbal balik dalam komunitas petani dan menganggap kerja sama sebagai bagian penting dari kehidupan sehari-harinya."/>
+            <text name="gui_help_char_desc_19" text="Peran: Tetangga | Pekerjaan: Petani&#10;Usia: 50+ | Hubungan: Teman | Perilaku: Hati-hati, Netral&#10;&#10;Jacob adalah peternak sapi perah berpengalaman generasi ketiga yang menjalankan pertanian keluarga berukuran sedang bersama kedua putranya. Peternakan ini tumbuh selama bertahun-tahun dan berakar kuat pada struktur tradisional yang ia kembangkan lewat penyesuaian hati-hati agar memenuhi tuntutan modern.&#10;&#10;Dalam interaksi dengan orang lain, Jacob tampak tenang, terkendali, dan cukup pendiam. Ia mendengarkan sebelum berbicara dan jarang membuat keputusan mendadak. Terutama dalam urusan bisnis atau hubungan dengan tetangga, ia berhati-hati menghindari risiko yang tidak perlu dan menjauhkan diri dari konflik bila memungkinkan.&#10;&#10;Sifat hati-hatinya paling terlihat dalam hal investasi, teknologi baru, atau perubahan besar di pertanian. Ia lebih suka metode yang terbukti dan meneliti inovasi secara menyeluruh sebelum mengadopsinya. Pendekatan ini memungkinkannya menjalankan pertanian dengan stabil – meski karena itu ia kadang dianggap terlalu lambat atau konservatif."/>
+            <text name="gui_help_char_desc_18" text="Peran: Tetangga | Pekerjaan: Petani&#10;Usia: 31–50 | Hubungan: Teman | Perilaku: Tegang, Tidak kooperatif&#10;&#10;Marcus adalah petani lokal yang telah bertahun-tahun menjalankan pertanian yang relatif kecil dan sangat tradisional. Sebagian besar peralatannya sudah tua; ia memperbaikinya dan terus menggunakannya selama mungkin – kebiasaan yang semakin memperumit dan memperlambat pekerjaan hariannya.&#10;&#10;Dalam interaksi sehari-hari, Marcus sering tampak tegang dan agak sulit didekati. Tekanan terus-menerus dari perbaikan, waktu yang dibutuhkan pekerjaannya, dan tuntutan pertanian modern yang terus meningkat membuatnya lelah dan mudah tersinggung selama bertahun-tahun. Ia sering skeptis terhadap metode baru atau teknologi modern karena pengalaman buruk dengan investasi atau perubahan di masa lalu.&#10;&#10;Ia tidak selalu kooperatif dalam berurusan dengan tetangga dan petani lain. Mencapai kesepakatan bisa sulit karena ia cepat merasa tertekan atau menolak perubahan prosedur yang sudah mapan. Konfliknya lebih sedikit berasal dari permusuhan pribadi dan lebih banyak dari rasa kewalahan – perasaan kehilangan kendali atas situasi."/>
+            <text name="gui_help_char_desc_17" text="Peran: Mitra bisnis | Pekerjaan: Kontraktor pertanian&#10;Usia: 31–50 | Hubungan: Kenal | Perilaku: Tidak kooperatif, Tegang&#10;&#10;Paul menjalankan bisnis kontraktor pertanian, menawarkan jasa seperti pemanenan, penyebaran pupuk kandang, pengolahan tanah, dan pekerjaan ladang lainnya kepada petani lokal. Kegiatannya sangat bergantung pada tenggat waktu, kondisi cuaca, dan puncak musiman – faktor yang sering membuat harinya sibuk dan menuntut perencanaan tinggi.&#10;&#10;Dalam interaksi dengan klien, Paul sering tampak singkat dan tidak sabar. Ia sepenuhnya berfokus pada penyelesaian pekerjaan dengan cepat dan penggunaan mesin yang efisien. Ia biasanya menolak diskusi panjang atau perubahan mendadak karena hal itu menambah beban pada jadwalnya yang sudah padat.&#10;&#10;Karena beban kerja yang berat dan tekanan terus-menerus untuk memenuhi tenggat, ia sering tampak stres dan tegang. Terutama di musim panen atau cuaca kritis, ia bisa tampak tidak kooperatif bila operasi tidak berjalan tepat sesuai rencana. Dalam kasus seperti itu, perhatiannya bukan pada konflik pribadi melainkan kebutuhan mutlak untuk menjaga bisnis tetap berjalan.&#10;&#10;Meski sikapnya kasar, Paul sangat kompeten dan berpengalaman dalam semua aspek pekerjaan ladang. Dengan syarat kesepakatan jelas dan dibuat jauh sebelumnya, ia bekerja andal dan efisien. Namun ia mengharapkan tingkat kejelasan dan komitmen yang sama dari mitra bisnisnya."/>
+            <text name="gui_help_char_desc_16" text="Peran: Mitra bisnis | Pekerjaan: Dealer mesin pertanian&#10;Usia: 31–50 | Hubungan: Teman dekat | Perilaku: Profesional, Ramah&#10;&#10;Andy memiliki dealer mesin pertanian dan sangat terhubung di seluruh sektor pertanian regional. Bisnisnya mencakup penjualan, perawatan, dan perbaikan mesin pertanian, serta pasokan suku cadang. Lewat pekerjaan hariannya, ia menjaga kontak erat dengan petani, bengkel, dan produsen, yang memberinya pemahaman tepat tentang tuntutan praktis pertanian modern.&#10;&#10;Dalam interaksi dengan klien dan mitra bisnis, ia tampak terbuka, ramah, dan berorientasi solusi. Ia tahu cara berkomunikasi sejajar dan memenangkan kepercayaan usaha dari semua ukuran – dari pertanian keluarga kecil hingga lahan pertanian besar. Fokus utamanya adalah menemukan solusi praktis dan nyata, bukan diskusi panjang tentang kemungkinan teoretis.&#10;&#10;Sebagai mitra bisnis, Andy dianggap andal dan adil. Ia menepati komitmennya, menunjukkan fleksibilitas dan niat baik bila situasi memungkinkan, dan berusaha menyelesaikan masalah dengan cepat tanpa birokrasi berlebihan. Terutama saat kerusakan teknis atau perbaikan mendesak, ia sering tersedia dalam waktu singkat dan berdedikasi meminimalkan waktu henti kliennya."/>
+            <text name="gui_help_char_desc_15" text="Peran: Mitra bisnis | Pekerjaan: Pedagang gandum&#10;Usia: 31–50 | Hubungan: Kenal | Perilaku: Netral, Curiga&#10;&#10;Susan bekerja sebagai pedagang gandum independen dan secara rutin bepergian ke seluruh wilayah untuk membeli gandum dari pertanian lokal lalu menjualnya kembali ke pabrik dan penggilingan regional. Ia mengenal pasar dengan baik, memantau harga dan hasil panen dengan cermat, serta bereaksi cepat terhadap perubahan permintaan dan penawaran.&#10;&#10;Dalam hubungan dengan petani dan mitra bisnis, ia tampak lugas, pendiam, dan tanpa emosi. Ia sangat menekankan kesepakatan yang jelas, kualitas yang dapat diverifikasi, dan jumlah yang transparan. Ia membangun kepercayaan secara perlahan, mengandalkan fakta dan angka yang andal di lingkungan bisnisnya – bukan janji atau kesan pribadi.&#10;&#10;Susan sangat jeli dan cepat melihat ketidaksesuaian dalam penawaran atau pengiriman. Karena itu sebagian orang menganggapnya tegas atau curiga, meski ini hanya bagian dari kehati-hatian profesionalnya. Ia lebih suka kontrak yang jelas dan kurang menghargai kesepakatan informal atau perubahan spontan."/>
+            <text name="gui_help_char_desc_14" text="Peran: Pegawai | Pekerjaan: Wali Kota&#10;Usia: 50+ | Hubungan: Kenal | Perilaku: Profesional, Otoriter&#10;&#10;Martin telah menjadi wali kota komunitas selama bertahun-tahun dan dianggap sebagai tokoh berpengalaman serta berpengaruh di kota. Ia telah mengenal sebagian besar keluarga, bisnis, dan perkembangan di wilayah ini selama puluhan tahun, dan sangat mementingkan agar komunitas menampilkan citra keteraturan, stabilitas, dan pengorganisasian yang baik ke luar. Ia menangani keuangan kota, infrastruktur, dan reputasi publik kota dengan sangat serius.&#10;&#10;Dalam interaksi dengan orang lain, Martin biasanya tampil tenang, lugas, dan tegas. Ia berbicara dengan tenang namun berwibawa, dan terbiasa agar keputusannya diperhatikan. Ia sering memimpin diskusi secara diplomatis; namun ia bisa cukup tegas jika aturan diabaikan atau keputusannya ditentang secara terbuka."/>
+            <text name="gui_help_char_desc_13" text="Peran: Tetangga | Pekerjaan: Rimbawan&#10;Usia: 31–50 | Hubungan: Teman | Perilaku: Hati-hati, Profesional&#10;&#10;Lukas bekerja sebagai rimbawan dan bertanggung jawab atas perawatan serta pengelolaan kawasan hutan di sekitarnya. Tugasnya meliputi inspeksi penghutanan kembali, pemeliharaan jalan hutan, pemantauan langkah konservasi alam, serta pengaturan dan verifikasi izin berburu. Ia mengenal hutan di wilayah ini secara mendalam dan menghabiskan sebagian besar kehidupan sehari-harinya di alam terbuka.&#10;&#10;Meski sifatnya cukup pendiam, ia dianggap dapat diandalkan dan adil. Ia selalu senang membagikan pengetahuannya kepada teman-temannya, terutama tentang pekerjaan hutan, kayu, perburuan, atau konservasi alam. Ia menghargai orang yang jujur dan terus terang, serta cocok dengan mereka yang bertindak bertanggung jawab dan menepati janji."/>
+            <text name="gui_help_char_desc_11" text="Peran: Warga sipil&#10;Usia: 31–50 | Hubungan: Teman dekat | Perilaku: Netral, Ramah&#10;&#10;Kyle bekerja sebagai pelatih pribadi dan menghabiskan sebagian besar kehidupan sehari-harinya di gym atau dalam aktivitas olahraga. Kebugaran fisik, disiplin, dan gaya hidup sehat penting baginya – tanpa pernah tampak menggurui. Ia suka memotivasi orang lain dan biasanya cepat memenangkan orang dengan sikapnya yang terbuka dan santai.&#10;&#10;Sebagai teman baik Joe, ia dapat diandalkan dan suka membantu – terutama saat seseorang butuh dukungan praktis atau motivasi. Ia cenderung menyemangati orang dan menawarkan pengalihan, daripada berlama-lama memikirkan kesulitan. Ia umumnya menghindari konflik, lebih suka menjaga suasana ringan."/>
+            <text name="gui_help_char_desc_10" text="Peran: Pegawai&#10;Usia: 50+ | Hubungan: Tegang | Perilaku: Otoriter, Hati-hati&#10;&#10;Sharon bekerja di administrasi kota, di mana ia memastikan prosedur yang jelas dan kehidupan komunitas yang harmonis. Bagi para petani, ini sering menyangkut hal seperti ketenangan malam, kebersihan, dan gangguan terkait bau atau kebisingan. Di luar pekerjaan, ia umumnya berusaha menjauhkan diri dari pengaturan dan pengawasan terus-menerus; ia menolak terlibat dalam diskusi semacam itu di waktu luangnya.&#10;&#10;Ia dianggap pendiam, lugas, dan cukup tertutup, meski bisa ramah dan humoris begitu lebih mengenal seseorang. Ia biasanya mendekati diskusi dengan cara yang tenang dan langsung. Di waktu luang, ia suka membaca, berjalan-jalan, atau menghabiskan waktu di kebunnya. Ia cenderung menghindari keramaian besar dan lingkungan yang sibuk. Keteraturan dan keandalan penting baginya, baik secara profesional maupun pribadi. Meski demikian, ia berusaha sadar untuk lebih santai setelah jam kerja dan tidak terus-menerus membawa pekerjaan pulang."/>
+            <text name="gui_help_char_desc_2" text="Peran: Anggota keluarga | Pekerjaan: Petani | Milik pertanian: Ya&#10;Usia: 21–30 | Hubungan: Keluarga | Perilaku: Tegang&#10;&#10;John Carter adalah saudara dari Joe Carter – karakter pemain – dan tumbuh di sampingnya di pertanian keluarga. Sejak usia dini, pertanian adalah bagian alami dan tak terpisahkan dari hidupnya; karena itu ia terus berusaha berkontribusi pada rutinitas harian pertanian sejauh kemampuannya. Namun karena kondisi medis yang membatasi fisiknya selama beberapa tahun, ia kini hanya bisa menjalankan tugas yang lebih ringan dan sederhana. Ini membebaninya lebih dari yang ia tunjukkan secara terbuka.&#10;&#10;Di masa lalu, John jauh lebih aktif di ladang dan dalam pekerjaan yang menuntut fisik. Kini ia kesulitan menerima bahwa banyak hal tidak lagi berjalan seperti dulu. Ia merasa sangat tidak berguna – atau menjadi beban bagi keluarganya – ketika orang lain harus mengambil alih pekerjaan berat, bahkan jika tidak ada yang sengaja membuatnya merasa begitu."/>
+            <text name="gui_help_char_desc_1" text="Peran: Anggota keluarga | Pekerjaan: Petani | Milik pertanian: Ya&#10;Usia: 31–50 | Hubungan: Keluarga | Perilaku: Ramah, Profesional, Suka membantu&#10;&#10;Mary Carter adalah istri Joe Carter (pemain) dan sangat terlibat baik dalam kehidupan keluarga maupun rutinitas harian pertanian. Meski bukan petani terlatih, ia rutin membantu pekerjaan pertanian – di kandang atau di ladang – setiap kali bantuan dibutuhkan. Terutama di masa sibuk, ia turun tangan secara alami, berusaha mendukung suami dan keluarganya dengan menangani hal-hal di belakang layar.&#10;&#10;Ia dianggap sebagai orang yang tenang, hangat, dan dapat diandalkan, yang biasanya mendekati konflik dengan tenang, objektif, dan sabar. Ia terbuka dan suka membantu orang lain, meski mengharapkan kejujuran dan rasa hormat timbal balik. Terhadap orang asing, ia mungkin awalnya tampak agak pendiam, tetapi cepat menghangat begitu didekati dengan ramah.&#10;&#10;Dalam kehidupan sehari-hari, ia sering mengurus hal-hal organisasi yang menyangkut rumah tangga, keluarga, dan pertanian. Ia memastikan bahwa, meski beban kerja berat, rasa kebersamaan keluarga dan suasana menyenangkan tetap terjaga. Ia umumnya berusaha melewati situasi penuh tekanan dengan ketenangan dan solusi pragmatis, bahkan jika kadang ia memikul terlalu banyak tanggung jawab."/>
+            <text name="gui_help_conversations_title" text="Pertemuan dan percakapan"/>
+            <text name="gui_help_conversations_body" text="Tetangga tersebar di seluruh peta menjalani hidup mereka. Bertemu dan berbicara dengan mereka, bersama pola perilaku realistis, adalah bagian inti dari mod.&#10;&#10;Cara memulai percakapan:&#10;1. Berjalanlah ke arah karakter. Saat cukup dekat (sekitar 5 meter), kamu bisa melakukan aksi «Mulai Percakapan».&#10;2. Tekan Shift+R untuk memulai percakapan.&#10;3. Dengarkan percakapan atau baca subtitelnya.&#10;4. Saat beberapa baris muncul, pilih yang ingin kamu katakan. Pilihanmu membentuk percakapan dan bagaimana hubungan berubah.&#10;5. Di masa depan, kamu akan bisa membicarakan obrolan ringan dan tindakan nyata (mis. meminjam mesin).&#10;&#10;Menemukan orang: karakter muncul di seluruh peta. Petani dalam kendaraan biasanya sulit didekati, tetapi jika kamu berjalan mendekat sekitar 20 meter, ia akan berhenti, mematikan mesin, dan turun setelah beberapa saat agar kamu bisa berbicara dengannya.&#10;&#10;Percakapan bersuara diputar saat paket suara terpasang; jika tidak, kamu cukup membaca teksnya."/>
+            <text name="gui_help_controls_title" text="Kontrol"/>
+            <text name="gui_help_controls_body" text="Shift+R: Mulai percakapan dengan orang di dekatmu. Jika tidak ada orang di sekitar, telepon akan terbuka sebagai gantinya.&#10;Shift+F3: Buka menu cerita dan pengaturan Fields of Stories.&#10;&#10;Di menu konstruksi (saat menempatkan penanda Fields of Stories):&#10;Shift+Q: Ubah ukuran tempat.&#10;Shift+Delete: Hapus semua tempat dari jenis yang dipilih."/>
+            <text name="gui_help_relationships_title" text="Hubungan"/>
+            <text name="gui_help_relationships_body" text="Setiap tetangga mengingat apa yang mereka rasakan tentangmu. Pertemuan baik membangun kepercayaan seiring waktu; pertemuan buruk merugikanmu.&#10;&#10;Cara kerjanya:&#10;- Setiap karakter punya tingkat hubungan (mulai dari 1) dan poin yang terisi menuju tingkat berikutnya.&#10;- Percakapan ramah memberi poin (dan hadiah uang kecil yang sesuai).&#10;- Saat bar poin penuh, tingkat hubungan naik, dan poin diatur ulang untuk tingkat berikutnya. Tingkat yang lebih tinggi membutuhkan lebih banyak poin, tetapi juga memberi bonus lebih besar saat dicapai.&#10;- Balasan kasar atau merendahkan bisa memakan poin. Kadang balasan yang tampak ramah pun bisa memicu perasaan negatif dan memperburuk hubunganmu. Poin tidak pernah turun di bawah nol dan tidak pernah menurunkan tingkat yang sudah dicapai.&#10;&#10;Kontrak ladang juga diperhitungkan: kontrak selesai meningkatkan hubunganmu dengan petani itu, sementara kegagalan, pembatalan, atau kedaluwarsa menurunkannya dengan jumlah yang sama.&#10;&#10;Di akhir percakapan, pesan seperti «Hubungan meningkat» atau «Tingkat hubungan naik» muncul."/>
+            <text name="gui_help_story_title" text="Tab Cerita"/>
+            <text name="gui_help_story_body" text="Tab Cerita memberimu gambaran singkat setiap karakter dan hubunganmu dengan mereka. Buka menu dengan Shift+F3 dan pilih tab Cerita.&#10;&#10;Di kiri ada daftar gulir semua tetangga – klik nama untuk memilih. Di kanan kamu melihat potret karakter terpilih, hubunganmu saat ini (seperti Kenal, Teman, atau Keluarga), tingkat hubungan, dan bilah kemajuan yang menunjukkan berapa poin hubungan yang telah kamu peroleh menuju tingkat berikutnya.&#10;&#10;Gunakan untuk melihat sekilas siapa yang sudah kamu kenal baik dan siapa yang perlu lebih sering dikunjungi. Lihat topik Hubungan untuk cara poin dan tingkat diperoleh serta hilang."/>
+            <text name="gui_help_contracts_title" text="Kontrak ladang dan panggilan"/>
+            <text name="gui_help_contracts_body" text="Para petani terkadang punya lebih banyak pekerjaan ladang daripada yang bisa mereka tangani, dan mereka meneleponmu untuk minta bantuan. Tawaran ini adalah pekerjaan nyata berbayar di ladang mereka. Mereka bisa memberimu serangkaian ladang untuk diselesaikan.&#10;&#10;Panggilannya:&#10;1. Seorang petani bisa menelepon di siang hari (kira-kira antara 08:00 dan 15:00). Kamu mendengar dering dan melihat notifikasi panggilan.&#10;2. Buka teleponmu dan tekan Jawab untuk mendengar tawaran, atau Tolak / Esc untuk menolaknya.&#10;3. Petani yang sama bisa mencoba lagi nanti. Ada batas harian panggilan kontrak (dapat dikonfigurasi di pengaturan permainan). Jika kamu tidak menjawab sama sekali, akan ada total tiga upaya tambahan untuk menghubungimu.&#10;&#10;Memilih pekerjaan: dalam percakapan telepon, biasanya kamu bisa menerima seluruh area ladang atau hanya paruh pertama, dan memilih apakah menggunakan peralatan sendiri atau meminjam mesin tetangga. Ini mengharuskan petani mampu melepas mesinnya. Tentu saja, kamu juga bisa langsung menolak permintaan.&#10;&#10;Tanpa meminjam: kamu menyelesaikan kontrak dengan mesinmu sendiri. Pekerjaan dibayar per hektar dan dianggap selesai begitu ladang mencapai kondisi yang diperlukan. Ladang diperiksa dengan titik sampel, dan ambang penyelesaian dapat dikonfigurasi di pengaturan permainan.&#10;&#10;Kontrak ini selalu diminta lewat telepon dan akan terlihat di menu misi biasa hanya setelah diterima.&#10;&#10;Hadiah dan reputasi: kontrak yang selesai membayarmu dan meningkatkan hubunganmu dengan petani. Kegagalan, pembatalan, atau kedaluwarsa melakukan sebaliknya."/>
+            <text name="gui_help_contracts_body2" text="Dengan meminjam: tetangga meminjamimu persis peralatan yang dibutuhkan (namun beban pemberat dan traktor tidak dipinjamkan). Jika perlu, mesin pinjaman mulai dalam keadaan terisi benih, cairan semprot, pupuk, pupuk kandang, atau bubur, yang dapat diisi ulang di pertanian tetangga.&#10;Meminjam berarti bayaran sedikit lebih kecil daripada menggunakan peralatan sendiri. Penting: kontrak dengan peralatan pinjaman tetap di 99 persen sampai kamu mengembalikan setiap mesin pinjaman ke pertanian tetangga dan melepasnya di sana. Baru setelah itu kontrak dianggap selesai.&#10;&#10;Jika kamu meminjam peralatan, kamu akan menemukan penanda di peta yang menunjukkan di mana mesin bisa diambil. Di sana kamu bisa mengisi ulang bahan habis pakai (mis. bubur, benih, atau herbisida) dan, di akhir kontrak, memarkir mesin kembali."/>
+            <text name="gui_help_contracts_body3" text="Kontrak panen dan pengiriman&#10;&#10;Beberapa kontrak pekerjaan ladang juga mengharuskan pengiriman hasil panen:&#10;&#10;Pengiriman panen: panen tanaman (mis. jagung, gandum, kanola) dan kirim bulirnya ke silo petani. Permainan melacak apa yang dikumpulkan pemanenmu dan membandingkannya dengan yang kamu kirim. Kamu harus mengirim setidaknya 99 % dari yang kamu panen.&#10;&#10;Pengiriman pemotongan rumput: potong rumput dan kirim (sebagai bal atau curah) ke silo petani.&#10;&#10;Pengambilan dan pengiriman: panen atau potong tanaman dan bawa ke silo petani, yang ditandai di peta dengan lingkaran merah. Silo dapat diakses sementara olehmu selama kontrak – membuang di tempat lain (mis. menjual hasil panen) tidak dihitung.&#10;&#10;Pekerjaan bahan habis pakai (kapur, pupuk, bubur, penyemprotan, benih, pupuk kandang): silo petani diisi dengan bahan yang diperlukan sehingga kamu bisa mengisi ulang peralatan di sana alih-alih membelinya.&#10;&#10;Jika beberapa kontrak pengiriman berbagi silo dan jenis tanaman yang sama, pengiriman dibagi proporsional di antara mereka.&#10;&#10;Daftar tugas: detail misi menunjukkan Pekerjaan Ladang, Pengiriman, dan (jika kamu meminjam mesin) Pengembalian Peralatan sebagai tugas terpisah dengan progres pengiriman saat ini.&#10;&#10;Penyelesaian paksa: tombol «Selesaikan Paksa» di menu kontrak menutup kontrak yang hampir selesai (di atas 70 %).&#10;&#10;Tampilan progres:&#10;0-80 % mencakup pekerjaan ladang, 80-99 % berarti pekerjaan ladang selesai tetapi pengiriman masih menunggu. Pada 100 % keduanya selesai – ambil kontrak di menu misi untuk menerima bayaran.&#10;&#10;Bonus pengiriman ekstra:&#10;petani mengharapkan seluruh panen dikirim – jangan simpan apa pun untuk dirimu sendiri. Kamu bisa terus mengirim setelah kontrak mencapai 100 %. Saat diambil, kelebihan apa pun di atas yang ada di silo saat selesai memberi bonus hubungan +50."/>
+            <text name="gui_help_contract_cap_call_info" text="Saat seorang petani butuh bantuan, kamu mendengar dering dan melihat notifikasi panggilan masuk (kira-kira antara 08:00 dan 15:00)."/>
+            <text name="gui_help_contract_cap_call" text="Buka teleponmu dan tekan Jawab untuk mendengar tawaran, atau Tolak / Esc untuk menolaknya.&#10;&#10;Kamu bisa menyesuaikan jumlah panggilan kerja di pengaturan permainan. Ini mengacu pada jumlah petani yang mencari bantuan, bukan jumlah panggilan.&#10;&#10;Penting: Jika kamu tidak menjawab panggilan sama sekali, akan ada total tiga upaya tambahan untuk menghubungimu."/>
+            <text name="gui_help_contract_cap_choices" text="Dalam panggilan kamu memilih pekerjaan: seluruh ladang atau hanya paruh pertama, dan apakah menggunakan peralatan sendiri atau meminjam mesin tetangga."/>
+            <text name="gui_help_contract_cap_borrow_map" text="Jika kamu meminjam peralatan, penanda di peta menunjukkan di mana mengambil mesin dan ke mana mengembalikannya nanti."/>
+            <text name="gui_help_contract_cap_borrow_attach" text="Di pertanian kamu memasang peralatan pinjaman dan mengisi ulang benih, cairan semprot, pupuk, atau bubur di sana bila perlu."/>
+            <text name="gui_help_contract_cap_fieldwork" text="Lakukan pekerjaan ladang. Dengan peralatan pinjaman, kontrak tetap di 99 % sampai kamu mengembalikan setiap mesin ke pertanian dan melepasnya."/>
+            <text name="gui_help_schedule_title" text="Petani dan pekerjaan ladang mereka"/>
+            <text name="gui_help_schedule_body" text="Petani AI bukan sekadar pembantu animasi. Mereka benar-benar merencanakan dan menjalankan pekerjaan ladang di tanah mereka sendiri, hari demi hari dan musim demi musim.&#10;&#10;Rencana harian: sekali per hari permainan, setiap petani melihat kondisi aktual ladangnya dan menyusun daftar tugas. Mereka mengerjakannya pada siang hari, kira-kira dari 06:00 hingga sore: keluar, melakukan pekerjaan, lalu pulang.&#10;&#10;Yang mereka lakukan, dalam urutan prioritas: memanen tanaman matang, lalu menanam, lalu menyemprot, lalu menyebar pupuk, pupuk kandang, atau bubur, lalu membajak, menggaru, dan mengolah tanah. Sebuah tugas dipilih hanya jika ladang benar-benar membutuhkannya (tanaman yang tepat, tahap pertumbuhan, kondisi tanah, atau gulma).&#10;&#10;Mengikuti musim: penanaman mengikuti kalender tanam nyata setiap tanaman, dan pekerjaan lain terikat pada bulan-bulan yang masuk akal, sehingga pekerjaan yang terlihat sesuai dengan musim. Saat menanam, petani merotasi tanaman yang sesuai (seperti kanola, gandum, jelai, gandum hitam, dan kedelai) dan berusaha menghindari tanaman sebelumnya.&#10;&#10;Alih daya: setiap hari, seorang petani dapat menawarkan tugas tertentu sebagai kontrak telepon. Kontrak ini diminta lewat telepon dan, setelah diterima, terlihat di menu misi biasa. Jika kamu tidak menerimanya sebelum tengah hari, ia akan melakukannya sendiri.&#10;&#10;Kamu dapat melihat rencana seorang petani untuk hari itu di menu Pengaturan, di bagian Karakter, termasuk tugas mana yang disediakan untukmu, ditawarkan sebagai kontrak, atau ditangani oleh AI petani sendiri."/>
+            <text name="gui_help_privatelife_title" text="Kehidupan pribadi"/>
+            <text name="gui_help_privatelife_body" text="Di luar pekerjaan, karakter punya kehidupan sendiri. Setiap tetangga punya rumah untuk kembali, dan banyak yang mengikuti rutinitas pribadi sepanjang hari.&#10;&#10;Hal-hal yang bisa kamu temui mereka lakukan:&#10;- Bersantai di rumah atau membereskan.&#10;- Menghabiskan waktu dengan teman, piknik, atau bermain dengan anak-anak.&#10;- Berjalan-jalan, mengajak anjing jalan, atau membaca buku.&#10;- Menjalankan tugas harian atau mengisi bahan bakar mobil.&#10;- Memeriksa kendaraan di pinggir jalan atau pergi ke bengkel untuk perbaikan.&#10;&#10;Rutinitas bergantung pada waktu (pagi, siang, sore, dan malam) serta peran dan pekerjaan karakter, sehingga seorang petani, wali kota, dan warga sipil menghabiskan waktu luang secara berbeda.&#10;&#10;Justru inilah yang membuat dunia terasa hidup: jika kamu menjelajahi peta pada jam berbeda, kamu akan bertemu orang dalam segala macam situasi. Mendekati mereka dengan berjalan kaki memungkinkanmu memulai percakapan dan mengenal mereka lebih baik."/>
+            <text name="gui_help_homebases_title" text="Pangkalan"/>
+            <text name="gui_help_homebases_body" text="Pangkalan adalah rumah karakter: tempat tinggal, tempat ia kembali di malam hari, dan tempat ia bisa ditemukan saat tidak bertugas. Tanpa pangkalan, karakter tidak benar-benar ada di dalam permainan – setiap tetangga butuh setidaknya satu.&#10;&#10;Dua titik kemunculan per karakter: setiap karakter sebaiknya punya setidaknya dua tempat rumah – satu dengan ukuran «Karakter» (berjalan kaki; di sini orang berdiri dan tidur) dan satu dengan ukuran «Kendaraan» (tempat mobilnya parkir). Dengan begitu setiap tetangga punya titik kemunculan berjalan kaki dan berkendara.&#10;&#10;Membuat tempat rumah (menu konstruksi, disarankan):&#10;1. Buka menu konstruksi (alat bangun) dan pilih kategori «Fields of Stories», lalu tab «Rumah karakter».&#10;2. Pilih objek karakter yang diinginkan (mis. «Mary Carter»).&#10;3. Tempatkan di tempat tinggal. Gunakan Shift+Q untuk mengubah ukuran («Karakter» untuk orang, «Kendaraan» untuk mobilnya, «Area luas» untuk pertanian, «Silo» untuk silo).&#10;&#10;Cara klasik: buka menu dengan Shift+F3, buka tab Pengaturan, pilih ukuran tempat yang sesuai di atas («Karakter» atau «Kendaraan»), berdiri berjalan kaki atau parkir kendaraanmu tepat di lokasi yang diinginkan di tempat tinggal, lalu pilih «Rumah [Nama]» dari daftar tempat untuk menyimpan posisi. Sebagai alternatif, di bagian Karakter, gunakan «Tambah pangkalan terdekat» untuk menetapkan tempat terdekat langsung ke karakter terpilih.&#10;&#10;Menghapus tempat rumah yang ada: jika ingin mengatur ulang tempat tinggal karakter, pilih ia di bagian Karakter dan gunakan tombol «Hapus tempat rumah». Ini melepas semua tempat rumah yang ditetapkan ke karakter itu – tempatnya sendiri tetap ada dan bisa ditetapkan ulang nanti.&#10;&#10;Pangkalan adalah tempat yang baik untuk menemukan seseorang, terutama pagi-pagi atau larut malam.&#10;&#10;Petani: bagi mereka, pangkalan sekaligus pertanian dan juga butuh ruang untuk mesin. Kamu bisa mempelajari cara merancang pertanian dengan benar di bab «Perancangan pertanian»."/>
+            <text name="gui_help_homebasedesign_title" text="Perancangan pertanian"/>
+            <text name="gui_help_homebasedesign_body" text="Bab ini tentang pertanian karakter petani. Bagi seorang petani, pangkalan sekaligus pertaniannya: saat mesin tidak digunakan atau sedang dikontrak, mereka diparkir di sana. Jadi rencanakan pertanian dengan luas, karena seorang petani memiliki banyak kendaraan dan peralatan (saat ini sekitar 10 peralatan, 1 pemanen, 2 traktor, dan satu mobil; kontraktor pertanian bahkan punya 23 peralatan, 6 mesin swagerak, 2 traktor, dan satu mobil).&#10;&#10;Cara membuat tempat: buka menu dengan Shift+F3, buka tab Pengaturan, pilih ukuran tempat yang sesuai di atas, dan simpan «Pangkalan karakter» di lokasi yang diinginkan (prosedur persisnya ada di bab «Pembuatan tempat di peta»).&#10;&#10;Ukuran tempat yang dibutuhkan pertanian:&#10;- «Karakter» (berjalan kaki): untuk petani itu sendiri.&#10;- «Kendaraan»: untuk mobil dan traktor.&#10;- «Kendaraan besar»: untuk pemanen dan mesin swagerak.&#10;- «Kendaraan + peralatan»: untuk peralatan dan trailer.&#10;- «Area luas»: untuk situasi luas di pertanian, seperti persiapan mesin.&#10;- «Silo»: untuk silo petani, yang menjadi titik pengiriman dan pengisian ulang untuk kontrak panen dan pemotongan rumput.&#10;Jika kamu tidak menemukan tempat untuk setiap mesin, tidak masalah – tergantung penggunaan, mereka diparkir atau disembunyikan."/>
+            <text name="gui_help_homebasedesign_body2" text="Membuat pertanian dapat diakses: untuk meminjam mesin seorang petani, pertaniannya harus bisa dilalui. Kamu harus bisa mengendarai kendaraan ke mesin yang diparkir dan keluar lagi. Jadi saat menempatkan pertanian, pastikan tidak ada pagar, gerbang, dinding, pohon, atau objek lain yang menghalangi masuk dan keluar.&#10;&#10;Menghapus gerbang: jika gerbang atau pintu menghalangi akses, kamu bisa menghapusnya langsung di Fields of Stories. Berdiri atau berkendaralah dekat gerbang (dalam 20 m), buka menu dengan Shift+F3 di tab Pengaturan, dan klik «Hapus gerbang terdekat». Objek terdekat yang nama simpulnya mengandung «gate» dihapus permanen dari peta dan tetap hilang setelah dimuat ulang. Gambar berikut menunjukkan bagaimana penghapusan gerbang membuka akses agar mesin bisa dipinjam."/>
+            <text name="gui_help_voices_title" text="Suara dan bahasa"/>
+            <text name="gui_help_voices_body" text="Percakapan bisa sepenuhnya bersuara. Suara ucapan datang sebagai paket suara terpisah agar mod itu sendiri tetap kecil.&#10;&#10;Memasang paket suara: unduh paket suara (lihat halaman GitHub mod untuk lokasi unduhan tepat: AirFoxTwo/FS25_FieldsOfStories), lalu ekstrak sehingga folder «conversations»-nya berada di folder modSettings mod (modSettings/FS25_FIELDS_OF_STORIES). Jika paket hilang atau usang, dialog peringatan muncul dengan tombol «Periksa lagi» dan «Abaikan». Kamu bisa terus bermain tanpanya; percakapan tetap menampilkan subtitel, hanya tanpa suara ucapan.&#10;&#10;Bahasa: mod sepenuhnya diterjemahkan ke bahasa Inggris dan Jerman. Teks yang ditampilkan otomatis mengikuti bahasa permainanmu. Paket suara tersedia dalam versi Inggris dan Jerman yang sesuai, dan mod memutar suara yang cocok dengan paket terpasang, jika tidak cocok dengan bahasa permainan.&#10;&#10;Pembuatan percakapan (lanjutan): setiap karakter punya teks percakapan sendiri denganmu. Totalnya mencapai lebih dari 10.000 bagian percakapan tertulis dan bersuara. Setiap percakapan telah diperiksa manual (setidaknya dari segi masuk akal). Namun kesalahan ungkapan atau tata bahasa tidak bisa dikesampingkan.&#10;&#10;Pembuatan suara (lanjutan): setiap karakter punya suara sendiri, dihasilkan dari desain suara text-to-speech. Suara-suara ini lalu direkam untuk semua teks percakapan melalui kloning suara pada NVIDIA RTX 5080 lokal. Rencananya adalah meningkatkan kualitas lewat optimasi lebih lanjut atau bahkan pengisi suara asli, yang tentu butuh upaya besar."/>
+            <text name="gui_help_support_title" text="Dukungan dan umpan balik"/>
+            <text name="gui_help_support_body" text="Menemukan bug atau punya ide untuk membuat mod lebih baik? Umpan balikmu sangat disambut.&#10;&#10;Umpan balik, laporan bug, dan permintaan fitur paling baik dikirim lewat halaman GitHub mod: AirFoxTwo/FS25_FieldsOfStories&#10;&#10;Saat melaporkan masalah, sangat membantu untuk menyertakan:&#10;- deskripsi singkat tentang apa yang terjadi dan apa yang kamu harapkan,&#10;- langkah-langkah untuk mereproduksinya,&#10;- peta yang kamu mainkan,&#10;- file log jika bisa kamu lampirkan.&#10;&#10;Laporan yang jelas dan rinci sangat mempercepat perbaikan. Terima kasih telah membantu meningkatkan Fields of Stories."/>
+            <text name="gui_mapinit_remove_mod_disclaimer" text="Catatan: Setelah ini, permainan harus disimpan."/>
+            <text name="gui_mapinit_remove_mod" text="Hapus data mod"/>
+            <text name="gui_mapinit_open_construction_menu" text="Buka menu konstruksi"/>
+            <text name="gui_mapinit_classic_init_mode" text="Mode inisialisasi klasik"/>
+            <text name="gui_mapinit_place_size_label" text="Ukuran tempat:"/>
+            <text name="gui_mapinit_place_size_character" text="Karakter"/>
+            <text name="gui_mapinit_place_size_vehicle" text="Kendaraan"/>
+            <text name="gui_mapinit_place_size_vehicle_attachment" text="Kendaraan + peralatan"/>
+            <text name="gui_mapinit_place_size_oversize_vehicle" text="Kendaraan besar"/>
+            <text name="gui_mapinit_place_size_large_area" text="Area luas"/>
+            <text name="gui_mapinit_place_size_silo" text="Silo"/>
+            <text name="gui_mapinit_place_type_label" text="Jenis tempat:"/>
+            <text name="gui_mapinit_place_type_shop" text="Toko"/>
+            <text name="gui_mapinit_place_type_gas_station" text="Pom bensin"/>
+            <text name="gui_mapinit_place_type_character_homebase" text="Pangkalan karakter"/>
+            <text name="gui_mapinit_place_type_roadside" text="Pinggir jalan"/>
+            <text name="gui_mapinit_place_type_dirt_road" text="Jalan tanah"/>
+            <text name="gui_mapinit_place_type_public_place" text="Tempat umum"/>
+            <text name="gui_mapinit_place_type_player_farm" text="Peternakan pemain"/>
+            <text name="gui_mapinit_place_type_public_relax_place" text="Tempat santai umum"/>
+            <text name="gui_mapinit_place_type_private_relax_place" text="Tempat santai pribadi"/>
+            <text name="gui_mapinit_place_type_sell_point" text="Titik jual"/>
+            <text name="gui_mapinit_place_type_other" text="Lainnya"/>
+            <text name="gui_mapinit_place_type_church" text="Gereja"/>
+            <text name="gui_mapinit_place_type_public_infrastructure" text="Infrastruktur publik"/>
+            <text name="gui_mapinit_place_type_roadside_trees" text="Pepohonan pinggir jalan"/>
+            <text name="gui_mapinit_place_type_industry" text="Industri"/>
+            <text name="gui_mapinit_place_type_workshop" text="Bengkel"/>
+            <text name="gui_mapinit_place_type_shed" text="Gudang"/>
+            <text name="gui_mapinit_place_type_fieldwork" text="Pekerjaan ladang"/>
+            <text name="fos_place_character_public_place" text="Tempat: Penanda tempat umum"/>
+            <text name="fos_place_character_public_place_desc" text="Fields of Stories - Alun-alun umum yang ramai tempat NPC berkumpul, mengobrol, dan menghabiskan waktu luang"/>
+            <text name="fos_place_character_shop" text="Tempat: Penanda toko"/>
+            <text name="fos_place_character_shop_desc" text="Fields of Stories - Area belanja tempat NPC pergi melihat dan membeli barang"/>
+            <text name="fos_place_character_gas_station" text="Tempat: Penanda pom bensin"/>
+            <text name="fos_place_character_gas_station_desc" text="Fields of Stories - Stasiun pengisian bahan bakar tempat NPC mengisi kendaraan dan bertemu orang lain"/>
+            <text name="fos_place_character_roadside" text="Tempat: Penanda pinggir jalan"/>
+            <text name="fos_place_character_roadside_desc" text="Fields of Stories - Titik pinggir jalan tempat NPC berhenti untuk mengobrol atau istirahat dari mengemudi"/>
+            <text name="fos_place_character_dirt_road" text="Tempat: Penanda jalan tanah"/>
+            <text name="fos_place_character_dirt_road_desc" text="Fields of Stories - Jalan tanah tenang tempat NPC menikmati berjalan-jalan dan pertemuan pedesaan"/>
+            <text name="fos_place_character_player_farm" text="Tempat: Penanda peternakan pemain"/>
+            <text name="fos_place_character_player_farm_desc" text="Fields of Stories - Menandai peternakan pemain, jantung aktivitas pertanianmu"/>
+            <text name="fos_place_character_public_relax_place" text="Tempat: Penanda area santai"/>
+            <text name="fos_place_character_public_relax_place_desc" text="Fields of Stories - Area santai umum tempat NPC bersantai dan menikmati waktu luang"/>
+            <text name="fos_place_character_private_relax_place" text="Tempat: Penanda area santai pribadi"/>
+            <text name="fos_place_character_private_relax_place_desc" text="Fields of Stories - Tempat peristirahatan terpencil tempat NPC mencari privasi dan perenungan tenang"/>
+            <text name="fos_place_character_sell_point" text="Tempat: Penanda titik jual"/>
+            <text name="fos_place_character_sell_point_desc" text="Fields of Stories - Titik perdagangan tempat NPC mengirim barang dan berbisnis"/>
+            <text name="fos_place_character_church" text="Tempat: Penanda gereja"/>
+            <text name="fos_place_character_church_desc" text="Fields of Stories - Tempat ibadah tempat NPC menghadiri kebaktian dan pertemuan komunitas"/>
+            <text name="fos_place_character_public_infrastructure" text="Tempat: Penanda infrastruktur"/>
+            <text name="fos_place_character_public_infrastructure_desc" text="Fields of Stories - Pusat layanan umum dan infrastruktur untuk komunitas lokal"/>
+            <text name="fos_place_character_industry" text="Tempat: Penanda industri"/>
+            <text name="fos_place_character_industry_desc" text="Fields of Stories - Kawasan industri tempat NPC bekerja dan memproduksi barang"/>
+            <text name="fos_place_character_workshop" text="Tempat: Penanda bengkel"/>
+            <text name="fos_place_character_workshop_desc" text="Fields of Stories - Bengkel perbaikan tempat NPC merawat dan memperbaiki peralatan mereka"/>
+            <text name="fos_place_character_shed" text="Tempat: Penanda gudang"/>
+            <text name="fos_place_character_shed_desc" text="Fields of Stories - Gudang penyimpanan tempat NPC menyimpan alat dan peralatan mereka"/>
+            <text name="fos_place_character_remove" text="Alat: Hapus tempat"/>
+            <text name="fos_place_character_remove_desc" text="Fields of Stories - Menghapus penanda tempat terdekat dalam 5 meter saat ditempatkan"/>
+            <text name="gui_fos_place_created" text="Tempat dibuat: %s (%s)"/>
+            <text name="gui_fos_bulk_remove_title" text="Penghapusan massal tempat"/>
+            <text name="gui_fos_bulk_remove_confirm" text="Hapus %d tempat dari jenis «%s»?"/>
+            <text name="gui_fos_bulk_remove_confirm_char" text="Hapus %d tempat untuk «%s»?"/>
+            <text name="gui_fos_bulk_remove_btn_yes" text="Hapus semua"/>
+            <text name="gui_fos_bulk_remove_btn_no" text="Batal"/>
+            <text name="gui_fos_bulk_remove_none" text="Tidak ada tempat dari jenis ini untuk dihapus."/>
+            <text name="gui_fos_bulk_remove_done" text="%d tempat dihapus."/>
+            <text name="input_IAMapInitDialog" text="Menu Fields of Stories"/>
+            <text name="input_IAI3DReferencesDebug" text="Fields of Stories - Tampilkan titik debug di semua simpul referensi i3d"/>
+            <text name="input_IADumpUserAttributes" text="Fields of Stories - Tulis atribut pengguna simpul peta ke log"/>
+            <text name="input_IAPlaceSizeSelect" text="Pemilihan ukuran tempat (Fields of Stories)"/>
+            <text name="input_IAPlaceBulkRemove" text="Penghapusan massal tempat (Fields of Stories)"/>
+            <text name="gui_fos_place_size_select" text="Ukuran tempat"/>
+            <text name="gui_mapinit_add_nearest_homebase" text="Tambah pangkalan terdekat"/>
+            <text name="gui_mapinit_add_nearest_homebase_info" text="Tempat terdekat ditetapkan ke karakter %s."/>
+            <text name="gui_mapinit_notify_place_saved" text="Tempat disimpan: %s"/>
+            <text name="gui_mapinit_notify_remove_nearest_ok" text="Tempat terdekat dihapus."/>
+            <text name="gui_mapinit_notify_remove_nearest_none" text="Tidak ada tempat untuk dihapus."/>
+            <text name="gui_mapinit_notify_end_init" text="Fase inisialisasi berakhir."/>
+            <text name="gui_mapinit_notify_remove_mod" text="Data mod Fields of Stories dibersihkan. Simpan permainan."/>
+            <text name="gui_mapinit_notify_reset_character" text="Karakter %s diatur ulang."/>
+            <text name="gui_mapinit_notify_delete_character" text="%s dihapus dari mod."/>
+            <text name="gui_mapinit_notify_remove_homeplaces" text="Tempat rumah dihapus untuk %s."/>
+            <text name="gui_mapinit_remove_nearest" text="Hapus tempat terdekat"/>
+            <text name="gui_mapinit_show_place_markers" text="Tampilkan penanda tempat"/>
+            <text name="gui_mapinit_hide_place_markers" text="Sembunyikan penanda tempat"/>
+            <text name="gui_mapinit_hide_nearest_gate" text="Hapus gerbang terdekat"/>
+            <text name="gui_mapinit_notify_hide_gate_ok" text="Gerbang terdekat dihapus: %s"/>
+            <text name="gui_mapinit_notify_hide_gate_none" text="Tidak ada objek gerbang di dekat sini."/>
+            <text name="gui_mapinit_end_init" text="Akhiri fase inisialisasi"/>
+            <text name="gui_mapinit_nudge_vehicle_left" text="Kendaraan: 5 m ke kanan"/>
+            <text name="gui_mapinit_notify_nudge_vehicle_no_vehicle" text="Naiklah ke kendaraan untuk menggunakan ini."/>
+            <text name="gui_mapinit_notify_nudge_vehicle_ai" text="Hentikan AI kendaraan sebelum mendorongnya."/>
+            <text name="gui_mapinit_notify_nudge_vehicle_failed" text="Gagal memindahkan kendaraan: %s"/>
+            <text name="gui_mapinit_reset_character" text="Atur ulang karakter"/>
+            <text name="gui_mapinit_delete_character" text="Hapus karakter"/>
+            <text name="gui_mapinit_remove_homeplaces" text="Hapus tempat rumah"/>
+            <text name="gui_mapinit_detail_name" text="Nama"/>
+            <text name="gui_mapinit_detail_job" text="Pekerjaan"/>
+            <text name="gui_mapinit_detail_role" text="Peran"/>
+            <text name="gui_mapinit_detail_relationship" text="Hubungan"/>
+            <text name="gui_mapinit_detail_relationship_fmt" text="%s (Tingkat %d, %d / %d poin)"/>
+            <text name="gui_mapinit_detail_vehicles" text="Kendaraan"/>
+            <text name="gui_mapinit_detail_current_situation" text="Situasi saat ini"/>
+            <text name="gui_mapinit_detail_schedule" text="Pekerjaan ladang yang direncanakan hari ini"/>
+            <text name="gui_mapinit_detail_at_place_fmt" text="di %s"/>
+            <text name="ingame_relationship_improved" text="Hubungan membaik dengan %s (+%s poin)"/>
+            <text name="ingame_relationship_levelup" text="Tingkat hubungan naik dengan %s (Tingkat %s)"/>
+            <text name="ingame_relationship_decreased" text="Hubungan memburuk dengan %s (-%s poin)"/>
+            <text name="ingame_situation_at_player_farm" text="%s menunggu di peternakanmu."/>
+            <text name="ia_field_outcome_mission_title_for_neighbour" text="%s untuk %s"/>
+            <text name="ia_field_outcome_mission_desc_short" text="Gunakan %s untuk menyelesaikan tugas ini."/>
+            <text name="ia_field_outcome_mission_desc_seed" text="Gunakan %s untuk menanam %s."/>
+            <text name="ia_field_outcome_neighbour_generic" text="tetanggamu"/>
+            <text name="ia_field_outcome_task_done" text="Selesai"/>
+            <text name="ia_field_outcome_task_open" text="Terbuka"/>
+            <text name="ia_field_outcome_task_fieldwork" text="Pekerjaan ladang: %s"/>
+            <text name="ia_field_outcome_task_delivery" text="Pengiriman"/>
+            <text name="ia_field_outcome_task_return" text="Kembalikan peralatan"/>
+            <text name="ia_field_outcome_task_delivery_progress" text="%s / %s terkirim"/>
+            <text name="ia_field_outcome_task_delivery_not_started" text="Belum dimulai"/>
+            <text name="ia_field_outcome_task_return_after_fieldwork" text="Setelah pekerjaan ladang"/>
+            <text name="ia_fieldwork_label_harvest_corn" text="Panen jagung"/>
+            <text name="ia_force_complete_button" text="Selesaikan Paksa"/>
+            <text name="ia_force_complete_no_mission" text="Tidak ada kontrak Fields of Stories aktif yang dipilih."/>
+            <text name="ia_field_outcome_target_fertilizer" text="Target: pupuk mineral pada tahap %d di ladang."/>
+            <text name="ia_field_outcome_target_slurry" text="Target: aplikasi bubur (pupuk cair) atau sisa fermentasi (digestat) hingga tahap pemupukan %d."/>
+            <text name="ia_field_outcome_target_manure" text="Target: penyebaran pupuk kandang padat hingga tahap pemupukan %d."/>
+            <text name="ia_field_outcome_target_lime" text="Target: aplikasi kapur (tahap pemupukan %d)."/>
+            <text name="ia_field_outcome_target_lime_deliver" text="Target: aplikasikan kapur secara merata ke seluruh ladang."/>
+            <text name="ia_field_outcome_target_stone_picking" text="Target: singkirkan semua batu dari ladang."/>
+            <text name="ia_field_outcome_target_grass_mowing" text="Target: potong rumput dan kirim ke pertanian."/>
+            <text name="ia_field_outcome_target_harvest_deliver_corn" text="Target: panen jagung dan kirim bulirnya ke pertanian."/>
+            <text name="ia_field_outcome_target_herbicide" text="Target: semprot herbisida sampai gulma mencapai kondisi yang disepakati."/>
+            <text name="ia_field_outcome_target_seed" text="Target: %s terbentuk di seluruh ladang."/>
+            <text name="ia_fieldwork_equip_cultivate" text="kultivator"/>
+            <text name="ia_fieldwork_equip_harrow" text="garu"/>
+            <text name="ia_fieldwork_equip_stubble_cultivation" text="garu cakram atau kultivator sisa panen"/>
+            <text name="ia_fieldwork_equip_harvest" text="pemanen"/>
+            <text name="ia_fieldwork_equip_mineral_fertilizer" text="penyebar pupuk mineral"/>
+            <text name="ia_fieldwork_equip_slurry" text="tangki bubur"/>
+            <text name="ia_fieldwork_equip_manure" text="penyebar pupuk kandang"/>
+            <text name="ia_fieldwork_equip_lime" text="penyebar kapur"/>
+            <text name="ia_fieldwork_equip_stone_picker" text="pemetik batu"/>
+            <text name="ia_fieldwork_equip_grass_mower" text="mesin potong dan gerobak hijauan atau pembal"/>
+            <text name="ia_fieldwork_equip_harvest_deliver_corn" text="pemanen dan trailer biji-bijian"/>
+            <text name="ia_fieldwork_equip_herbicide" text="penyemprot ladang dengan herbisida"/>
+            <text name="ia_fieldwork_equip_seed" text="penanam"/>
+            <text name="ia_fieldwork_equip_plow" text="bajak"/>
+            <text name="ia_fieldwork_equip_generic" text="traktor dan peralatan yang sesuai"/>
+            <text name="ia_fieldwork_label_cultivate" text="Mengolah tanah"/>
+            <text name="ia_fieldwork_label_harrow" text="Menggaru"/>
+            <text name="ia_fieldwork_label_stubble_cultivation" text="Pengolahan sisa panen"/>
+            <text name="ia_fieldwork_label_harvest" text="Panen"/>
+            <text name="ia_fieldwork_label_fertilize_mineral" text="Pemupukan mineral"/>
+            <text name="ia_fieldwork_label_slurry" text="Penyebaran bubur"/>
+            <text name="ia_fieldwork_label_manure" text="Penyebaran pupuk kandang"/>
+            <text name="ia_fieldwork_label_lime" text="Pengapuran"/>
+            <text name="ia_fieldwork_label_stone_picking" text="Pemetikan batu"/>
+            <text name="ia_fieldwork_label_grass_mowing" text="Potong rumput dan kirim"/>
+            <text name="ia_fieldwork_label_grass_mowing_short" text="Potong rumput"/>
+            <text name="ia_fieldwork_label_harvest_deliver_corn" text="Panen jagung dan kirim"/>
+            <text name="ia_fieldwork_label_harvest_deliver_with_crop" text="Panen %s dan kirim"/>
+            <text name="ia_fieldwork_label_spray" text="Semprot"/>
+            <text name="ia_fieldwork_label_seed" text="Tanam"/>
+            <text name="ia_fieldwork_label_seed_with_crop" text="Penanaman %s"/>
+            <text name="ia_fieldwork_label_plow" text="Membajak"/>
+            <text name="ia_fieldwork_label_condition" text="Kondisi ladang"/>
+            <text name="ia_field_outcome_mission_finished" text="Kontrak ladang Fields of Stories selesai."/>
+            <text name="ia_field_outcome_mission_failed" text="Kontrak ladang Fields of Stories berakhir gagal."/>
+            <text name="ia_field_outcome_deliver_wrong_location" text="Kamu harus mengirim hasil panen ke pertanian, bukan menjualnya di tempat lain!"/>
+            <text name="ia_delivery_marker_label" text="Titik pengiriman pertanian"/>
+            <text name="ia_field_outcome_mission_deliver_note" text="Kirim hasil panen ke pertanian (ditandai di peta)."/>
+            <text name="ia_field_outcome_delivery_complete" text="Pengiriman selesai! Barang telah tiba di pertanian."/>
+            <text name="ia_mission_borrow_refill_at_farm" text="Peralatan pinjaman kosong — isi ulang di pertanian %s."/>
+            <text name="ia_mission_borrow_return_to_farm" text="Pekerjaan ladang selesai — kembalikan peralatan pinjaman ke pertanian %s (lepas di halaman)."/>
+            <text name="ia_mission_borrow_pickup_marker" text="Pengambilan peralatan pinjaman"/>
+            <text name="ia_mission_borrow_yard_marker" text="Peralatan pinjaman — pengambilan dan pengembalian"/>
+            <text name="ia_settings_section_title" text="Fields of Stories"/>
+            <text name="ia_settings_contractCallsPerDay_title" text="Panggilan kontrak per hari"/>
+            <text name="ia_settings_contractCallsPerDay_info" text="Jumlah maksimum panggilan kontrak per hari permainan di semua tetangga."/>
+            <text name="ia_settings_contractCallsPerDay_none" text="Tidak ada"/>
+            <text name="ia_settings_contractCallsPerDay_1" text="1"/>
+            <text name="ia_settings_contractCallsPerDay_2" text="2"/>
+            <text name="ia_settings_contractCallsPerDay_3" text="3"/>
+            <text name="ia_settings_contractCallsPerDay_4" text="4"/>
+            <text name="ia_settings_contractCallsPerDay_unlimited" text="Tak terbatas"/>
+            <text name="ia_settings_missionOfferMode_title" text="Mode penawaran misi"/>
+            <text name="ia_settings_missionOfferMode_info" text="Klasik: misi vanilla tetap di peta, tanpa panggilan kontrak. Realistis: hanya panggilan kontrak tetangga, misi vanilla dihapus."/>
+            <text name="ia_settings_missionOfferMode_classic" text="Klasik"/>
+            <text name="ia_settings_missionOfferMode_realistic" text="Realistis"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_title" text="Ladang kontrak per tetangga"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_info" text="Jumlah maksimum ladang/petak yang dapat dialihdayakan seorang tetangga sebagai kontrak per hari."/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_1" text="1"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_2" text="2"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_3" text="3"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_4" text="4"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_5" text="5"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_unlimited" text="Tak terbatas"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_title" text="Ambang penyelesaian pekerjaan ladang"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_info" text="Persentase titik sampel ladang yang harus cocok dengan kondisi yang diharapkan agar misi pekerjaan ladang dianggap selesai."/>
+            <text name="ia_settings_fieldworkCompletionThreshold_60" text="60 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_65" text="65 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_70" text="70 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_75" text="75 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_80" text="80 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_85" text="85 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_90" text="90 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_95" text="95 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_100" text="100 %"/>
+            <text name="ia_settings_voiceVolume_title" text="Volume suara"/>
+            <text name="ia_settings_voiceVolume_info" text="Volume baris dialog yang diucapkan oleh tetangga."/>
+            <text name="ia_settings_voiceVolume_10" text="10 %"/>
+            <text name="ia_settings_voiceVolume_20" text="20 %"/>
+            <text name="ia_settings_voiceVolume_30" text="30 %"/>
+            <text name="ia_settings_voiceVolume_40" text="40 %"/>
+            <text name="ia_settings_voiceVolume_50" text="50 %"/>
+            <text name="ia_settings_voiceVolume_60" text="60 %"/>
+            <text name="ia_settings_voiceVolume_70" text="70 %"/>
+            <text name="ia_settings_voiceVolume_80" text="80 %"/>
+            <text name="ia_settings_voiceVolume_90" text="90 %"/>
+            <text name="ia_settings_voiceVolume_100" text="100 %"/>
+            <text name="ia_npc_unavailable" text=" (Tidak tersedia)"/>
+            <text name="gui_language" text="id"/>
+	</texts>
+</l10n>

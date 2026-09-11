@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<conversationsStructure>
 <conversationsData>
   <character id="6" index="1">
     <situation id="4">
@@ -1077,3 +1078,38 @@
     </situation>
   </character>
 </conversationsData>
+<dynamicConversationsData>
+  <character id="18" index="1">
+    <topic id="field_mission_offer">
+      <variant id="1"/>
+    </topic>
+    <topic id="field_mission_offer_single">
+      <variant id="1"/>
+    </topic>
+  </character>
+  <character id="19" index="2">
+    <topic id="field_mission_offer">
+      <variant id="1"/>
+    </topic>
+    <topic id="field_mission_offer_single">
+      <variant id="1"/>
+    </topic>
+  </character>
+  <character id="20" index="3">
+    <topic id="field_mission_offer">
+      <variant id="1"/>
+    </topic>
+    <topic id="field_mission_offer_single">
+      <variant id="1"/>
+    </topic>
+  </character>
+  <character id="21" index="4">
+    <topic id="field_mission_offer">
+      <variant id="1"/>
+    </topic>
+    <topic id="field_mission_offer_single">
+      <variant id="1"/>
+    </topic>
+  </character>
+</dynamicConversationsData>
+</conversationsStructure>

@@ -1,9 +1,10 @@
 --
 -- FS25 Fields of Stories - field outcome mission (phone contract).
 -- Subclasses AbstractFieldMission so Field.currentMission / contracts UI bind like vanilla field work.
--- Completion: FieldState:update at vertex inset probes (IAHelper_getBorderInsetProbePoints) plus random interior samples (IAHelper_getRandomPointsInField); all must match expected keys.
+-- Completion: FieldState:update at static border-ring probes (IAHelper_getRingProbePoints, fixed 5 m inset) plus deterministic interior hexagonal-grid samples (IAHelper_getGridProbePoints); all must match expected keys.
+-- Ring probes cover the perimeter at a fixed inset; grid probes fill the interior with uniform hexagonal spacing — no random generation, proportional spread, no overlap outside the field, unlimited probe count.
 -- Expected-vs-probe key matching (incl. fertilize spray equivalence) lives in IAFieldOutcomeMissionProbeEvaluator.lua (loaded after IAFieldwork in IANeighbours.lua).
--- Border probe count is capped (MAX_PROBES - MIN_INTERIOR_PROBE_SLOTS) so interior samples always get budget on large / high-vertex fields.
+-- Ring probes are capped at 80% of MAX_PROBES so the interior grid always gets at least 20% budget on large-perimeter fields.
 -- Persistence: phone field-outcome contracts are stored under IANeighbours_outbound.xml (fieldOutcomeMissions), not missions.xml.
 --
 
@@ -24,8 +25,12 @@ IAFieldOutcomeMission.WORKER_ONLY_REWARD_PER_HA = {
 	[IAFieldwork.JobType.SLURRYSPREADING] = 1140,
 	[IAFieldwork.JobType.FERTILIZEDSPREADING] = 1140,
 	[IAFieldwork.JobType.SPRAY] = 1000,
-	[IAFieldwork.JobType.HARVEST] = 1980,
+	[IAFieldwork.JobType.HARVEST] = 2970,
 	[IAFieldwork.JobType.IA_FIELD_OUTCOME] = 860,
+	[IAFieldwork.JobType.LIME] = 1060,
+	[IAFieldwork.JobType.STONE_PICKING] = 800,
+	[IAFieldwork.JobType.GRASS_MOWING] = 2580,
+	[IAFieldwork.JobType.HARVEST_DELIVER_CORN] = 2420,
 }
 IAFieldOutcomeMission.WORKER_ONLY_REWARD_FALLBACK_PER_HA = 1100
 --- Reward multipliers applied directly in resolveWorkerOnlyRewardPerHaFromJobRaw when the player borrows equipment.
@@ -34,12 +39,29 @@ IAFieldOutcomeMission.BORROW_REWARD_MULT_CONSUMABLE = 0.55
 --- How often `update` runs the full probe FieldState scan (all probe points). Lower = smoother HUD, higher = less CPU.
 --- `iaRebuildProbePositions` still calls `iaSyncProbeEvaluation` once right after probes change.
 IAFieldOutcomeMission.PROBE_CHECK_INTERVAL_MS = 15000
-IAFieldOutcomeMission.NUM_INTERIOR_RANDOM = 24
---- Minimum slots reserved for interior random probes; border inset probes use at most MAX_PROBES minus this (capped by NUM_INTERIOR_RANDOM).
-IAFieldOutcomeMission.MIN_INTERIOR_PROBE_SLOTS = 24
+--- How often `update` runs the grass windrow density-map sampling (one getFillLevelAtArea call per GRASS_MOWING mission).
+IAFieldOutcomeMission.GRASS_WINDROW_CHECK_INTERVAL_MS = 1000
+--- How often the NPC silo is topped up with consumables during a refillable contract (ms).
+IAFieldOutcomeMission.CONSUMABLE_SILO_REFILL_INTERVAL_MS = 30000
+--- Target fill level in the NPC silo for consumable refills; tops up to this amount when below threshold.
+IAFieldOutcomeMission.CONSUMABLE_SILO_TARGET_FILL = 50000
+--- Threshold below which the silo is considered "low" and will be refilled.
+IAFieldOutcomeMission.CONSUMABLE_SILO_REFILL_THRESHOLD = 5000
+--- Job types that require refillable consumables loaded from the NPC silo.
+--- Maps JobType → FillType constant name to look up in the engine `FillType` table.
+IAFieldOutcomeMission.CONSUMABLE_JOB_FILL_TYPES = {
+	[IAFieldwork.JobType.LIME]                = "LIME",
+	[IAFieldwork.JobType.FERTILIZEDSPREADING] = "FERTILIZER",
+	[IAFieldwork.JobType.SLURRYSPREADING]     = "LIQUIDMANURE",
+	[IAFieldwork.JobType.MANURESPREADING]     = "MANURE",
+	[IAFieldwork.JobType.SPRAY]               = "HERBICIDE",
+	[IAFieldwork.JobType.SEED]                = "SEEDS",
+}
+IAFieldOutcomeMission.NUM_INTERIOR_RANDOM = 24 -- kept for reference / legacy save compatibility; not used by new probe system
+IAFieldOutcomeMission.RING_INSET_M = 5
+IAFieldOutcomeMission.RING_SPACING_M = 10
+IAFieldOutcomeMission.GRID_MARGIN_M = 8
 IAFieldOutcomeMission.MAX_PROBES = 64
-IAFieldOutcomeMission.BORDER_INSET_MIN_M = 5
-IAFieldOutcomeMission.BORDER_INSET_MAX_M = 10
 --- Fraction of probes that must match expected FieldState for the mission to be considered finished.
 --- Now read from IASettings (default 0.9 = 90%); user-configurable in game settings.
 function IAFieldOutcomeMission.getProbeCompletionThreshold()
@@ -80,6 +102,11 @@ IAFieldOutcomeMission.SPRAY_TYPE_LOG_ORDER = {
 --- Set true for extra probe logs in addition to `IANeighbours.debug` (see `iaDbg`).
 IAFieldOutcomeMission.DEBUG_COMPLETION = false
 
+--- Delivery pool: when multiple missions share the same neighbour + fill type, deliveries
+-- are split proportionally based on each mission's harvested liters. Key = "neighbourId:fillTypeIndex".
+-- Value: { missions = {[uniqueId] = mission}, totalHarvested = number, lastKnownFill = number }
+IAFieldOutcomeMission._deliveryPools = IAFieldOutcomeMission._deliveryPools or {}
+
 local IAFieldOutcomeMission_mt = Class(IAFieldOutcomeMission, AbstractFieldMission)
 InitObjectClass(IAFieldOutcomeMission, "IAFieldOutcomeMission")
 
@@ -90,6 +117,10 @@ local PLAIN_JOB_LABEL_KEY = {
 	[IAFieldwork.JobType.HARVEST] = "ia_fieldwork_label_harvest",
 	[IAFieldwork.JobType.SPRAY] = "ia_fieldwork_label_spray",
 	[IAFieldwork.JobType.PLOW] = "ia_fieldwork_label_plow",
+	[IAFieldwork.JobType.LIME] = "ia_fieldwork_label_lime",
+	[IAFieldwork.JobType.STONE_PICKING] = "ia_fieldwork_label_stone_picking",
+	[IAFieldwork.JobType.GRASS_MOWING] = "ia_fieldwork_label_grass_mowing",
+	[IAFieldwork.JobType.HARVEST_DELIVER_CORN] = "ia_fieldwork_label_harvest_deliver_corn",
 }
 local PLAIN_JOB_EQUIP_KEY = {
 	[IAFieldwork.JobType.CULTIVATE] = "ia_fieldwork_equip_cultivate",
@@ -98,6 +129,10 @@ local PLAIN_JOB_EQUIP_KEY = {
 	[IAFieldwork.JobType.SPRAY] = "ia_fieldwork_equip_herbicide",
 	[IAFieldwork.JobType.SEED] = "ia_fieldwork_equip_seed",
 	[IAFieldwork.JobType.PLOW] = "ia_fieldwork_equip_plow",
+	[IAFieldwork.JobType.LIME] = "ia_fieldwork_equip_lime",
+	[IAFieldwork.JobType.STONE_PICKING] = "ia_fieldwork_equip_stone_picker",
+	[IAFieldwork.JobType.GRASS_MOWING] = "ia_fieldwork_equip_grass_mower",
+	[IAFieldwork.JobType.HARVEST_DELIVER_CORN] = "ia_fieldwork_equip_harvest_deliver_corn",
 }
 
 --------------------------------------------------------------------------------
@@ -377,6 +412,22 @@ function IAFieldOutcomeMission:iaJobDisplayLabel(raw, expectedFieldState)
 		if jt == IAFieldwork.JobType.FERTILIZEDSPREADING then
 			return g_i18n:getText("ia_fieldwork_label_fertilize_mineral")
 		end
+		if jt == IAFieldwork.JobType.LIME then
+			return g_i18n:getText("ia_fieldwork_label_lime")
+		end
+		if jt == IAFieldwork.JobType.STONE_PICKING then
+			return g_i18n:getText("ia_fieldwork_label_stone_picking")
+		end
+		if jt == IAFieldwork.JobType.GRASS_MOWING then
+			return g_i18n:getText("ia_fieldwork_label_grass_mowing_short")
+		end
+		if jt == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
+			local crop = IAFieldOutcomeMission.iaFruitTypeDisplayTitle(expectedFieldState ~= nil and expectedFieldState.fruitTypeIndex or nil)
+			if crop ~= nil and crop ~= "" then
+				return string.format(g_i18n:getText("ia_fieldwork_label_harvest_deliver_with_crop"), crop)
+			end
+			return g_i18n:getText("ia_fieldwork_label_harvest_deliver_corn")
+		end
 		if jt == IAFieldwork.JobType.HARROW then
 			IAprintDebug("iaJobDisplayLabel", "harrow: "..g_i18n:getText("ia_fieldwork_label_harrow"), nil, nil, nil)
 			return g_i18n:getText("ia_fieldwork_label_harrow")
@@ -418,6 +469,18 @@ function IAFieldOutcomeMission:iaEquipmentHint(raw, expectedFieldState)
 		if jt == IAFieldwork.JobType.FERTILIZEDSPREADING then
 			return g_i18n:getText("ia_fieldwork_equip_mineral_fertilizer")
 		end
+		if jt == IAFieldwork.JobType.LIME then
+			return g_i18n:getText("ia_fieldwork_equip_lime")
+		end
+		if jt == IAFieldwork.JobType.STONE_PICKING then
+			return g_i18n:getText("ia_fieldwork_equip_stone_picker")
+		end
+		if jt == IAFieldwork.JobType.GRASS_MOWING then
+			return g_i18n:getText("ia_fieldwork_equip_grass_mower")
+		end
+		if jt == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
+			return g_i18n:getText("ia_fieldwork_equip_harvest_deliver_corn")
+		end
 		if jt == IAFieldwork.JobType.HARROW then
 			return g_i18n:getText("ia_fieldwork_equip_harrow")
 		end
@@ -458,6 +521,20 @@ function IAFieldOutcomeMission:iaTargetSubtitle()
 	end
 	if jt == IAFieldwork.JobType.SPRAY then
 		return g_i18n:getText("ia_field_outcome_target_herbicide")
+	end
+	if jt == IAFieldwork.JobType.LIME then
+		local ll = exp ~= nil and exp.limeLevel or 0
+		local n = tonumber(ll) or ll
+		return string.format(g_i18n:getText("ia_field_outcome_target_lime"), n)
+	end
+	if jt == IAFieldwork.JobType.STONE_PICKING then
+		return g_i18n:getText("ia_field_outcome_target_stone_picking")
+	end
+	if jt == IAFieldwork.JobType.GRASS_MOWING then
+		return g_i18n:getText("ia_field_outcome_target_grass_mowing")
+	end
+	if jt == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
+		return g_i18n:getText("ia_field_outcome_target_harvest_deliver_corn")
 	end
 	if jt == IAFieldwork.JobType.SEED then
 		local crop = IAFieldOutcomeMission.iaFruitTypeDisplayTitle(exp.fruitTypeIndex)
@@ -746,6 +823,12 @@ function IAFieldOutcomeMission.queueRestoreFromOutboundXml(xmlFile, rootKey)
 		if situationId == nil or situationId == "" then
 			situationId = nil
 		end
+		local harvestedLiters = getXMLFloat(xmlFile, key .. "#harvestedLiters", 0)
+		local receivedLiters = getXMLFloat(xmlFile, key .. "#receivedLiters", 0)
+		local deliveryBaselineFill = nil
+		if hasXMLProperty(xmlFile, key .. "#deliveryBaselineFill") then
+			deliveryBaselineFill = getXMLFloat(xmlFile, key .. "#deliveryBaselineFill", 0)
+		end
 		local row = {
 			farmlandId = farmlandId,
 			farmId = getXMLInt(xmlFile, key .. "#farmId", 0),
@@ -758,6 +841,9 @@ function IAFieldOutcomeMission.queueRestoreFromOutboundXml(xmlFile, rootKey)
 			fieldworkJob = fj,
 			neighbourFirstName = nn,
 			expected = {},
+			harvestedLiters = harvestedLiters,
+			receivedLiters = receivedLiters,
+			deliveryBaselineFill = deliveryBaselineFill,
 		}
 		for _, attr in ipairs(IAFieldOutcomeMission.OUTCOME_KEY_ORDER) do
 			if hasXMLProperty(xmlFile, key .. "#" .. attr) then
@@ -803,6 +889,16 @@ function IAFieldOutcomeMission.appendOutboundFieldOutcomeMissionsXml(xmlFile)
 				end
 				if mission.iaFoSNeighbourFirstName ~= nil and tostring(mission.iaFoSNeighbourFirstName) ~= "" then
 					setXMLString(xmlFile, base .. "#neighbourFirstName", tostring(mission.iaFoSNeighbourFirstName))
+				end
+				-- Persist harvest tracking for delivery missions
+				if mission.iaFoSFieldHarvestedLiters ~= nil and mission.iaFoSFieldHarvestedLiters > 0 then
+					setXMLFloat(xmlFile, base .. "#harvestedLiters", mission.iaFoSFieldHarvestedLiters)
+				end
+				if mission.iaFoSReceivedLiters ~= nil and mission.iaFoSReceivedLiters > 0 then
+					setXMLFloat(xmlFile, base .. "#receivedLiters", mission.iaFoSReceivedLiters)
+				end
+				if mission.iaFoSDeliveryBaselineFill ~= nil then
+					setXMLFloat(xmlFile, base .. "#deliveryBaselineFill", mission.iaFoSDeliveryBaselineFill)
 				end
 				for _, attr in ipairs(IAFieldOutcomeMission.OUTCOME_KEY_ORDER) do
 					local v = mission.iaExpectedFieldState ~= nil and mission.iaExpectedFieldState[attr] or nil
@@ -892,6 +988,16 @@ function IAFieldOutcomeMission.tryApplyOutboundRestoreAfterLoad()
 					end
 					if row.situationId ~= nil and tostring(row.situationId) ~= "" then
 						mission.iaFoSSituationId = tostring(row.situationId)
+					end
+					-- Restore harvest tracking state for delivery missions
+					if row.harvestedLiters ~= nil and row.harvestedLiters > 0 then
+						mission.iaFoSFieldHarvestedLiters = row.harvestedLiters
+					end
+					if row.receivedLiters ~= nil and row.receivedLiters > 0 then
+						mission.iaFoSReceivedLiters = row.receivedLiters
+					end
+					if row.deliveryBaselineFill ~= nil then
+						mission.iaFoSDeliveryBaselineFill = row.deliveryBaselineFill
 					end
 					if row.usesBorrowedEquipment == true then
 						mission.iaFoSUsesBorrowedEquipment = true
@@ -991,7 +1097,7 @@ function IAFieldOutcomeMission.registerXMLPaths(schema, key)
 end
 
 function IAFieldOutcomeMission.registerSavegameXMLPaths(schema, key)
-	-- Same pattern as FS25_AdditionalContracts field missions: superClass first (AbstractFieldMission / cultivateMission paths in savegame_missions.xsd), then custom root attrs (#farmlandId + OUTCOME_KEY_ORDER).
+	-- superClass first (AbstractFieldMission / cultivateMission paths in savegame_missions.xsd), then custom root attrs (#farmlandId + OUTCOME_KEY_ORDER).
 	-- Parent may be defined as static (schema, key) or method (self, schema, key); try both like AdditionalContracts superClass chains.
 	local super = IAFieldOutcomeMission:superClass()
 	if super ~= nil and type(super.registerSavegameXMLPaths) == "function" then
@@ -1070,6 +1176,7 @@ function IAFieldOutcomeMission.resolveWorkerOnlyRewardPerHaFromJobRaw(rawJob, us
 			and (
 				jt == IAFieldwork.JobType.SEED
 				or jt == IAFieldwork.JobType.SPRAY
+				or jt == IAFieldwork.JobType.LIME
 				or (IAFieldwork.isFertilizeJobType ~= nil and IAFieldwork.isFertilizeJobType(jt))
 			)
 		then
@@ -1216,6 +1323,17 @@ function IAFieldOutcomeMission:iaRefreshProbeDebugPoints()
 		return
 	end
 	self.iaProbeDebugNodes = {}
+
+	-- Weed (spray) missions: annotate each probe with target -> actual weed state.
+	local isSpray = false
+	if IAFieldwork ~= nil and IAFieldwork.JobType ~= nil and type(IAFieldwork.normalizeFieldworkJobType) == "function" then
+		isSpray = IAFieldwork.normalizeFieldworkJobType(tostring(self.iaFoSFieldworkJob or "")) == IAFieldwork.JobType.SPRAY
+	end
+	local expWeed = self.iaExpectedFieldState ~= nil and self.iaExpectedFieldState.weedState or nil
+	if expWeed == nil and isSpray and IAFieldwork ~= nil and type(IAFieldwork.getExpectedPostHerbicideWeedState) == "function" then
+		expWeed = IAFieldwork.getExpectedPostHerbicideWeedState()
+	end
+
 	for _, p in ipairs(self.iaProbes or {}) do
 		local y = 0
 		if g_terrainNode ~= nil and getTerrainHeightAtWorldPos ~= nil then
@@ -1227,9 +1345,134 @@ function IAFieldOutcomeMission:iaRefreshProbeDebugPoints()
 		else
 			label = string.format("FoS outcome I/%d", p.idx)
 		end
+		if isSpray then
+			local actWeed = nil
+			local state = self:iaSampleFieldStateAt(p.x, p.z)
+			if state ~= nil then
+				actWeed = state.weedState
+			end
+			label = string.format(
+				"%s weed %s->%s",
+				label,
+				expWeed ~= nil and tostring(expWeed) or "?",
+				actWeed ~= nil and tostring(actWeed) or "?"
+			)
+		end
 		local node = IANeighbours:addDebugPointAtPosition(p.x, y, p.z, label, nil)
 		if node ~= nil and node ~= 0 then
 			table.insert(self.iaProbeDebugNodes, node)
+		end
+	end
+end
+
+function IAFieldOutcomeMission.isGrassFoliageDebugDrawEnabled()
+	return IANeighbours ~= nil and IANeighbours.debugGrassFoliageFill == true
+end
+
+--- Apply or clear grass foliage debug markers on every active GRASS_MOWING mission (console toggle).
+function IAFieldOutcomeMission.syncGrassFoliageDebugMarkersForAllActive()
+	if g_missionManager == nil or g_missionManager.missions == nil then return end
+	local enabled = IAFieldOutcomeMission.isGrassFoliageDebugDrawEnabled()
+	for _, mission in ipairs(g_missionManager.missions) do
+		if mission ~= nil and mission.iaFieldsOfStoriesMission == true and mission.getMissionTypeName ~= nil then
+			local okName, typeName = pcall(mission.getMissionTypeName, mission)
+			if okName and typeName == IAFieldOutcomeMission.NAME and mission.status ~= MissionStatus.FINISHED then
+				if enabled then
+					mission:iaRefreshGrassFoliageDebugPoints()
+				else
+					mission:iaClearGrassFoliageDebugPoints()
+				end
+			end
+		end
+	end
+end
+
+function IAFieldOutcomeMission:iaClearGrassFoliageDebugPoints()
+	if self.iaFoSFoliageDebugNodes == nil then return end
+	if IANeighbours ~= nil and IANeighbours.removeDebugPointNode ~= nil then
+		for _, entry in ipairs(self.iaFoSFoliageDebugNodes) do
+			if entry.node ~= nil then
+				IANeighbours:removeDebugPointNode(entry.node)
+			end
+		end
+	end
+	self.iaFoSFoliageDebugNodes = {}
+end
+
+function IAFieldOutcomeMission:iaRefreshGrassFoliageDebugPoints()
+	self:iaClearGrassFoliageDebugPoints()
+	if not IAFieldOutcomeMission.isGrassFoliageDebugDrawEnabled() then return end
+	if IAFieldwork == nil or not IAFieldwork.isDeliveryRequiredJobType(self.iaFoSFieldworkJob) then return end
+	if IAFieldwork.normalizeFieldworkJobType(tostring(self.iaFoSFieldworkJob or "")) ~= IAFieldwork.JobType.GRASS_MOWING then return end
+
+	local wfType = self.iaFoSGrassWindrowFillType
+	if wfType == nil then
+		if FillType ~= nil and FillType.GRASS_WINDROW ~= nil then
+			wfType = tonumber(FillType.GRASS_WINDROW)
+		end
+		if wfType == nil then return end
+		self.iaFoSGrassWindrowFillType = wfType
+	end
+
+	local field = self.field or self:iaResolveField()
+	if field == nil then return end
+
+	-- Get field polygon vertices for AABB
+	local vertices = nil
+	if field.densityMapPolygon ~= nil and type(field.densityMapPolygon.getVerticesList) == "function" then
+		vertices = field.densityMapPolygon:getVerticesList()
+	end
+	if vertices == nil or #vertices < 6 then return end
+
+	local minX, maxX, minZ, maxZ = math.huge, -math.huge, math.huge, -math.huge
+	for i = 1, #vertices, 2 do
+		local vx, vz = vertices[i], vertices[i + 1]
+		if vx ~= nil and vz ~= nil then
+			if vx < minX then minX = vx end
+			if vx > maxX then maxX = vx end
+			if vz < minZ then minZ = vz end
+			if vz > maxZ then maxZ = vz end
+		end
+	end
+	if minX == math.huge then return end
+
+	-- 0.5m grid across the field
+	local spacing = 0.5
+	local sampleHalf = spacing * 0.5
+	self.iaFoSFoliageDebugNodes = {}
+
+	local nx = math.floor((maxX - minX) / spacing) + 1
+	local nz = math.floor((maxZ - minZ) / spacing) + 1
+	local maxPoints = 5000  -- safety cap
+	local count = 0
+
+	for ix = 0, nx - 1 do
+		if count >= maxPoints then break end
+		for iz = 0, nz - 1 do
+			if count >= maxPoints then break end
+			local px = minX + (ix + 0.5) * spacing
+			local pz = minZ + (iz + 0.5) * spacing
+
+			-- Sample fill level in a tiny area at this grid point
+			local x1, z1 = px - sampleHalf, pz - sampleHalf
+			local x2, z2 = px + sampleHalf, pz - sampleHalf
+			local x3, z3 = px - sampleHalf, pz + sampleHalf
+			local ok, fillLevel = pcall(DensityMapHeightUtil.getFillLevelAtArea, wfType, x1, z1, x2, z2, x3, z3)
+			local fl = (ok and fillLevel ~= nil and fillLevel > 0) and fillLevel or 0
+
+			-- Only show points with foliage
+			if fl > 0.001 then
+				local y = 0
+				if g_terrainNode ~= nil and getTerrainHeightAtWorldPos ~= nil then
+					y = getTerrainHeightAtWorldPos(g_terrainNode, px, 0, pz) + 0.2
+				end
+				local label = string.format("%.1f", fl)
+				local node = IANeighbours:addDebugPointAtPosition(px, y, pz, label, nil)
+				if node ~= nil and node ~= 0 then
+					table.insert(self.iaFoSFoliageDebugNodes, { node = node, fillLevel = fl })
+				end
+				count = count + 1
+			end
 		end
 	end
 end
@@ -1268,38 +1511,37 @@ function IAFieldOutcomeMission:iaRebuildProbePositions(field)
 		return
 	end
 
-	local MAX = IAFieldOutcomeMission.MAX_PROBES
-	local minInterior = tonumber(IAFieldOutcomeMission.MIN_INTERIOR_PROBE_SLOTS)
-	if minInterior == nil or minInterior < 1 then
-		minInterior = 16
+	local ringInsets = {}
+	if type(IAHelper_getRingProbePoints) == "function" then
+		ringInsets = IAHelper_getRingProbePoints(field, IAFieldOutcomeMission.RING_INSET_M, IAFieldOutcomeMission.RING_SPACING_M)
 	end
-	local interiorReserve = math.min(IAFieldOutcomeMission.NUM_INTERIOR_RANDOM, minInterior, math.max(1, MAX - 1))
-	local borderCap = math.max(1, MAX - interiorReserve)
-	local borderInsets = {}
-	if type(IAHelper_getBorderInsetProbePoints) == "function" then
-		borderInsets = IAHelper_getBorderInsetProbePoints(field, IAFieldOutcomeMission.BORDER_INSET_MIN_M, IAFieldOutcomeMission.BORDER_INSET_MAX_M, borderCap)
-	end
-	if borderInsets == nil then
-		borderInsets = {}
+	if ringInsets == nil then
+		ringInsets = {}
 	end
 
-	local nInset = #borderInsets
-	local nRandomWanted = math.min(IAFieldOutcomeMission.NUM_INTERIOR_RANDOM, math.max(0, MAX - nInset))
-	local randomPts = {}
-	if nRandomWanted > 0 and type(IAHelper_getRandomPointsInField) == "function" then
-		randomPts = IAHelper_getRandomPointsInField(field, nRandomWanted, borderInsets)
+	local ringProbes = {}
+	for _, p in ipairs(ringInsets) do
+		if p.x ~= nil and p.z ~= nil then
+			ringProbes[#ringProbes + 1] = p
+		end
 	end
-	if randomPts == nil then
-		randomPts = {}
+
+	local gridPts = {}
+	if type(IAHelper_getGridProbePoints) == "function" then
+		local gridSpacing = nil -- nil lets the function compute from area and budget (unlimited)
+		gridPts = IAHelper_getGridProbePoints(field, gridSpacing, IAFieldOutcomeMission.GRID_MARGIN_M, ringProbes, nil)
+	end
+	if gridPts == nil then
+		gridPts = {}
 	end
 
 	local probes = {}
-	for i, p in ipairs(borderInsets) do
+	for i, p in ipairs(ringProbes) do
 		if p.x ~= nil and p.z ~= nil then
 			probes[#probes + 1] = { x = p.x, z = p.z, kind = "V", idx = i }
 		end
 	end
-	for i, p in ipairs(randomPts) do
+	for i, p in ipairs(gridPts) do
 		if p.x ~= nil and p.z ~= nil then
 			probes[#probes + 1] = { x = p.x, z = p.z, kind = "I", idx = i }
 		end
@@ -1316,7 +1558,13 @@ function IAFieldOutcomeMission:iaRebuildProbePositions(field)
 	end
 
 	self.iaProbes = probes
-	IAFieldOutcomeMission.iaLog(string.format("iaRebuildProbePositions: borderCap=%d nBorder=%d interiorWanted=%d nInterior=%d total=%d", borderCap, nInset, nRandomWanted, #randomPts, #probes))
+	-- Compute area-per-probe for grass foliage detection (Phase 1c)
+	if self.iaFoSFieldAreaHa ~= nil and #probes > 0 then
+		self.iaFoSAreaPerProbe = self.iaFoSFieldAreaHa / #probes
+	else
+		self.iaFoSAreaPerProbe = nil
+	end
+	IAFieldOutcomeMission.iaLog(string.format("iaRebuildProbePositions: nRing=%d nGrid=%d total=%d", #ringProbes, #gridPts, #probes))
 	self:iaSyncProbeEvaluation()
 	self:iaRefreshProbeDebugPoints()
 end
@@ -1431,6 +1679,579 @@ function IAFieldOutcomeMission:iaSyncProbeEvaluation()
 	end
 end
 
+--- Compute grass harvested liters from actual foliage (grass windrow) on the ground
+--- using a single DensityMapHeightUtil.getFillLevelAtArea call on the field's bounding box.
+--- No formula estimation — reads the real density map in one efficient call.
+function IAFieldOutcomeMission:iaUpdateGrassHarvestedLiters()
+	if not IAFieldwork.isDeliveryRequiredJobType(self.iaFoSFieldworkJob) then return end
+	if IAFieldwork.normalizeFieldworkJobType(tostring(self.iaFoSFieldworkJob or "")) ~= IAFieldwork.JobType.GRASS_MOWING then return end
+	local wfType = self.iaFoSGrassWindrowFillType
+	if wfType == nil then
+		if FillType ~= nil and FillType.GRASS_WINDROW ~= nil then
+			wfType = tonumber(FillType.GRASS_WINDROW)
+		end
+		if wfType == nil then return end
+		self.iaFoSGrassWindrowFillType = wfType
+	end
+
+	local field = self.field or self:iaResolveField()
+	if field == nil then return end
+
+	-- Get field polygon vertices to compute axis-aligned bounding box
+	local vertices = nil
+	if field.densityMapPolygon ~= nil and type(field.densityMapPolygon.getVerticesList) == "function" then
+		vertices = field.densityMapPolygon:getVerticesList()
+	end
+	if vertices == nil or #vertices < 6 then return end
+
+	-- Compute AABB (unpacked vertices: x,z,x,z,...)
+	local minX, maxX, minZ, maxZ = math.huge, -math.huge, math.huge, -math.huge
+	for i = 1, #vertices, 2 do
+		local vx, vz = vertices[i], vertices[i + 1]
+		if vx ~= nil and vz ~= nil then
+			if vx < minX then minX = vx end
+			if vx > maxX then maxX = vx end
+			if vz < minZ then minZ = vz end
+			if vz > maxZ then maxZ = vz end
+		end
+	end
+	if minX == math.huge then return end
+
+	-- Single call: sample windrow fill level in the field's axis-aligned bounding box
+	local x1, z1 = minX, minZ          -- origin
+	local x2, z2 = maxX, minZ          -- u-axis (width)
+	local x3, z3 = minX, maxZ          -- v-axis (height)
+	local ok, fillLevel, filledArea, totalArea = pcall(DensityMapHeightUtil.getFillLevelAtArea, wfType, x1, z1, x2, z2, x3, z3)
+
+	local ok, fillLevel, filledArea, totalArea = pcall(DensityMapHeightUtil.getFillLevelAtArea, wfType, x1, z1, x2, z2, x3, z3)
+
+	-- Dual-track total: received (delivered to silo) + currentWindrow (still on field).
+	-- Before any delivery, the raw windrow peak acts as the floor. After delivery starts,
+	-- received + currentWindrow is the accurate total — this handles simultaneous mow+collect
+	-- where the peak windrow was captured too late (grass already in wagon).
+	local currentWindrow = (ok and fillLevel ~= nil and fillLevel > 0) and fillLevel or 0
+	local rawPeak = currentWindrow
+	if rawPeak > (self.iaFoSFieldWindrowPeak or 0) then
+		self.iaFoSFieldWindrowPeak = rawPeak
+	end
+	local totalEstimate = (self.iaFoSReceivedLiters or 0) + currentWindrow
+	local floorEstimate = self.iaFoSFieldWindrowPeak or 0
+	if totalEstimate > (self.iaFoSFieldHarvestedLiters or floorEstimate) then
+		self.iaFoSFieldHarvestedLiters = totalEstimate
+	end
+	self.iaFoSFieldCurrentWindrow = currentWindrow
+
+	if IAFieldOutcomeMission.iaDbg() then
+		local fa = ok and filledArea or 0
+		local ta = ok and totalArea or 0
+		IAFieldOutcomeMission.iaLog(string.format(
+			"iaUpdateGrassHarvestedLiters: aabb=%.1f,%.1f→%.1f,%.1f currentWindrow=%.0f L peak=%.0f L filled=%.0f m² total=%.0f m²",
+			minX, minZ, maxX, maxZ, currentWindrow, self.iaFoSFieldHarvestedLiters or 0, fa, ta
+		))
+	end
+
+end
+
+--- Per-frame harvest tracking for delivery missions (HARVEST_DELIVER_CORN, GRASS_MOWING).
+--- For grain crops: polls combine grain tank fill level while on the mission field.
+--- For grass: polls forage wagon / loading wagon fill level while on the mission field.
+--- Accumulates positive deltas into iaFoSFieldHarvestedLiters.
+--- @param number dt delta time in seconds
+function IAFieldOutcomeMission:iaTrackHarvest(dt)
+	if g_currentMission == nil or g_currentMission.vehicleSystem == nil then return end
+	if self.iaFieldFarmlandId == nil or self.iaFieldFarmlandId <= 0 then return end
+	if g_farmlandManager == nil then return end
+
+	local vehicles = g_currentMission.vehicleSystem.vehicles
+	if vehicles == nil then return end
+
+	-- Find a player-owned combine/harvester on the mission field
+	local farmId = g_currentMission.getFarmId and g_currentMission:getFarmId() or self.farmId
+
+	for _, v in pairs(vehicles) do
+		if v ~= nil and not v.isDeleted and v.spec_combine ~= nil then
+			local vFarmId = v:getOwnerFarmId()
+			if vFarmId == farmId then
+				-- Get world position
+				local x, _, z
+				if v.rootNode ~= nil then
+					x, _, z = getWorldTranslation(v.rootNode)
+				elseif v.components ~= nil and v.components[1] ~= nil then
+					x, _, z = getWorldTranslation(v.components[1].node)
+				end
+
+				if x ~= nil then
+					-- Check if on the mission field
+					local farmland = g_farmlandManager:getFarmlandAtWorldPosition(x, z)
+					if farmland ~= nil then
+						local fId = farmland.getId and farmland:getId()
+						if fId == self.iaFieldFarmlandId then
+							-- Read grain tank fill level
+							local fillUnitIndex = v.spec_combine.fillUnitIndex or 1
+							local okFill, currentFill = pcall(v.getFillUnitFillLevel, v, fillUnitIndex)
+							if okFill then
+								-- Per-combine delta tracking (supports multiple combines on the same field)
+								self._iaCombineTrackers = self._iaCombineTrackers or {}
+								local uid = tostring(v.uniqueId)
+								local tracker = self._iaCombineTrackers[uid]
+								if tracker == nil then
+									tracker = { lastFill = currentFill }
+									self._iaCombineTrackers[uid] = tracker
+								end
+
+								if currentFill > tracker.lastFill then
+									local delta = currentFill - tracker.lastFill
+									self.iaFoSFieldHarvestedLiters = (self.iaFoSFieldHarvestedLiters or 0) + delta
+								end
+								tracker.lastFill = currentFill
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+end
+
+--- Resolve the farmer neighbour for this mission and return their first spawned placeable (silo).
+--- @return table|nil placeable game placeable object
+function IAFieldOutcomeMission:iaGetNeighbourSilo()
+	if self.iaFoSNeighbourId == nil then return nil end
+	if IANeighbours == nil or IANeighbours.neighbours == nil then return nil end
+	local nid = tonumber(self.iaFoSNeighbourId)
+	if nid == nil then return nil end
+	local neighbour = IANeighbours.neighbours[nid]
+	-- Fallback: linear scan only when the neighbour table key doesn't match the id
+	-- (e.g. after a savegame migration where neighbour indices shifted).
+	if neighbour == nil or tonumber(neighbour.id) ~= nid then
+		for _, n in pairs(IANeighbours.neighbours) do
+			if n ~= nil and tonumber(n.id) == nid then
+				neighbour = n
+				break
+			end
+		end
+	end
+	if neighbour ~= nil then
+		return neighbour:getFirstPlaceable()
+	end
+	return nil
+end
+
+--- Capture silo baseline fill level at mission start for delivery progress tracking.
+--- Also marks the silo as temporarily player-accessible (via IABorrowAccess) and registers
+--- this mission in the delivery pool for proportional multi-mission splitting.
+function IAFieldOutcomeMission:iaCaptureSiloBaseline()
+	local silo = self:iaGetNeighbourSilo()
+	local ftIdx = self:iaGetMissionFillTypeIndex()
+	if silo ~= nil then
+		self.iaFoSFieldHarvestFillTypeIndex = ftIdx
+		if ftIdx ~= nil then
+			self.iaFoSDeliveryBaselineFill = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, ftIdx, 1)
+		else
+			self.iaFoSDeliveryBaselineFill = IAPlaceableHelper.getPlaceableFillLevel(silo)
+		end
+		-- Grant temporary player access to the NPC silo for the duration of this mission
+		if silo.uniqueId ~= nil and IABorrowAccess ~= nil and IABorrowAccess.markMissionSilo ~= nil then
+			IABorrowAccess.markMissionSilo(silo.uniqueId)
+			self.iaFoSMarkedSiloId = silo.uniqueId
+		end
+	end
+	-- Reset harvest tracking for delivery missions (HARVEST_DELIVER_CORN, GRASS_MOWING)
+	self.iaFoSFieldHarvestedLiters = 0
+	-- Only reset received liters if not already set (preserved across reloads)
+	if self.iaFoSReceivedLiters == nil then
+		self.iaFoSReceivedLiters = 0
+	end
+	self._iaCombineTrackers = {}
+	-- Cache grass windrow fill type for actual foliage detection via DensityMapHeightUtil
+	if IAFieldwork ~= nil and type(IAFieldwork.getGrassWindrowFillTypeIndex) == "function" then
+		self.iaFoSGrassWindrowFillType = IAFieldwork.getGrassWindrowFillTypeIndex()
+	else
+		self.iaFoSGrassWindrowFillType = nil
+	end
+	-- Cache field area for per-probe area scaling
+	local field = self.field or self:iaResolveField()
+	if field ~= nil and type(field.getAreaHa) == "function" then
+		self.iaFoSFieldAreaHa = field:getAreaHa()
+	else
+		self.iaFoSFieldAreaHa = nil
+	end
+	self.iaFoSAreaPerProbe = nil  -- computed after probes are built in iaRebuildProbePositions
+	-- For GRASS_MOWING, the silo stores grass as the windrow fill type (e.g. 28), not the fruit fill
+	-- type (e.g. 26). Override ftIdx and re-capture the baseline so the delivery pool reads the
+	-- correct fill level from the silo.
+	local jt = IAFieldwork.normalizeFieldworkJobType(tostring(self.iaFoSFieldworkJob or ""))
+	if jt == IAFieldwork.JobType.GRASS_MOWING and self.iaFoSGrassWindrowFillType ~= nil then
+		ftIdx = self.iaFoSGrassWindrowFillType
+		self.iaFoSFieldHarvestFillTypeIndex = ftIdx
+		if silo ~= nil then
+			self.iaFoSDeliveryBaselineFill = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, ftIdx, 1)
+		end
+	end
+	-- For consumable job types (LIME, FERTILIZER, SLURRY, SPRAY, SEED, MANURE): fill the NPC's
+	-- silo with the required consumable so the player can refill their implement from it.
+	IAprintDebug("iaCaptureSiloBaseline", string.format("jt=%s silo=%s", tostring(jt), tostring(silo ~= nil)))
+	local consumableFt = nil
+	if IAFieldOutcomeMission.CONSUMABLE_JOB_FILL_TYPES[jt] ~= nil or jt == "seed" then
+		consumableFt = IAFieldOutcomeMission.getConsumableFillTypeForJob(jt, self)
+	end
+	IAprintDebug("iaCaptureSiloBaseline", string.format("consumableFt=%s", tostring(consumableFt)))
+	if consumableFt ~= nil and silo ~= nil then
+		self:iaRefillSiloConsumable(silo, consumableFt)
+	end
+	-- Red circle map marker at the delivery/refill silo (only for delivery-required or consumable jobs)
+	if silo ~= nil and (IAFieldwork.isDeliveryRequiredJobType(jt) or consumableFt ~= nil) then
+		if IATargetMapHotspot ~= nil and IATargetMapHotspot.new ~= nil then
+			local sx, _, sz = getWorldTranslation(silo.rootNode or silo.components[1].node)
+			if sx ~= nil and sz ~= nil then
+				local hotspot = IATargetMapHotspot.new(sx, sz, 20, IATargetMapHotspot.DEFAULT_OVERLAY_ID,{0, 0.516, 0.016, 1})
+				if hotspot ~= nil and g_currentMission ~= nil and g_currentMission.addMapHotspot ~= nil then
+					g_currentMission:addMapHotspot(hotspot)
+					self.iaFoSiloDeliveryHotspot = hotspot
+				end
+			end
+		end
+	end
+	-- Register in the multi-mission delivery pool (proportional splitting)
+	if ftIdx ~= nil then
+		IAFieldOutcomeMission._registerInDeliveryPool(self, self.iaFoSNeighbourId, ftIdx)
+	end
+end
+
+--- Resolve the engine FillType index for a consumable job type.
+--- For SEED jobs the fill type depends on the field's fruit; other job types use CONSUMABLE_JOB_FILL_TYPES.
+--- @param jt string|nil job type key
+--- @param mission table|nil mission instance (needed for SEED to resolve field fruit)
+--- @return number|nil fillTypeIndex
+function IAFieldOutcomeMission.getConsumableFillTypeForJob(jt, mission)
+	if jt == nil then
+		IAprintDebug("getConsumableFillTypeForJob", "FAIL: jt nil")
+		return nil
+	end
+
+	local tbl = IAFieldOutcomeMission.CONSUMABLE_JOB_FILL_TYPES
+	if tbl == nil then
+		IAprintDebug("getConsumableFillTypeForJob", "FAIL: CONSUMABLE_JOB_FILL_TYPES table nil")
+		return nil
+	end
+
+	local ftName = tbl[jt]
+
+	if ftName == nil then
+		IAprintDebug("getConsumableFillTypeForJob", string.format("FAIL: no mapping for jt=%s", tostring(jt)))
+		return nil
+	end
+
+	if FillType == nil then
+		IAprintDebug("getConsumableFillTypeForJob", "FAIL: FillType global nil")
+		return nil
+	end
+
+	local raw = FillType[ftName]
+	if raw == nil then
+		IAprintDebug("getConsumableFillTypeForJob", string.format("FAIL: FillType[%s] nil", ftName))
+		return nil
+	end
+
+	local result = tonumber(raw)
+	return result
+end
+
+--- Refill the NPC silo with a consumable fill type to the target level if it has dropped below threshold.
+--- Called once at mission start (from iaCaptureSiloBaseline), periodically from update(), and on borrow.
+--- @param silo table placeable with spec_silo (unloadingStation + storages)
+--- @param fillTypeIndex number|nil engine FillType index (e.g. FillType.LIME → 149)
+function IAFieldOutcomeMission:iaRefillSiloConsumable(silo, fillTypeIndex)
+	if silo == nil or silo.spec_silo == nil or fillTypeIndex == nil then
+		IAprintDebug("iaRefillSiloConsumable", string.format("SKIP silo=%s spec_silo=%s ftIdx=%s",
+			tostring(silo ~= nil), tostring(silo ~= nil and silo.spec_silo ~= nil), tostring(fillTypeIndex)))
+		return
+	end
+	local farmId = silo.ownerFarmId or AccessHandler.EVERYONE
+	local targetFill = IAFieldOutcomeMission.CONSUMABLE_SILO_TARGET_FILL
+	local threshold = IAFieldOutcomeMission.CONSUMABLE_SILO_REFILL_THRESHOLD
+
+	-- Check current level; skip refill if already above threshold.
+	local currentLevel = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, fillTypeIndex, 1)
+	if currentLevel >= threshold then
+		return
+	end
+
+	-- Approach 1: unloadingStation.addFillLevel (native tip-to-trigger path)
+	local us = silo.spec_silo.unloadingStation
+	if us ~= nil and type(us.addFillLevel) == "function" then
+		local amount = targetFill - currentLevel
+		local ok, err = pcall(us.addFillLevel, us, fillTypeIndex, amount, farmId)
+		IAprintDebug("iaRefillSiloConsumable", string.format("addFillLevel(ft=%d amt=%d farmId=%d) ok=%s err=%s",
+			fillTypeIndex, amount, farmId, tostring(ok), tostring(err or "nil")))
+		-- Re-check after native call
+		local after = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, fillTypeIndex, 1)
+		if after >= threshold then
+			return
+		end
+	end
+
+	-- Approach 2: Storage.setFillLevel(fillLevel, fillType) – fillLevel FIRST (base game Storage.lua:420).
+	local storages = silo.spec_silo.storages
+	if storages == nil then return end
+	for _, storage in ipairs(storages) do
+		if storage ~= nil and storage.fillLevels ~= nil and storage.fillTypes ~= nil then
+			if storage.fillLevels[fillTypeIndex] == nil then
+				storage.fillLevels[fillTypeIndex] = 0
+			end
+			if next(storage.fillTypes) ~= nil then
+				storage.fillTypes[fillTypeIndex] = true
+			end
+			local free = storage:getFreeCapacity(fillTypeIndex)
+			local current = storage.fillLevels[fillTypeIndex] or 0
+			if free > 0 and current < targetFill then
+				local newLevel = current + math.min(targetFill - current, free)
+				storage:setFillLevel(newLevel, fillTypeIndex)
+				IAprintDebug("iaRefillSiloConsumable", string.format("storage:setFillLevel(%d, %d) current=%d free=%d -> new=%s",
+					newLevel, fillTypeIndex, current, free, tostring(storage:getFillLevel(fillTypeIndex))))
+			end
+		end
+	end
+end
+
+--- Resolve the fill type index for this mission's field crop (fruitTypeIndex → fillTypeIndex).
+--- @return number|nil fillTypeIndex
+function IAFieldOutcomeMission:iaGetMissionFillTypeIndex()
+	if self.iaExpectedFieldState == nil then return nil end
+	local fti = self.iaExpectedFieldState.fruitTypeIndex
+	if fti == nil then return nil end
+	if g_fruitTypeManager ~= nil and type(g_fruitTypeManager.getFillTypeIndexByFruitTypeIndex) == "function" then
+		local ok, fillIdx = pcall(g_fruitTypeManager.getFillTypeIndexByFruitTypeIndex, g_fruitTypeManager, fti)
+		if ok and fillIdx ~= nil then
+			return fillIdx
+		end
+	end
+	return nil
+end
+
+--- Get the delivered amount for the mission's specific fill type from the NPC silo.
+--- Returns 0 if no silo or no fill type.
+--- @return number delivered liters, number|nil fillTypeIndex
+function IAFieldOutcomeMission:iaGetDeliveredFillForMission()
+	local ftIdx = self.iaFoSFieldHarvestFillTypeIndex or self:iaGetMissionFillTypeIndex()
+	if ftIdx == nil then return 0, nil end
+	local silo = self:iaGetNeighbourSilo()
+	if silo == nil then return 0, ftIdx end
+	local currentFill = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, ftIdx, 1)
+	local baseline = self.iaFoSDeliveryBaselineFill or 0
+	return math.max(0, currentFill - baseline), ftIdx
+end
+
+--------------------------------------------------------------------------------
+-- Multi-mission delivery pool (proportional splitting by harvested liters)
+--------------------------------------------------------------------------------
+
+--- Build pool key from neighbourId and fillTypeIndex.
+local function _iaDeliveryPoolKey(neighbourId, fillTypeIndex)
+	return tostring(neighbourId or 0) .. ":" .. tostring(fillTypeIndex or 0)
+end
+
+--- Register a mission in its delivery pool. Recalculates totalHarvested, captures lastKnownFill.
+function IAFieldOutcomeMission._registerInDeliveryPool(mission, neighbourId, fillTypeIndex)
+	if mission == nil or neighbourId == nil or fillTypeIndex == nil then return end
+	local pools = IAFieldOutcomeMission._deliveryPools
+	local key = _iaDeliveryPoolKey(neighbourId, fillTypeIndex)
+	local pool = pools[key]
+	if pool == nil then
+		pool = { missions = {}, totalHarvested = 0, lastKnownFill = 0 }
+		pools[key] = pool
+	end
+	local uid = tostring(mission.uniqueId or mission.iaFieldFarmlandId or "")
+	pool.missions[uid] = mission
+	-- Recalculate total harvested from all pool members
+	local total = 0
+	for _, m in pairs(pool.missions) do
+		total = total + (m.iaFoSFieldHarvestedLiters or 0)
+	end
+	pool.totalHarvested = total
+	-- Capture current silo fill as reference for delta tracking
+	local silo = mission:iaGetNeighbourSilo()
+	if silo ~= nil then
+		pool.lastKnownFill = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, fillTypeIndex, 1)
+	end
+end
+
+--- Remove a mission from its delivery pool. Cleans up empty pools.
+function IAFieldOutcomeMission._unregisterFromDeliveryPool(mission, neighbourId, fillTypeIndex)
+	if mission == nil or neighbourId == nil or fillTypeIndex == nil then return end
+	local pools = IAFieldOutcomeMission._deliveryPools
+	local key = _iaDeliveryPoolKey(neighbourId, fillTypeIndex)
+	local pool = pools[key]
+	if pool == nil then return end
+	local uid = tostring(mission.uniqueId or mission.iaFieldFarmlandId or "")
+	pool.missions[uid] = nil
+	-- Recalculate or remove empty pool
+	local total = 0
+	local hasAny = false
+	for _, m in pairs(pool.missions) do
+		total = total + (m.iaFoSFieldHarvestedLiters or 0)
+		hasAny = true
+	end
+	if hasAny then
+		pool.totalHarvested = total
+	else
+		pools[key] = nil
+	end
+end
+
+--- Distribute a delivery delta proportionally across all missions in a pool.
+-- @param neighbourId number
+-- @param fillTypeIndex number
+-- @param delta number positive liters delivered since last check
+function IAFieldOutcomeMission._distributeDeliveryDelta(neighbourId, fillTypeIndex, delta)
+	if delta == nil or delta <= 0 then return end
+	local pools = IAFieldOutcomeMission._deliveryPools
+	local key = _iaDeliveryPoolKey(neighbourId, fillTypeIndex)
+	local pool = pools[key]
+	if pool == nil or pool.totalHarvested <= 0 then return end
+	for _, m in pairs(pool.missions) do
+		local share = m.iaFoSFieldHarvestedLiters or 0
+		if share > 0 then
+			local fraction = share / pool.totalHarvested
+			local credit = delta * fraction
+			m.iaFoSReceivedLiters = (m.iaFoSReceivedLiters or 0) + credit
+		end
+	end
+end
+
+--- Per-frame: check for delivery deltas on all active pools and distribute.
+function IAFieldOutcomeMission._updateDeliveryPools()
+	local pools = IAFieldOutcomeMission._deliveryPools
+	for key, pool in pairs(pools) do
+		if pool.missions == nil or next(pool.missions) == nil then
+			pools[key] = nil
+		else
+			-- Recalculate totalHarvested dynamically (harvested liters grow per-frame;
+			-- on reload, outbound restore overwrites after pool registration).
+			-- Prune finished missions so they don't steal proportional delivery credit.
+			local total = 0
+			for uid, m in pairs(pool.missions) do
+				if m ~= nil and m.status ~= MissionStatus.FINISHED then
+					total = total + (m.iaFoSFieldHarvestedLiters or 0)
+				else
+					pool.missions[uid] = nil
+				end
+			end
+			if next(pool.missions) == nil then
+				pools[key] = nil
+			else
+				pool.totalHarvested = total
+
+				if total <= 0 then
+					-- Nothing harvested yet — do NOT update lastKnownFill here.
+					-- lastKnownFill was set at registration and must stay at the baseline
+					-- so that when harvesting starts, any prior delivery delta is still visible.
+				else
+					-- Find any mission in the pool to read the silo
+					local anyMission = nil
+					for _, m in pairs(pool.missions) do anyMission = m; break end
+					
+					if anyMission ~= nil then
+						local silo = anyMission:iaGetNeighbourSilo()
+						if silo ~= nil then
+							local sep = string.find(key, ":", 1, true)
+							local ftIdx = sep and tonumber(string.sub(key, sep + 1)) or nil
+							local poolKeyFtIdx = ftIdx  -- preserved for _distributeDeliveryDelta key lookup
+							-- For GRASS_MOWING, the silo stores grass as the windrow fill type, not the
+							-- fruit fill type. Correct ftIdx for both new and existing savegame missions.
+							local jt = IAFieldwork.normalizeFieldworkJobType(tostring(anyMission.iaFoSFieldworkJob or ""))
+							if jt == IAFieldwork.JobType.GRASS_MOWING and anyMission.iaFoSGrassWindrowFillType ~= nil then
+								if ftIdx ~= anyMission.iaFoSGrassWindrowFillType then
+									if not pool._iaWindrowMigrated then
+										pool._iaWindrowMigrated = true
+										-- Pool was registered with wrong fill type; capture correct baseline once
+										pool.lastKnownFill = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, anyMission.iaFoSGrassWindrowFillType, 1)
+									end
+								end
+								ftIdx = anyMission.iaFoSGrassWindrowFillType
+							end
+							if ftIdx ~= nil then
+								local currentFill = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, ftIdx, 1)
+								local prev = pool.lastKnownFill or currentFill
+								if currentFill > prev then
+									local delta = currentFill - prev
+									IAFieldOutcomeMission._distributeDeliveryDelta(anyMission.iaFoSNeighbourId, poolKeyFtIdx, delta)
+								end
+								pool.lastKnownFill = currentFill
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+--- Debug: get totalHarvested for a pool by neighbourId + fillTypeIndex.
+--- @return number|nil totalHarvested, or nil if pool doesn't exist
+function IAFieldOutcomeMission._getPoolTotal(neighbourId, fillTypeIndex)
+	if neighbourId == nil or fillTypeIndex == nil then return nil end
+	local pools = IAFieldOutcomeMission._deliveryPools
+	local key = _iaDeliveryPoolKey(neighbourId, fillTypeIndex)
+	local pool = pools[key]
+	if pool == nil then return nil end
+	return pool.totalHarvested
+end
+
+--- Remove temporary silo access when the mission ends, and unregister from delivery pool.
+function IAFieldOutcomeMission:iaUnmarkMissionSilo()
+	if self.iaFoSMarkedSiloId ~= nil and IABorrowAccess ~= nil and IABorrowAccess.unmarkMissionSilo ~= nil then
+		IABorrowAccess.unmarkMissionSilo(self.iaFoSMarkedSiloId)
+		self.iaFoSMarkedSiloId = nil
+	end
+	-- Remove red circle map marker from the delivery silo
+	if self.iaFoSiloDeliveryHotspot ~= nil then
+		if g_currentMission ~= nil and g_currentMission.removeMapHotspot ~= nil then
+			g_currentMission:removeMapHotspot(self.iaFoSiloDeliveryHotspot)
+		end
+		if self.iaFoSiloDeliveryHotspot.delete ~= nil then
+			pcall(function() self.iaFoSiloDeliveryHotspot:delete() end)
+		end
+		self.iaFoSiloDeliveryHotspot = nil
+	end
+	-- Unregister from multi-mission delivery pool
+	local ftIdx = self.iaFoSFieldHarvestFillTypeIndex or self:iaGetMissionFillTypeIndex()
+	if ftIdx ~= nil then
+		IAFieldOutcomeMission._unregisterFromDeliveryPool(self, self.iaFoSNeighbourId, ftIdx)
+	end
+end
+
+--- For HARVEST / HARVEST_DELIVER_CORN / GRASS_MOWING: compares delivered amount vs 99% of harvested via delivery pool.
+--- GRASS_MOWING uses 90% threshold with a 7,500 L tolerance for partial bales stuck in the baler.
+--- @return boolean true if delivery is complete or not required
+function IAFieldOutcomeMission:iaIsDeliveryComplete()
+    if not IAFieldwork.isDeliveryRequiredJobType(self.iaFoSFieldworkJob) then
+        return true  -- not a delivery mission
+    end
+    local jt = IAFieldwork.normalizeFieldworkJobType(tostring(self.iaFoSFieldworkJob or ""))
+
+    -- HARVEST, HARVEST_DELIVER_CORN, GRASS_MOWING: proportional delivery check
+    if jt == IAFieldwork.JobType.HARVEST or jt == IAFieldwork.JobType.HARVEST_DELIVER_CORN or jt == IAFieldwork.JobType.GRASS_MOWING then
+        local harvested = self.iaFoSFieldHarvestedLiters or 0
+        if harvested <= 0 then return false end
+        local received = self.iaFoSReceivedLiters or 0
+        if jt == IAFieldwork.JobType.GRASS_MOWING then
+            -- Grass bales are 6,000–7,500 L; partial bales can't be unloaded from the baler.
+            -- Allow 90% delivery OR within 7,500 L of harvested (one partial bale tolerance).
+            return received >= harvested * 0.90 or (harvested - received) <= 7500
+        end
+        return received >= harvested * 0.99
+    end
+
+	-- Unknown delivery type: fall back to any-delivery check
+	local silo = self:iaGetNeighbourSilo()
+	if silo == nil then return true end
+	local currentFill = IAPlaceableHelper.getPlaceableFillLevel(silo)
+	local baseline = self.iaFoSDeliveryBaselineFill or 0
+	return (currentFill > baseline)
+end
+
 function IAFieldOutcomeMission:iaExpectedOutcomeSatisfiedBy(probe)
 	return IAFieldOutcomeMissionProbeEvaluator.probeSatisfiesExpected(self.iaExpectedFieldState, self.iaFoSFieldworkJob, probe)
 end
@@ -1439,7 +2260,10 @@ function IAFieldOutcomeMission:getIsFinished()
 	if self.iaFoSBorrowReturnPending == true then
 		return false
 	end
-	return self.iaProbeEvalAllFinished == true
+	if self.iaProbeEvalAllFinished ~= true then
+		return false
+	end
+	return self:iaIsDeliveryComplete()
 end
 
 function IAFieldOutcomeMission:getFieldCompletion()
@@ -1448,6 +2272,10 @@ function IAFieldOutcomeMission:getFieldCompletion()
 	local comp = math.max(0, math.min(1, m / t))
 	if self.iaProbeEvalAllFinished == true then
 		if self.iaFoSBorrowReturnPending == true then
+			return 0.99
+		end
+		-- Fieldwork done but delivery still pending → stay at 99% (same pattern as borrow-return)
+		if not self:iaIsDeliveryComplete() then
 			return 0.99
 		end
 		return 1.0
@@ -1459,6 +2287,81 @@ function IAFieldOutcomeMission:getCompletion()
 	return self:getFieldCompletion()
 end
 
+--- Append per-task rows (Fieldwork -> Delivery -> Return equipment) to the vanilla contract details list.
+function IAFieldOutcomeMission:getDetails()
+	local details = IAFieldOutcomeMission:superClass().getDetails(self)
+	if g_i18n == nil then
+		return details
+	end
+	local doneText = g_i18n:getText("ia_field_outcome_task_done")
+	local openText = g_i18n:getText("ia_field_outcome_task_open")
+	if doneText == nil or openText == nil then
+		return details
+	end
+	local jt = nil
+	local jobTypes = nil
+	if IAFieldwork ~= nil and IAFieldwork.JobType ~= nil and type(IAFieldwork.normalizeFieldworkJobType) == "function" then
+		jobTypes = IAFieldwork.JobType
+		jt = IAFieldwork.normalizeFieldworkJobType(tostring(self.iaFoSFieldworkJob or ""))
+	end
+
+	-- Fieldwork (always shown)
+	local fieldLabel
+	if jobTypes ~= nil and jt == jobTypes.HARVEST_DELIVER_CORN then
+		fieldLabel = g_i18n:getText("ia_fieldwork_label_harvest_corn")
+		if fieldLabel == nil or fieldLabel == "" then
+			fieldLabel = self:iaJobDisplayLabel(self.iaFoSFieldworkJob, self.iaExpectedFieldState)
+		end
+	else
+		fieldLabel = self:iaJobDisplayLabel(self.iaFoSFieldworkJob, self.iaExpectedFieldState)
+	end
+	if fieldLabel == nil or fieldLabel == "" then
+		fieldLabel = g_i18n:getText("ia_fieldwork_label_condition")
+	end
+	table.insert(details, {
+		title = string.format(g_i18n:getText("ia_field_outcome_task_fieldwork"), fieldLabel),
+		value = (self.iaProbeEvalAllFinished == true) and doneText or openText,
+	})
+
+	-- Delivery (only jobs that require delivering the harvest/grass)
+	if IAFieldwork ~= nil and type(IAFieldwork.isDeliveryRequiredJobType) == "function" and IAFieldwork.isDeliveryRequiredJobType(jt) then
+		local deliveryValue
+		if self:iaIsDeliveryComplete() then
+			deliveryValue = doneText
+		else
+			local harvested = self.iaFoSFieldHarvestedLiters or 0
+			if harvested > 0 then
+				local received = self.iaFoSReceivedLiters or 0
+				deliveryValue = string.format(g_i18n:getText("ia_field_outcome_task_delivery_progress"), g_i18n:formatVolume(received, 0), g_i18n:formatVolume(harvested, 0))
+			else
+				deliveryValue = g_i18n:getText("ia_field_outcome_task_delivery_not_started")
+			end
+		end
+		table.insert(details, {
+			title = g_i18n:getText("ia_field_outcome_task_delivery"),
+			value = deliveryValue,
+		})
+	end
+
+	-- Return borrowed equipment (only when the mission uses borrowed equipment)
+	if self.iaFoSUsesBorrowedEquipment == true then
+		local returnValue
+		if self.iaFoSBorrowReturnSatisfied == true then
+			returnValue = doneText
+		elseif self.iaProbeEvalAllFinished == true then
+			returnValue = openText
+		else
+			returnValue = g_i18n:getText("ia_field_outcome_task_return_after_fieldwork")
+		end
+		table.insert(details, {
+			title = g_i18n:getText("ia_field_outcome_task_return"),
+			value = returnValue,
+		})
+	end
+
+	return details
+end
+
 --- GDN vanilla: getIsRunning() and (workAreaType == nil or workAreaTypes[workAreaType]).
 function IAFieldOutcomeMission:getIsWorkAllowed(farmId, x, z, workAreaType, vehicle)
 	local active = false
@@ -1466,6 +2369,11 @@ function IAFieldOutcomeMission:getIsWorkAllowed(farmId, x, z, workAreaType, vehi
 		active = true
 	end
 	if self:getIsFinished() then
+		active = true
+	end
+	-- Mission is FINISHED (paid out) but delivery threshold not yet met —
+	-- player can keep working the remaining field (e.g. harvest leftover crop).
+	if self.status == MissionStatus.FINISHED then
 		active = true
 	end
 
@@ -1505,6 +2413,24 @@ function IAFieldOutcomeMission:iaApplyWorkAreaTypesForFoSJob()
 			IAFieldOutcomeMission.iaEnableWorkAreaTypesByEnumNames(out, { "SPREADER", "SPRAYER", "DEFAULT" })
 		elseif jt == IAFieldwork.JobType.FERTILIZEDSPREADING then
 			IAFieldOutcomeMission.iaEnableWorkAreaTypesByEnumNames(out, { "SPREADER", "SPRAYER", "FERTILIZER" })
+		elseif jt == IAFieldwork.JobType.LIME then
+			IAFieldOutcomeMission.iaEnableWorkAreaTypesByEnumNames(out, { "SPREADER", "SPRAYER" })
+		elseif jt == IAFieldwork.JobType.STONE_PICKING then
+			IAFieldOutcomeMission.iaEnableWorkAreaTypesByEnumNames(out, { "STONEPICKER", "STONE_PICKER", "DEFAULT" })
+		elseif jt == IAFieldwork.JobType.GRASS_MOWING then
+			-- Mowing + collection: allow mower, windrower, baler, and loading/forage wagon.
+			IAFieldOutcomeMission.iaEnableWorkAreaTypesByEnumNames(out, {
+				"MOWER",
+				"CUTTER",
+				"BALER",
+				"WINDROWER",
+				"FORAGEWAGON",
+				"LOADINGWAGON",
+				"PICKUP",
+				"DEFAULT",
+			})
+		elseif jt == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
+			IAFieldOutcomeMission.iaEnableWorkAreaTypesByEnumNames(out, { "HARVESTER", "COMBINE", "CUTTER" })
 		elseif jt == IAFieldwork.JobType.SPRAY then
 			IAFieldOutcomeMission.iaEnableWorkAreaTypesByEnumNames(out, { "SPRAYER", "WEEDER" })
 		elseif jt == IAFieldwork.JobType.SEED then
@@ -1612,6 +2538,8 @@ function IAFieldOutcomeMission:initFromField(field, expectedOutcome, context)
 	if ok then
 		self:iaRebuildProbePositions(field)
 		self:iaApplyDynamicMissionPresentation(field, context)
+		-- Capture silo baseline fill level for delivery/consumable missions
+		self:iaCaptureSiloBaseline()
 	end
 	if IAFieldOutcomeMission.iaDbg() then
 		local fid = self.iaFieldFarmlandId
@@ -1657,12 +2585,47 @@ function IAFieldOutcomeMission:update(dt)
 	if self.status ~= MissionStatus.RUNNING then
 		return
 	end
+	-- Per-frame harvest tracking for delivery missions (before the probe interval check).
+	-- GRASS_MOWING uses its own 1-second windrow density-map sampler; other crops track combine fill levels.
+	local jt = IAFieldwork.normalizeFieldworkJobType(tostring(self.iaFoSFieldworkJob or ""))
+	if IAFieldwork.isDeliveryRequiredJobType(jt) and jt ~= IAFieldwork.JobType.GRASS_MOWING then
+		self:iaTrackHarvest(dt)
+	end
+	-- GRASS_MOWING: independent 1-second windrow density-map sampling (not tied to 15s probe cycle)
+	if jt == IAFieldwork.JobType.GRASS_MOWING then
+		self.iaGrassWindrowCheckAccumMs = (self.iaGrassWindrowCheckAccumMs or 0) + (dt or 0)
+		if self.iaGrassWindrowCheckAccumMs >= IAFieldOutcomeMission.GRASS_WINDROW_CHECK_INTERVAL_MS then
+			self.iaGrassWindrowCheckAccumMs = 0
+			self:iaUpdateGrassHarvestedLiters()
+		end
+	end
+	-- Consumable silo refill: periodically top up the NPC silo for job types that need
+	-- refillable consumables (LIME, FERTILIZER, SLURRY, SPRAY, SEED, MANURE).
+	local consumableFt = nil
+	if IAFieldOutcomeMission.CONSUMABLE_JOB_FILL_TYPES[jt] ~= nil or jt == "seed" then
+		consumableFt = IAFieldOutcomeMission.getConsumableFillTypeForJob(jt, self)
+	end
+	if consumableFt ~= nil then
+		self.iaConsumableRefillAccumMs = (self.iaConsumableRefillAccumMs or 0) + (dt or 0)
+		if self.iaConsumableRefillAccumMs >= IAFieldOutcomeMission.CONSUMABLE_SILO_REFILL_INTERVAL_MS then
+			self.iaConsumableRefillAccumMs = 0
+			local silo = self:iaGetNeighbourSilo()
+			if silo ~= nil then
+				self:iaRefillSiloConsumable(silo, consumableFt)
+			end
+		end
+	end
+	-- Per-frame delivery pool distribution (proportional splitting across same-fillType missions)
+	IAFieldOutcomeMission._updateDeliveryPools()
 	self.iaOutcomeCheckAccumMs = (self.iaOutcomeCheckAccumMs or 0) + (dt or 0)
 	if self.iaOutcomeCheckAccumMs < IAFieldOutcomeMission.PROBE_CHECK_INTERVAL_MS then
 		return
 	end
 	self.iaOutcomeCheckAccumMs = 0
 	self:iaSyncProbeEvaluation()
+	if IAFieldOutcomeMission.isProbeDebugDrawEnabled() then
+		self:iaRefreshProbeDebugPoints()
+	end
 	if self.isServer and self:getIsFinished() then
 		if self.iaFoSUsesBorrowedEquipment == true then
 			return
@@ -1838,6 +2801,23 @@ function IAFieldOutcomeMission:finish(success)
 		end
 		self:iaApplyMissionEndToNeighbourSchedule(success)
 	end
+	-- Snapshot silo fill at finish for post-finish bonus check
+	if success == MissionFinishState.SUCCESS then
+		local silo = self:iaGetNeighbourSilo()
+		local ftIdx = self:iaGetMissionFillTypeIndex()
+		if silo ~= nil and ftIdx ~= nil then
+			self.iaFoSSiloFillAtFinish = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, ftIdx, 1)
+			IAFieldOutcomeMission.iaLog(string.format(
+				"finish() bonus snapshot: neighbourId=%s fillTypeIdx=%s siloFill=%.0f farmlandId=%s",
+				tostring(self.iaFoSNeighbourId), tostring(ftIdx), self.iaFoSSiloFillAtFinish, tostring(self.iaFieldFarmlandId)
+			))
+		else
+			IAFieldOutcomeMission.iaLog(string.format(
+				"finish() bonus snapshot SKIPPED: neighbourId=%s silo=%s ftIdx=%s farmlandId=%s",
+				tostring(self.iaFoSNeighbourId), tostring(silo ~= nil), tostring(ftIdx), tostring(self.iaFieldFarmlandId)
+			))
+		end
+	end
 	if g_currentMission ~= nil and g_currentMission.getFarmId ~= nil and g_currentMission:getFarmId() == self.farmId then
 		if success == MissionFinishState.SUCCESS then
 			g_currentMission:addIngameNotification(FSBaseMission.INGAME_NOTIFICATION_OK, g_i18n:getText("ia_field_outcome_mission_finished"))
@@ -1865,6 +2845,66 @@ function IAFieldOutcomeMission:delete()
 		), nil, nil, nil)
 	end
 	self:iaClearProbeDebugPoints()
+	-- Post-finish delivery bonus: if bonus silo snapshot exists and fill increased, award static bonus
+	if self.iaFoSSiloFillAtFinish ~= nil then
+		local silo = self:iaGetNeighbourSilo()
+		local ftIdx = self:iaGetMissionFillTypeIndex()
+		if silo ~= nil and ftIdx ~= nil then
+			local currentFill = IAPlaceableHelper.getPlaceableFillLevelForFillType(silo, ftIdx, 1)
+			if currentFill > self.iaFoSSiloFillAtFinish then
+				local nid = tonumber(self.iaFoSNeighbourId)
+				if nid ~= nil and IANeighbours ~= nil and IANeighbours.neighbours ~= nil then
+					local neighbour = IANeighbours.neighbours[nid]
+					-- Linear-scan fallback (mirrors iaGetNeighbourSilo): neighbour table key
+					-- may not match .id after savegame migrations.
+					if neighbour == nil or tonumber(neighbour.id) ~= nid then
+						for _, n in pairs(IANeighbours.neighbours) do
+							if n ~= nil and tonumber(n.id) == nid then
+								neighbour = n
+								break
+							end
+						end
+					end
+					if neighbour ~= nil and type(neighbour.addScore) == "function" then
+						neighbour:addScore(50)
+						IAFieldOutcomeMission.iaLog(string.format(
+							"delete() post-finish bonus AWARDED +50: neighbourId=%s name=%s snapshotFill=%.0f currentFill=%.0f delta=%.0f farmlandId=%s",
+							tostring(nid), tostring(neighbour.name), self.iaFoSSiloFillAtFinish, currentFill,
+							currentFill - self.iaFoSSiloFillAtFinish, tostring(self.iaFieldFarmlandId)
+						))
+					else
+						IAFieldOutcomeMission.iaLog(string.format(
+							"delete() post-finish bonus NOT awarded: neighbour not found or missing addScore nid=%s found=%s addScoreFn=%s farmlandId=%s",
+							tostring(nid), tostring(neighbour ~= nil), tostring(neighbour ~= nil and type(neighbour.addScore)),
+							tostring(self.iaFieldFarmlandId)
+						))
+					end
+				else
+					IAFieldOutcomeMission.iaLog(string.format(
+						"delete() post-finish bonus NOT awarded: nid or IANeighbours nil nid=%s IANeighbours=%s farmlandId=%s",
+						tostring(nid), tostring(IANeighbours ~= nil and IANeighbours.neighbours ~= nil),
+						tostring(self.iaFieldFarmlandId)
+					))
+				end
+			else
+				IAFieldOutcomeMission.iaLog(string.format(
+					"delete() post-finish bonus NOT awarded: fill not increased snapshotFill=%.0f currentFill=%.0f farmlandId=%s",
+					self.iaFoSSiloFillAtFinish, currentFill, tostring(self.iaFieldFarmlandId)
+				))
+			end
+		else
+			IAFieldOutcomeMission.iaLog(string.format(
+				"delete() post-finish bonus NOT awarded: silo or ftIdx nil silo=%s ftIdx=%s neighbourId=%s farmlandId=%s",
+				tostring(silo ~= nil), tostring(ftIdx), tostring(self.iaFoSNeighbourId), tostring(self.iaFieldFarmlandId)
+			))
+		end
+	else
+		IAFieldOutcomeMission.iaLog(string.format(
+			"delete() post-finish bonus NOT awarded: no snapshot (iaFoSSiloFillAtFinish nil) farmlandId=%s",
+			tostring(self.iaFieldFarmlandId)
+		))
+	end
+	self:iaUnmarkMissionSilo()
 	self.iaExpectedFieldState = {}
 	self.iaProbes = {}
 	IAFieldOutcomeMission:superClass().delete(self)
@@ -1926,6 +2966,13 @@ function IAFieldOutcomeMission:onSavegameLoaded()
 	end
 	IAFieldOutcomeMission:superClass().onSavegameLoaded(self)
 	self:iaResolveField()
+	-- Recompute grass windrow fill type after load (derived from FillType, may have been streamed in)
+	if self.iaFoSGrassWindrowFillType == nil and IAFieldwork ~= nil and type(IAFieldwork.getGrassWindrowFillTypeIndex) == "function" then
+		self.iaFoSGrassWindrowFillType = IAFieldwork.getGrassWindrowFillTypeIndex()
+	end
+	if self.iaFoSFieldAreaHa == nil and self.field ~= nil and type(self.field.getAreaHa) == "function" then
+		self.iaFoSFieldAreaHa = self.field:getAreaHa()
+	end
 	self:iaPruneExpectedFieldStateForJobType()
 	self:iaApplyWorkAreaTypesForFoSJob()
 	if self.field ~= nil then
@@ -1947,6 +2994,13 @@ function IAFieldOutcomeMission:writeStream(streamId, connection)
 	streamWriteString(streamId, self.iaFoSFieldworkJob or "")
 	streamWriteString(streamId, self.iaFoSNeighbourFirstName or "")
 	streamWriteString(streamId, self.iaFoSSituationId or "")
+	streamWriteFloat32(streamId, self.iaFoSFieldHarvestedLiters or 0)
+	streamWriteFloat32(streamId, self.iaFoSFieldWindrowPeak or 0)
+	streamWriteFloat32(streamId, self.iaFoSReceivedLiters or 0)
+	streamWriteUInt32(streamId, self.iaFoSGrassWindrowFillType or 0)
+	streamWriteFloat32(streamId, self.iaFoSFieldAreaHa or 0)
+	streamWriteFloat32(streamId, self.iaFoSAreaPerProbe or 0)
+	streamWriteBool(streamId, self.iaFoSUsesBorrowedEquipment == true)
 end
 
 function IAFieldOutcomeMission:readStream(streamId, connection)
@@ -1973,6 +3027,17 @@ function IAFieldOutcomeMission:readStream(streamId, connection)
 	if self.iaFoSSituationId == nil or self.iaFoSSituationId == "" then
 		self.iaFoSSituationId = nil
 	end
+	self.iaFoSFieldHarvestedLiters = streamReadFloat32(streamId) or 0
+	self.iaFoSFieldWindrowPeak = streamReadFloat32(streamId)
+	if self.iaFoSFieldWindrowPeak == 0 then self.iaFoSFieldWindrowPeak = nil end
+	self.iaFoSReceivedLiters = streamReadFloat32(streamId) or 0
+	self.iaFoSGrassWindrowFillType = streamReadUInt32(streamId)
+	if self.iaFoSGrassWindrowFillType == 0 then self.iaFoSGrassWindrowFillType = nil end
+	self.iaFoSFieldAreaHa = streamReadFloat32(streamId)
+	if self.iaFoSFieldAreaHa == 0 then self.iaFoSFieldAreaHa = nil end
+	self.iaFoSAreaPerProbe = streamReadFloat32(streamId)
+	if self.iaFoSAreaPerProbe == 0 then self.iaFoSAreaPerProbe = nil end
+	self.iaFoSUsesBorrowedEquipment = streamReadBool(streamId)
 	self:iaPruneExpectedFieldStateForJobType()
 	self:iaApplyWorkAreaTypesForFoSJob()
 	self._iaFoSMissionPresentationPending = true

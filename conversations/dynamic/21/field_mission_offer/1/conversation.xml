@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<conversation>
+	<entry id="1" previousId="0" speaker="npc"
+		text_en="Hey, I would need your help with {jobType}. it's about {totalHectares} hectares. Do you have the time to take that on?"
+		text_de="Hey, sag mal, ich bräuchte deine Hilfe beim {jobType}, das wären so ungefähr {totalHectares} Hektar. Hast du Zeit und kannst das übernehmen?">
+		<voiceSegments>
+			<segment type="named" id="dm_1_1"/>
+			<segment type="variable" name="jobType"/>
+			<segment type="named" id="dm_1_2"/>
+			<segment type="variable" name="totalHectares"/>
+			<segment type="named" id="dm_1_3"/>
+		</voiceSegments>
+	</entry>
+	<entry id="2" previousId="1" speaker="player"
+		text_en="Yeah sure, send me the locations."
+		text_de="Ja klar, schick mir die Standorte."
+		callbackOnSelectImmediate="accept">
+		<voiceSegments>
+			<segment type="named" id="dm_2_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="3" previousId="1" speaker="player"
+		text_en="Basically yes, but I would need to use {vehicleNameWithArticle}, okay?"
+		text_de="Grundsätzlich ja, ich müsste aber {vehicleNameWithArticle} nutzen, okay?"
+		callbackOnSelectImmediate="accept_with_equipment">
+		<voiceSegments>
+			<segment type="named" id="dm_3_1"/>
+			<segment type="variable" name="vehicleNameWithArticle"/>
+			<segment type="named" id="dm_3_2"/>
+		</voiceSegments>
+	</entry>
+	<entry id="4" previousId="1" speaker="player"
+		text_en="I'm swamped, but I could manage the first half. Would that still help?"
+		text_de="Ich bin voll eingespannt, aber ich könnte die erste Hälfte machen. Wär dir das trotzdem was wert?"
+		callbackOnSelectImmediate="accept_half">
+		<voiceSegments>
+			<segment type="named" id="dm_4_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="5" previousId="1" speaker="player"
+		text_en="Half is all I can spare, and I would need to use {vehicleNameWithArticle} for that part."
+		text_de="Die Hälfte würde ich schaffen, ich müsste aber {vehicleNameWithArticle} nutzen, okay?"
+		callbackOnSelectImmediate="accept_half_with_equipment">
+		<voiceSegments>
+			<segment type="named" id="dm_5_1"/>
+			<segment type="variable" name="vehicleNameWithArticle"/>
+			<segment type="named" id="dm_5_2"/>
+		</voiceSegments>
+	</entry>
+	<entry id="6" previousId="1" speaker="player"
+		text_en="Sorry, I don't have time right now. I'm completely swamped."
+		text_de="Sorry, ich habe gerade keine Zeit. Ich bin voll beschäftigt."
+		callbackOnSelectImmediate="decline">
+		<voiceSegments>
+			<segment type="named" id="dm_6_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="7" previousId="2" speaker="npc"
+		text_en="Perfect, thank you very much. I'll send you the locations. {extraRefillNote}"
+		text_de="Perfekt, vielen Dank. Ich schick dir die Standorte. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm_7_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="8" previousId="3" speaker="npc"
+		text_en="Sure, it's ready and waiting on my farm. {extraRefillNote}"
+		text_de="Klar, steht vorbereitet auf meinem Hof. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm_8_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="9" previousId="4" speaker="npc"
+		text_en="That still saves my day. You handle the first fields, and I'll follow up with the rest. {extraRefillNote}"
+		text_de="Das rettet mir trotzdem den Tag. Du machst die ersten Flächen, den Rest zieh ich dann nach. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept_half">
+		<voiceSegments>
+			<segment type="named" id="dm_9_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="10" previousId="5" speaker="npc"
+		text_en="Sure, it's ready and waiting on the farm. {extraRefillNote}"
+		text_de="Klar, steht vorbereitet auf dem Hof. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept_half">
+		<voiceSegments>
+			<segment type="named" id="dm_10_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="11" previousId="6" speaker="npc"
+		text_en="No problem. I'll manage to squeeze it in somehow."
+		text_de="Kein Thema, ich krieg das schon irgendwie noch unter."
+		callbackOnPlaybackEnd="after_decline">
+		<voiceSegments>
+			<segment type="named" id="dm_11_1"/>
+		</voiceSegments>
+	</entry>
+</conversation>

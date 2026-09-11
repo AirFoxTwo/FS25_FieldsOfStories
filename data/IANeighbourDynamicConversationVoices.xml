@@ -20,29 +20,38 @@
 -->
 <voiceCatalog>
 	<defaults>
-		<jobType key="cultivate" suffix="job_cultivate" text="I need your help with Cultivating." textDe="ich bräuchte deine Hilfe beim Grubbern"/>
-		<jobType key="harrow" suffix="job_harrow" text="I need your help with Harrowing." textDe="ich bräuchte deine Hilfe beim Eggen"/>
-		<jobType key="harvest" suffix="job_harvest" text="I need your help with Harvesting." textDe="ich bräuchte deine Hilfe beim Ernten"/>
-		<jobType key="manure_spreading" suffix="job_manure_spreading" text="I need your help with spreading Manure." textDe="ich bräuchte deine Hilfe beim Mistausbringen"/>
-		<jobType key="slurry_spreading" suffix="job_slurry_spreading" text="I need your help with spreading Slurry." textDe="ich bräuchte deine Hilfe beim Gülleausbringen"/>
-		<jobType key="fertilizer_spreading" suffix="job_fertilizer_spreading" text="I need your help with spreading mineral Fertilizer." textDe="ich bräuchte deine Hilfe beim Mineraldüngerstreuen"/>
-		<jobType key="spray" suffix="job_spray" text="I need your help with Spraying." textDe="ich bräuchte deine Hilfe beim Spritzen"/>
-		<jobType key="seed" suffix="job_seed" text="I need your help with Seeding." textDe="ich bräuchte deine Hilfe beim Ansäen"/>
-		<jobType key="plow" suffix="job_plow" text="I need your help with Plowing." textDe="ich bräuchte deine Hilfe beim Pflügen"/>
-		<jobType key="ia_field_outcome" suffix="job_other" text="I need your help with Fieldwork." textDe="ich bräuchte deine Hilfe beim Ackern"/>
-		<jobType key="other" suffix="job_other" text="I need your help with Fieldwork." textDe="ich bräuchte deine Hilfe beim Ackern"/>
-		<vehicleNameWithArticle key="cultivate" suffix="ia_fieldwork_equip_cultivate" text="i would need to use your cultivator." textDe="ich müsste aber deinen Grubber nutzen."/>
-		<vehicleNameWithArticle key="harrow" suffix="ia_fieldwork_equip_harrow" text="i would need to use your harrow." textDe="ich müsste aber deine Egge nutzen."/>
-		<vehicleNameWithArticle key="harvest" suffix="ia_fieldwork_equip_harvest" text="i would need to use your harvester." textDe="ich müsste aber deinen Mähdrescher nutzen."/>
-		<vehicleNameWithArticle key="manure_spreading" suffix="ia_fieldwork_equip_manure" text="i would need to use your manure spreader." textDe="ich müsste aber deinen Miststreuer nutzen."/>
-		<vehicleNameWithArticle key="slurry_spreading" suffix="ia_fieldwork_equip_slurry" text="i would need to use your slurry tanker." textDe="ich müsste aber dein Güllefass nutzen."/>
-		<vehicleNameWithArticle key="fertilizer_spreading" suffix="ia_fieldwork_equip_mineral_fertilizer" text="i would need to use your fertilizer spreader." textDe="ich müsste aber deinen Mineraldüngerstreuer nutzen."/>
-		<vehicleNameWithArticle key="spray" suffix="ia_fieldwork_equip_herbicide" text="i would need to use your field sprayer." textDe="ich müsste aber deine Feldspritze nutzen."/>
-		<vehicleNameWithArticle key="seed" suffix="ia_fieldwork_equip_seed" text="i would need to use your seeder." textDe="ich müsste aber deine Sämaschine nutzen."/>
-		<vehicleNameWithArticle key="plow" suffix="ia_fieldwork_equip_plow" text="i would need to use your plow." textDe="ich müsste aber deinen Pflug nutzen."/>
-		<vehicleNameWithArticle key="ia_field_outcome" suffix="ia_fieldwork_equip_generic" text="i would need to use your equipment." textDe="ich müsste aber deine Geräte nutzen."/>
-		<vehicleNameWithArticle key="other" suffix="ia_fieldwork_equip_generic" text="i would need to use your equipment." textDe="ich müsste aber deine Geräte nutzen."/>
-		<extraRefillNote key="needed" suffix="extra_refill_needed" text="If it runs empty, come back to the yard to refill." textDe="Wenn es leer wird, komm zum Auffüllen vorbei."/>
+		<jobType key="cultivate" suffix="job_cultivate" text="Cultivating" textDe="Grubbern"/>
+		<jobType key="harrow" suffix="job_harrow" text="Harrowing" textDe="Eggen"/>
+		<jobType key="harvest" suffix="job_harvest" text="Harvesting" textDe="Ernten"/>
+		<jobType key="manure_spreading" suffix="job_manure_spreading" text="Manure spreading" textDe="Mistausbringen"/>
+		<jobType key="slurry_spreading" suffix="job_slurry_spreading" text="Slurry spreading" textDe="Gülleausbringen"/>
+		<jobType key="fertilizer_spreading" suffix="job_fertilizer_spreading" text="Fertilizer spreading" textDe="Mineraldüngerstreuen"/>
+		<jobType key="spray" suffix="job_spray" text="Spraying" textDe="Spritzen"/>
+		<jobType key="seed" suffix="job_seed" text="Seeding" textDe="Ansäen"/>
+		<jobType key="plow" suffix="job_plow" text="Plowing" textDe="Pflügen"/>
+		<jobType key="ia_field_outcome" suffix="job_other" text="Fieldwork" textDe="Ackern"/>
+		<jobType key="lime" suffix="job_lime" text="Liming" textDe="Kalken"/>
+		<jobType key="stone_picking" suffix="job_stone_picking" text="Stone picking" textDe="Steinsammeln"/>
+		<jobType key="grass_mowing" suffix="job_grass_mowing" text="Grass mowing" textDe="Grasmähen"/>
+		<jobType key="harvest_deliver_corn" suffix="job_harvest_deliver_corn" text="Corn harvest &amp; delivery" textDe="Mais ernten &amp; abliefern"/>
+		<jobType key="other" suffix="job_other" text="Fieldwork" textDe="Ackern"/>
+		<vehicleNameWithArticle key="cultivate" suffix="ia_fieldwork_equip_cultivate" text="your cultivator" textDe="deinen Grubber"/>
+		<vehicleNameWithArticle key="harrow" suffix="ia_fieldwork_equip_harrow" text="your harrow" textDe="deine Scheibenegge"/>
+		<vehicleNameWithArticle key="harvest" suffix="ia_fieldwork_equip_harvest" text="your harvester" textDe="deinen Mähdrescher"/>
+		<vehicleNameWithArticle key="manure_spreading" suffix="ia_fieldwork_equip_manure" text="your manure spreader" textDe="deinen Miststreuer"/>
+		<vehicleNameWithArticle key="slurry_spreading" suffix="ia_fieldwork_equip_slurry" text="your slurry tanker" textDe="dein Güllefass"/>
+		<vehicleNameWithArticle key="fertilizer_spreading" suffix="ia_fieldwork_equip_mineral_fertilizer" text="your fertilizer spreader" textDe="deinen Mineraldüngerstreuer"/>
+		<vehicleNameWithArticle key="spray" suffix="ia_fieldwork_equip_herbicide" text="your field sprayer" textDe="deine Feldspritze"/>
+		<vehicleNameWithArticle key="seed" suffix="ia_fieldwork_equip_seed" text="your seeder" textDe="deine Sämaschine"/>
+		<vehicleNameWithArticle key="plow" suffix="ia_fieldwork_equip_plow" text="your plow" textDe="deinen Pflug"/>
+		<vehicleNameWithArticle key="ia_field_outcome" suffix="ia_fieldwork_equip_generic" text="your equipment" textDe="deine Geräte"/>
+		<vehicleNameWithArticle key="lime" suffix="ia_fieldwork_equip_lime" text="your lime spreader" textDe="deinen Kalkstreuer"/>
+		<vehicleNameWithArticle key="stone_picking" suffix="ia_fieldwork_equip_stone_picker" text="your stone picker" textDe="deinen Steinsammler"/>
+		<vehicleNameWithArticle key="grass_mowing" suffix="ia_fieldwork_equip_grass_mower" text="your mower and wagon" textDe="dein Mähwerk und Ladewagen"/>
+		<vehicleNameWithArticle key="harvest_deliver_corn" suffix="ia_fieldwork_equip_harvest_deliver_corn" text="your harvester and trailer" textDe="deinen Mähdrescher und Anhänger"/>
+		<vehicleNameWithArticle key="other" suffix="ia_fieldwork_equip_generic" text="your equipment" textDe="deine Geräte"/>
+		<extraRefillNote key="needed" suffix="extra_refill_needed" text="You can fill up at my main silo." textDe="Du kannst dann an meinem Hauptsilo auffüllen."/>
+		<extraRefillNote key="delivery" suffix="delivery_needed" text="Please deliver it to my main silo." textDe="Liefer es bitte an mein Hauptsilo."/>
 		<FieldNumber key="1" suffix="fld_1" text="one." textDe="eins"/>
 		<FieldNumber key="2" suffix="fld_2" text="two." textDe="zwei"/>
 		<FieldNumber key="3" suffix="fld_3" text="three." textDe="drei"/>

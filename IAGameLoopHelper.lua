@@ -24,15 +24,19 @@ IAGameLoopHelper.NEXT_CROP_WHITELIST_NAMES = {
 -- Keyed by IAFieldwork.JobType.* (canonical strings) so it tracks the enum without separate string drift.
 IAGameLoopHelper.FIELDWORK_TYPE_PRIORITY = {
 	[IAFieldwork.JobType.HARVEST] = 1,
-	[IAFieldwork.JobType.SEED] = 2,
-	[IAFieldwork.JobType.SPRAY] = 3,
-	[IAFieldwork.JobType.MANURESPREADING] = 4,
-	[IAFieldwork.JobType.SLURRYSPREADING] = 4,
-	[IAFieldwork.JobType.FERTILIZEDSPREADING] = 4,
-	[IAFieldwork.JobType.PLOW] = 5,
-	[IAFieldwork.JobType.HARROW] = 6,
-	[IAFieldwork.JobType.CULTIVATE] = 7,
-	[IAFieldwork.JobType.IA_FIELD_OUTCOME] = 8,
+	[IAFieldwork.JobType.HARVEST_DELIVER_CORN] = 1,
+	[IAFieldwork.JobType.GRASS_MOWING] = 2,
+	[IAFieldwork.JobType.SEED] = 3,
+	[IAFieldwork.JobType.SPRAY] = 4,
+	[IAFieldwork.JobType.MANURESPREADING] = 5,
+	[IAFieldwork.JobType.SLURRYSPREADING] = 5,
+	[IAFieldwork.JobType.FERTILIZEDSPREADING] = 5,
+	[IAFieldwork.JobType.LIME] = 5,
+	[IAFieldwork.JobType.STONE_PICKING] = 5,
+	[IAFieldwork.JobType.PLOW] = 6,
+	[IAFieldwork.JobType.HARROW] = 7,
+	[IAFieldwork.JobType.CULTIVATE] = 8,
+	[IAFieldwork.JobType.IA_FIELD_OUTCOME] = 9,
 }
 
 -- Phone-accepted fieldwork uses IAFieldOutcomeMission only (no vanilla FertilizeMission / tryGenerateMission).
@@ -68,8 +72,10 @@ local function placeMatchesPlacetypes(place, placetypes)
 end
 
 -- Place sizeType values that situations must explicitly opt into via <placeSizes>; never selected by default.
+-- Silo places are storage buildings, not parking bays, and must never be selected for vehicle/attachment parking.
 local IA_EXCLUSIVE_PLACE_SIZE_TYPES = {
 	["large_area"] = true,
+	["silo"] = true,
 }
 
 --- True when the place's sizeType satisfies the situation config's <placeSizes> list.
@@ -223,7 +229,7 @@ end
 
 -- True if the planned next crop may be sown in the current period (FruitType growthDataSeasonal.plantingAllowed),
 -- or when that data is missing, if current month appears on any matching SEED situation (legacy XML months).
-function IAGameLoopHelper:isSowingMonthForPlannedSeed(neighbour, farmlandId)
+function IAGameLoopHelper:isSowingMonthForPlannedSeed(neighbour, farmlandId, monthOverride)
 	if neighbour == nil or farmlandId == nil or self.ianeighbours.situationConfigs == nil then
 		return false
 	end
@@ -233,17 +239,35 @@ function IAGameLoopHelper:isSowingMonthForPlannedSeed(neighbour, farmlandId)
 	if nextCrop == nil then
 		return false
 	end
-	local planting = iaIsFruitTypePlantingAllowedInPeriod(nextCrop)
+	-- When an explicit month is given (day-end completion), convert to the matching
+	-- growth period so iaIsFruitTypePlantingAllowedInPeriod checks the right calendar
+	-- window instead of the post-rollover environment period.
+	local period = nil
+	if monthOverride ~= nil then
+		local om = tonumber(monthOverride)
+		if om ~= nil then
+			if om >= 3 then
+				period = om - 2
+			else
+				period = om + 10
+			end
+		end
+	end
+	local planting = iaIsFruitTypePlantingAllowedInPeriod(nextCrop, period)
 	if planting == true then
 		return true
 	end
 	if planting == false then
 		return false
 	end
-	local currentMonth = getEnvironmentMonth1to12()
+	local currentMonth = monthOverride
+	if currentMonth == nil then
+		currentMonth = getEnvironmentMonth1to12()
+	end
 	if currentMonth == nil then
 		return false
 	end
+	currentMonth = tonumber(currentMonth) or currentMonth
 	for _, config in ipairs(self.ianeighbours.situationConfigs) do
 		if config ~= nil and config.type ~= nil and string.lower(tostring(config.type)) == "fieldwork"
 			and config.fieldwork ~= nil and string.lower(tostring(config.fieldwork)) == "seed" then
@@ -322,52 +346,137 @@ function IAGameLoopHelper:hasActivePlayerFieldOutcomeForFarmland(farmlandId)
 end
 
 -- Build ordered daily queue from open candidates; mutates neighbour fieldwork schedule fields.
-function IAGameLoopHelper:rebuildDailyFieldworkSchedule(neighbour)
-	local year, month, dayIn = getEnvironmentYearMonthDayInPeriod()
-	neighbour.fieldworkScheduleYear = year
-	neighbour.fieldworkScheduleMonth = month
-	neighbour.fieldworkScheduleDayInPeriod = dayIn
-	neighbour.fieldworkScheduleTasks = {}
-	neighbour.contractCallTriggerFiredForScheduleKey = nil
-	neighbour.contractCallRingOpensCount = 0
-	neighbour.contractCallRingAnsweredToday = false
-	neighbour.contractFallbackToAiFiredForScheduleKey = nil
-	neighbour.contractCallLastRingScheduleKey = nil
-	neighbour.contractCallLastRingTotalMinutes = nil
+-- @param table|nil opts { defineContracts = bool (default true), isDayChange = bool (default false) }
+--   defineContracts=true: pick outsource type, set random call window, mark contractEnabled rows (6:00 run).
+--   defineContracts=false: preserve existing outsourceType/callHour/callMinute; match contractEnabled by
+--     identical (situationId, farmlandId) from old schedule; new rows of the same type get contractEnabled
+--     up to the cap. Clears contract bookkeeping only on day change.
+function IAGameLoopHelper:rebuildDailyFieldworkSchedule(neighbour, opts)
+	opts = opts or {}
+	local defineContracts = opts.defineContracts ~= false  -- default true
+	local isDayChange = opts.isDayChange == true
+	local additiveOnly = opts.additiveOnly == true
 
-	if IATestRunner ~= nil and type(IATestRunner.onScheduleRebuildBegin) == "function" then
-		IATestRunner.onScheduleRebuildBegin(neighbour)
+	local year, month, dayIn = getEnvironmentYearMonthDayInPeriod()
+
+	-- Save old schedule for contract preservation (before we potentially clear it)
+	local oldContractKeys = {}
+	local oldOutsourcedJobType = nil
+	local existingRowKeys = {}  -- set of "situationId|farmlandId" already in schedule
+	if (not defineContracts or additiveOnly) and neighbour.fieldworkScheduleTasks ~= nil then
+		for _, row in ipairs(neighbour.fieldworkScheduleTasks) do
+			if row ~= nil and row.situationId ~= nil and row.farmlandId ~= nil then
+				local rk = tostring(row.situationId) .. "|" .. tostring(row.farmlandId)
+				existingRowKeys[rk] = true
+				if row.contractEnabled == true then
+					oldContractKeys[rk] = true
+				end
+			end
+		end
+		oldOutsourcedJobType = neighbour._iaLastOutsourcedJobType
+	end
+
+	-- Determine if we need to define contracts: either explicit, or additive mode with zero existing contracts.
+	-- Also treats acceptedByPlayer rows as "contracts already handled" so we don't redefine after player acceptance.
+	-- Likewise checks contractFallbackToAiFiredForScheduleKey (decline) and contractCallRingAnsweredToday (answered) so a resolved call doesn't trigger fresh contracts.
+	local hasPlayerAcceptedContract = false
+	if additiveOnly and not defineContracts then
+		local hasAnyContract = false
+		if neighbour.fieldworkScheduleTasks ~= nil then
+			for _, row in ipairs(neighbour.fieldworkScheduleTasks) do
+				if row ~= nil and row.contractEnabled == true then
+					hasAnyContract = true
+				end
+				if row ~= nil and row.acceptedByPlayer == true then
+					hasPlayerAcceptedContract = true
+				end
+				if hasAnyContract and hasPlayerAcceptedContract then
+					break
+				end
+			end
+		end
+		local scheduleKey = self:getFieldworkScheduleDayKey(neighbour)
+		-- acceptedByPlayer / decline / already-answered-today all count as "contracts handled" —
+		-- don't auto-define fresh ones (prevents a same-day re-call after the player resolved a call).
+		if not hasAnyContract and not hasPlayerAcceptedContract
+			and neighbour.contractCallRingAnsweredToday ~= true
+			and neighbour.contractFallbackToAiFiredForScheduleKey ~= scheduleKey then
+			defineContracts = true
+		end
 	end
 
 	--- Normalized fieldwork key for daily planning (stubble_cultivation → harrow; sow → seed).
 	local function fieldworkKeyForOutsource(cfg)
 		local jt = (cfg ~= nil and cfg.fieldwork) and string.lower(tostring(cfg.fieldwork)) or ""
-		if jt == "" then
-			return ""
-		end
-		if jt == "harvest" then
-			return "harvest"
-		end
+		if jt == "" then return "" end
 		if IAFieldwork ~= nil and type(IAFieldwork.normalizeFieldworkJobType) == "function" then
 			local n = IAFieldwork.normalizeFieldworkJobType(jt)
-			if n ~= nil then
-				return n
-			end
+			if n ~= nil then return n end
 		end
 		return jt
 	end
 
 	local all = self:collectOpenFieldworkCandidates(neighbour)
+
+	-- In additive mode, filter out candidates already present in the schedule.
+	if additiveOnly then
+		local newCandidates = {}
+		for _, c in ipairs(all) do
+			local rk = tostring(c.config.id) .. "|" .. tostring(c.farmlandId)
+			if not existingRowKeys[rk] then
+				table.insert(newCandidates, c)
+			end
+		end
+		all = newCandidates
+	end
+
+	-- Always stamp the day so calendarDayMatchesStoredSchedule works correctly
+	-- even when there are no candidates.
+	neighbour.fieldworkScheduleYear = year
+	neighbour.fieldworkScheduleMonth = month
+	neighbour.fieldworkScheduleDayInPeriod = dayIn
+
 	if #all == 0 then
 		return
+	end
+
+	-- From here on we know we have candidates. Clear the schedule only in non-additive mode.
+	if not additiveOnly then
+		neighbour.fieldworkScheduleTasks = {}
+
+		-- Only clear contract bookkeeping on day-change rebuilds (not on mid-day refreshes)
+		if isDayChange or defineContracts then
+			neighbour.contractCallTriggerFiredForScheduleKey = nil
+			neighbour.contractCallRingOpensCount = 0
+			neighbour.contractCallRingAnsweredToday = false
+			neighbour.contractFallbackToAiFiredForScheduleKey = nil
+			neighbour.contractCallLastRingScheduleKey = nil
+			neighbour.contractCallLastRingTotalMinutes = nil
+		end
+	else
+		-- Additive mode: never clear existing rows. But if we auto-enabled
+		-- defineContracts (no contracts existed), reset call bookkeeping.
+		if neighbour.fieldworkScheduleTasks == nil then
+			neighbour.fieldworkScheduleTasks = {}
+		end
+		if defineContracts then
+			neighbour.contractCallTriggerFiredForScheduleKey = nil
+			neighbour.contractCallRingOpensCount = 0
+			neighbour.contractCallRingAnsweredToday = false
+			neighbour.contractFallbackToAiFiredForScheduleKey = nil
+			neighbour.contractCallLastRingScheduleKey = nil
+			neighbour.contractCallLastRingTotalMinutes = nil
+		end
+	end
+
+	if IATestRunner ~= nil and type(IATestRunner.onScheduleRebuildBegin) == "function" then
+		IATestRunner.onScheduleRebuildBegin(neighbour)
 	end
 
 	local byField = {}
 	for _, c in ipairs(all) do
 		local fid = c.farmlandId
-		if byField[fid] == nil then
-			byField[fid] = {}
-		end
+		if byField[fid] == nil then byField[fid] = {} end
 		table.insert(byField[fid], c)
 	end
 
@@ -410,78 +519,72 @@ function IAGameLoopHelper:rebuildDailyFieldworkSchedule(neighbour)
 		end
 	end
 
-	-- Randomize the order fields are worked so neighbours don't always start at their lowest field id.
-	-- Build a shuffled permutation of this neighbour's assigned farmlands (stable for the whole game day,
-	-- since rebuild only runs on day change) and assign each task its field's position in that permutation.
-	-- compareFieldworkScheduleTasks uses this fieldOrderKey instead of ascending farmlandId.
+	-- Random field order permutation
 	local fieldOrderKeyByFarmland = {}
 	do
 		local ids = {}
-		for _, fid in ipairs(neighbour.assignedFarmlands) do
-			table.insert(ids, fid)
-		end
+		for _, fid in ipairs(neighbour.assignedFarmlands) do table.insert(ids, fid) end
 		for i = #ids, 2, -1 do
 			local j = math.random(1, i)
 			ids[i], ids[j] = ids[j], ids[i]
 		end
-		for rank, fid in ipairs(ids) do
-			fieldOrderKeyByFarmland[fid] = rank
-		end
+		for rank, fid in ipairs(ids) do fieldOrderKeyByFarmland[fid] = rank end
 	end
-	for _, c in ipairs(chosen) do
-		c.fieldOrderKey = fieldOrderKeyByFarmland[c.farmlandId]
-	end
-
+	for _, c in ipairs(chosen) do c.fieldOrderKey = fieldOrderKeyByFarmland[c.farmlandId] end
 	table.sort(chosen, compareFieldworkScheduleTasks)
 
-	-- One outsourced fieldwork type per day (random among types present); harvest is never outsourced.
-	-- Also exclude the job type the neighbour is currently performing in an active fieldwork
-	-- situation: offering contracts for the same job type would race with the implements that
-	-- the active AI run still needs (slurry tank, fertilizer spreader, ...).
-	local activeJobTypeKey = nil
-	if neighbour.activeSituation ~= nil and neighbour.activeSituation.jobType ~= nil then
-		local rawActive = string.lower(tostring(neighbour.activeSituation.jobType))
-		if IAFieldwork ~= nil and type(IAFieldwork.normalizeFieldworkJobType) == "function" then
-			local norm = IAFieldwork.normalizeFieldworkJobType(rawActive)
-			if norm ~= nil and norm ~= "" then
-				activeJobTypeKey = norm
+	-- Determine outsource type: pick fresh when defineContracts, else preserve from old schedule
+	local outsourcedJobType = nil
+	if defineContracts then
+		local activeJobTypeKey = nil
+		if neighbour.activeSituation ~= nil and neighbour.activeSituation.jobType ~= nil then
+			local rawActive = string.lower(tostring(neighbour.activeSituation.jobType))
+			if IAFieldwork ~= nil and type(IAFieldwork.normalizeFieldworkJobType) == "function" then
+				local norm = IAFieldwork.normalizeFieldworkJobType(rawActive)
+				if norm ~= nil and norm ~= "" then activeJobTypeKey = norm end
+			end
+			if activeJobTypeKey == nil and rawActive ~= "" then activeJobTypeKey = rawActive end
+		end
+		local distinctNonHarvestTypes = {}
+		local seenType = {}
+		local jobTypeLacksEquipment = {}
+		for _, c in ipairs(chosen) do
+			local key = fieldworkKeyForOutsource(c.config)
+			if key ~= "" and (activeJobTypeKey == nil or key ~= activeJobTypeKey) and not seenType[key] then
+				seenType[key] = true
+				table.insert(distinctNonHarvestTypes, key)
+				if IAFieldwork ~= nil and type(IAFieldwork.neighbourHasFleetEquipmentForJobType) == "function" then
+					if not IAFieldwork.neighbourHasFleetEquipmentForJobType(neighbour, key) then
+						jobTypeLacksEquipment[key] = true
+					end
+				end
 			end
 		end
-		if activeJobTypeKey == nil and rawActive ~= "" then
-			activeJobTypeKey = rawActive
+		if #distinctNonHarvestTypes > 0 then
+			local weightedPool = {}
+			for _, jt in ipairs(distinctNonHarvestTypes) do
+				table.insert(weightedPool, jt)
+				if jobTypeLacksEquipment[jt] then table.insert(weightedPool, jt) end
+			end
+			outsourcedJobType = weightedPool[math.random(1, #weightedPool)]
 		end
+		if IATestRunner ~= nil and type(IATestRunner.forceOutsourceType) == "string" and IATestRunner.forceOutsourceType ~= "" then
+			outsourcedJobType = IATestRunner.forceOutsourceType
+		end
+		neighbour._iaLastOutsourcedJobType = outsourcedJobType
+		neighbour.callPlayerHour = math.random(8, 14)
+		neighbour.callPlayerMinute = math.random(0, 59)
+	else
+		outsourcedJobType = oldOutsourcedJobType
 	end
 
-	local distinctNonHarvestTypes = {}
-	local seenType = {}
-	for _, c in ipairs(chosen) do
-		local key = fieldworkKeyForOutsource(c.config)
-		local skip = false
-		if key == "" or key == "harvest" then
-			skip = true
-		end
-		if activeJobTypeKey ~= nil and key == activeJobTypeKey then
-			skip = true
-		end
-		if not skip and not seenType[key] then
-			seenType[key] = true
-			table.insert(distinctNonHarvestTypes, key)
-		end
-	end
-	local outsourcedJobType = nil
-	if #distinctNonHarvestTypes > 0 then
-		outsourcedJobType = distinctNonHarvestTypes[math.random(1, #distinctNonHarvestTypes)]
-	end
-	if self.ianeighbours.debug and activeJobTypeKey ~= nil then
-		print("--- IAGameLoopHelper:rebuildDailyFieldworkSchedule() - excluded active jobType '" .. tostring(activeJobTypeKey) .. "' from outsource pool for " .. tostring(neighbour.name))
-	end
-
+	-- Determine contract eligibility for each row
 	local function rowIsContractForOutsource(c)
 		local key = fieldworkKeyForOutsource(c.config)
-		if key == "harvest" then
-			return false
-		end
 		return outsourcedJobType ~= nil and key == outsourcedJobType
+	end
+	local function rowKey(c)
+		return tostring(c.config.id) .. "|" .. tostring(c.farmlandId)
 	end
 
 	local aiFirst = {}
@@ -494,43 +597,54 @@ function IAGameLoopHelper:rebuildDailyFieldworkSchedule(neighbour)
 		end
 	end
 	local ordered = {}
-	for _, c in ipairs(aiFirst) do
-		table.insert(ordered, c)
-	end
-	for _, c in ipairs(contractTail) do
-		table.insert(ordered, c)
-	end
+	for _, c in ipairs(aiFirst) do table.insert(ordered, c) end
+	for _, c in ipairs(contractTail) do table.insert(ordered, c) end
 
-	local contractFieldCount = 0
 	local maxContractFields = IAGameLoopHelper.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_PER_DAY
-	-- Read from player setting; -1 means unlimited (no cap).
 	if IASettings ~= nil and type(IASettings.getContractMaxFieldsPerNeighbour) == "function" then
 		local settingCap = IASettings.getContractMaxFieldsPerNeighbour()
-		if settingCap ~= nil then
-			maxContractFields = settingCap
+		if settingCap ~= nil then maxContractFields = settingCap end
+	end
+
+	-- In additive mode, count existing contracts so we respect the cap across old + new rows.
+	local contractFieldCount = 0
+	if additiveOnly and neighbour.fieldworkScheduleTasks ~= nil then
+		for _, row in ipairs(neighbour.fieldworkScheduleTasks) do
+			if row ~= nil and row.contractEnabled == true then
+				contractFieldCount = contractFieldCount + 1
+			end
 		end
 	end
+
 	for _, c in ipairs(ordered) do
-		local row = {
-			situationId = c.config.id,
-			farmlandId = c.farmlandId,
-		}
-		if c.nextCropFruitTypeIndex ~= nil then
-			row.seedFruitTypeIndex = c.nextCropFruitTypeIndex
-		end
+		local row = { situationId = c.config.id, farmlandId = c.farmlandId }
+		if c.nextCropFruitTypeIndex ~= nil then row.seedFruitTypeIndex = c.nextCropFruitTypeIndex end
+
 		if rowIsContractForOutsource(c) then
-			if maxContractFields < 0 or contractFieldCount < maxContractFields then
+			local rk = rowKey(c)
+			if defineContracts then
+				-- Fresh contract marking based on chosen outsource type (6:00 or additive with zero contracts)
+				if maxContractFields < 0 or contractFieldCount < maxContractFields then
+					row.contractEnabled = true
+					contractFieldCount = contractFieldCount + 1
+				end
+			elseif oldContractKeys[rk] then
+				-- Preserve: same row was contract before, keep it
+				if maxContractFields < 0 or contractFieldCount < maxContractFields then
+					row.contractEnabled = true
+					contractFieldCount = contractFieldCount + 1
+				end
+			elseif not hasPlayerAcceptedContract
+				and neighbour.contractCallRingAnsweredToday ~= true
+				and (maxContractFields < 0 or contractFieldCount < maxContractFields) then
+				-- New row of the contract type — add to the bundle (up to cap),
+				-- but only when the player hasn't already accepted contracts today.
 				row.contractEnabled = true
 				contractFieldCount = contractFieldCount + 1
 			end
-			-- Remaining contract-eligible rows become plain AI work (no contractEnabled flag)
 		end
 		table.insert(neighbour.fieldworkScheduleTasks, row)
 	end
-
-	-- Daily random call window (hour 8..14 inclusive, minute 0..59). Set once per game day (rebuild only runs on day change via ensureDailyFieldworkSchedule).
-	neighbour.callPlayerHour = math.random(8, 14)
-	neighbour.callPlayerMinute = math.random(0, 59)
 
 	if IATestRunner ~= nil and type(IATestRunner.onScheduleRebuildEnd) == "function" then
 		IATestRunner.onScheduleRebuildEnd(neighbour, outsourcedJobType)
@@ -541,7 +655,7 @@ function IAGameLoopHelper:rebuildDailyFieldworkSchedule(neighbour)
 		for _, t in ipairs(neighbour.fieldworkScheduleTasks) do
 			if t.contractEnabled then contractCount = contractCount + 1 end
 		end
-		print("--- IAGameLoopHelper:rebuildDailyFieldworkSchedule() - "..tostring(neighbour.name).." y="..tostring(year).." m="..tostring(month).." d="..tostring(dayIn).." tasks="..tostring(#neighbour.fieldworkScheduleTasks).." outsourceType="..tostring(outsourcedJobType or "none").." contracts="..tostring(contractCount).." callAt="..string.format("%02d:%02d", neighbour.callPlayerHour, neighbour.callPlayerMinute))
+		print("--- IAGameLoopHelper:rebuildDailyFieldworkSchedule() - "..tostring(neighbour.name).." y="..tostring(year).." m="..tostring(month).." d="..tostring(dayIn).." tasks="..tostring(#neighbour.fieldworkScheduleTasks).." outsourceType="..tostring(outsourcedJobType or "none").." contracts="..tostring(contractCount).." defineContracts="..tostring(defineContracts).." callAt="..string.format("%02d:%02d", neighbour.callPlayerHour or 0, neighbour.callPlayerMinute or 0))
 	end
 end
 
@@ -558,6 +672,13 @@ function IAGameLoopHelper:autoCompleteScheduledFieldworkAtDayEnd(neighbour)
 		return
 	end
 	local completed = 0
+	local completedMonth = nil
+	if neighbour ~= nil and neighbour.fieldworkScheduleMonth ~= nil then
+		completedMonth = tonumber(neighbour.fieldworkScheduleMonth)
+	end
+	if completedMonth == nil then
+		completedMonth = getEnvironmentMonth1to12()
+	end
 	local tasks = neighbour.fieldworkScheduleTasks
 	for _, row in ipairs(tasks) do
 		local ok, err = pcall(function()
@@ -619,6 +740,67 @@ function IAGameLoopHelper:autoCompleteScheduledFieldworkAtDayEnd(neighbour)
 			print("--- IAGameLoopHelper:autoCompleteScheduledFieldworkAtDayEnd() - row failed: " .. tostring(err))
 		end
 	end
+	-- Fast-forward urgent seeding: when a field is in a pre-seed pipeline state
+	-- (harvested, stubble, plowed, cultivated) and the planned next crop must be
+	-- sown in the current month, bypass multi-day cultivation and seed directly.
+	-- Uses the same day-end FieldUpdateTask so the crop gets the overnight growth
+	-- compensation built into enqueueCompleteFieldworkFieldUpdateForDayEnd.
+	if IAFieldwork ~= nil and IAFieldwork.JobType ~= nil and IAFieldwork.JobType.SEED ~= nil then
+		local grassFruitTypeIndex = IAFieldwork.resolveFruitTypeNameOrIndex("GRASS")
+		local PRE_SEED_GROUND_TYPES = {
+			[2] = true,  -- STUBBLE_TILLAGE
+			[3] = true,  -- CULTIVATED
+			[4] = true,  -- SEEDBED
+			[5] = true,  -- PLOWED
+			[6] = true,  -- other cultivated
+			[13] = true, -- HARVEST_READY
+			[14] = true, -- HARVEST_READY_OTHER
+		}
+		local farmlands = g_farmlandManager:getFarmlands()
+		if farmlands ~= nil then
+			for _, farmlandId in ipairs(neighbour.assignedFarmlands) do
+				if neighbour.activeSituation ~= nil
+					and neighbour.activeSituation.farmlandId ~= nil
+					and tonumber(neighbour.activeSituation.farmlandId) == tonumber(farmlandId) then
+					-- actively worked, skip
+				elseif not self:isSowingMonthForPlannedSeed(neighbour, farmlandId, completedMonth) then
+					-- not urgent, skip
+				else
+					local field = nil
+					for _, f in pairs(farmlands) do
+						if f ~= nil and f.id == farmlandId and f.field ~= nil then
+							field = f.field
+							break
+						end
+					end
+					if field ~= nil and not self:hasActivePlayerFieldOutcomeForFarmland(farmlandId) then
+						local fs = IAHelper_getFieldStateFresh(field)
+						if fs ~= nil and (grassFruitTypeIndex == nil or tonumber(fs.fruitTypeIndex) ~= grassFruitTypeIndex)
+						and PRE_SEED_GROUND_TYPES[tonumber(fs.groundType)] then
+							local nextCrop = nil
+							if neighbour.assignedFarmlandNextCrop ~= nil then
+								nextCrop = neighbour.assignedFarmlandNextCrop[farmlandId]
+							end
+							if nextCrop == nil then
+								nextCrop = self:getNextCropForField(neighbour, farmlandId)
+							end
+							if nextCrop ~= nil then
+								if type(IAFieldwork.enqueueCompleteFieldworkFieldUpdateForDayEnd) == "function" then
+									if IAFieldwork.enqueueCompleteFieldworkFieldUpdateForDayEnd(
+										field, IAFieldwork.JobType.SEED, nextCrop, nil) then
+										completed = completed + 1
+										if self.ianeighbours ~= nil and self.ianeighbours.debug then
+											print("--- IAGameLoopHelper:autoCompleteScheduledFieldworkAtDayEnd() - fast-forward seed farmland " .. tostring(farmlandId) .. " nextCrop=" .. tostring(nextCrop))
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 	if self.ianeighbours ~= nil and self.ianeighbours.debug then
 		print("--- IAGameLoopHelper:autoCompleteScheduledFieldworkAtDayEnd() - " .. tostring(neighbour.name)
 			.. " completed " .. tostring(completed) .. " of " .. tostring(#tasks) .. " scheduled tasks at day end")
@@ -650,18 +832,69 @@ function IAGameLoopHelper:ensureDailyFieldworkSchedule(neighbour)
 	end
 	if not self:calendarDayMatchesStoredSchedule(neighbour) then
 		self:autoCompleteScheduledFieldworkAtDayEnd(neighbour)
-		self:rebuildDailyFieldworkSchedule(neighbour)
+		-- Day-change rebuild: defer contract definition to the first evaluateScheduledFieldworkRefresh run.
+		-- Field state queue from autoComplete should flush by then.
+		self:rebuildDailyFieldworkSchedule(neighbour, { defineContracts = false, isDayChange = true })
 	end
 	if self:calendarDayMatchesStoredSchedule(neighbour)
 		and neighbour.fieldworkScheduleTasks ~= nil
 		and #neighbour.fieldworkScheduleTasks == 0 then
-		-- Rebuilding here would reset contract-call bookkeeping and pick a new random outsource type
-		-- for the same calendar day, causing a second ring with missions that were not in today's plan.
+		-- Same-day empty schedule fallback: rebuild without redefining contracts.
 		local dayKey = self:getFieldworkScheduleDayKey(neighbour)
 		if dayKey ~= nil and neighbour.contractCallTriggerFiredForScheduleKey == dayKey then
 			return
 		end
-		self:rebuildDailyFieldworkSchedule(neighbour)
+		self:rebuildDailyFieldworkSchedule(neighbour, { defineContracts = false })
+	end
+end
+
+-- Called from the neighbour's 30-second interval timer. Runs the daily fieldwork
+-- schedule rebuild on every tick:
+--   First run of the day – full rebuild (defineContracts=true): pick outsource type,
+--     set call window, mark contract-enabled rows.
+--   Subsequent runs – additive rebuild: keep all existing rows, only add new field
+--     candidates. If no contracts exist, falls back to defineContracts=true.
+--
+-- A full rebuild only fires once per day (tracked via neighbour._iaScheduleRebuiltForDayKey).
+function IAGameLoopHelper:evaluateScheduledFieldworkRefresh(neighbour)
+	if neighbour == nil or not neighbour.initialized then
+		return
+	end
+	if neighbour.job ~= "Farmer" or neighbour.role ~= "Neighbour" then
+		return
+	end
+	if g_currentMission == nil or g_currentMission.environment == nil then
+		return
+	end
+
+	-- Ensure we have a schedule for today (handles day-change if needed)
+	self:ensureDailyFieldworkSchedule(neighbour)
+	if not self:calendarDayMatchesStoredSchedule(neighbour) then
+		return
+	end
+
+	local dayKey = self:getFieldworkScheduleDayKey(neighbour)
+	if dayKey == nil then
+		return
+	end
+
+	-- First run of the day: full rebuild with contract definition.
+	-- Subsequent runs: additive-only (keep existing rows, only add new candidates).
+	local isFirstRunToday = (neighbour._iaScheduleRebuiltForDayKey ~= dayKey)
+	neighbour._iaScheduleRebuiltForDayKey = dayKey
+
+	if isFirstRunToday then
+		if self.ianeighbours.debug then
+			print("--- IAGameLoopHelper:evaluateScheduledFieldworkRefresh() - " .. tostring(neighbour.name)
+				.. " FIRST-RUN defineContracts=true")
+		end
+		self:rebuildDailyFieldworkSchedule(neighbour, { defineContracts = true })
+	else
+		if self.ianeighbours.debug then
+			print("--- IAGameLoopHelper:evaluateScheduledFieldworkRefresh() - " .. tostring(neighbour.name)
+				.. " additiveOnly")
+		end
+		self:rebuildDailyFieldworkSchedule(neighbour, { defineContracts = false, additiveOnly = true })
 	end
 end
 
@@ -1247,24 +1480,44 @@ function IAGameLoopHelper:clearContractFlagsOnSchedule(neighbour)
 end
 
 -- @param table farmlandIds number[] unique farmland ids
--- @return number total hectares rounded to whole number
+-- @return number total hectares rounded to whole number (uses field.getAreaHa, not farmland.areaInHa,
+--         because a farmland plot often includes non-field land — forests, paths, meadows —
+--         making farmland.areaInHa much larger than the actual arable field polygon).
 function IAGameLoopHelper:sumRoundedHectaresForFarmlandIds(farmlandIds)
-	if farmlandIds == nil or #farmlandIds == 0 or g_farmlandManager == nil or g_farmlandManager.getFarmlands == nil then
+	if farmlandIds == nil or #farmlandIds == 0 or g_farmlandManager == nil then
 		return 0
 	end
 	local totalHa = 0
-	local farmlands = g_farmlandManager:getFarmlands()
 	for _, fid in ipairs(farmlandIds) do
-		for _, f in pairs(farmlands) do
-			if f ~= nil and f.id == fid then
-				if f.areaInHa ~= nil then
-					totalHa = totalHa + f.areaInHa
+		local farmland = nil
+		if type(g_farmlandManager.getFarmlandById) == "function" then
+			farmland = g_farmlandManager:getFarmlandById(fid)
+		elseif g_farmlandManager.getFarmlands ~= nil then
+			-- Fallback: scan all farmlands (maps without getFarmlandById)
+			for _, f in pairs(g_farmlandManager:getFarmlands()) do
+				if f ~= nil and f.id == fid then
+					farmland = f
+					break
 				end
-				break
+			end
+		end
+		if farmland ~= nil and type(farmland.getField) == "function" then
+			local ok, field = pcall(farmland.getField, farmland)
+			if ok and field ~= nil and type(field.getAreaHa) == "function" then
+				local okHa, ha = pcall(field.getAreaHa, field)
+				if okHa and ha ~= nil then
+					totalHa = totalHa + ha
+				end
 			end
 		end
 	end
-	return math.floor(totalHa + 0.5)
+	local rounded = math.floor(totalHa + 0.5)
+	-- Fields smaller than 1 ha must never report 0: the farmer says "1" (voice) and the
+	-- subtitle shows "1", so a positive-but-tiny field is still communicated as 1 ha.
+	if totalHa > 0 and rounded == 0 then
+		rounded = 1
+	end
+	return rounded
 end
 
 -- Pending contract rows become normal AI work (player declined or 15:00 fallback). Returns true if flags were cleared.
@@ -1558,10 +1811,23 @@ function IAGameLoopHelper:buildFieldworkScenarioFromOpenFieldwork(neighbour, ope
 	if fieldworkConfig.vehicles ~= nil and string.lower(tostring(fieldworkConfig.vehicles)) == "force" and situationVehicle == nil then
 		return nil
 	end
+	-- For job types that require specific implements: if GetVehiclesForSituation found no matching
+	-- attachment, do NOT fall back to a random tractor — the job can't be done without the implement.
 	if situationVehicle == nil then
 		situationVehicle = self:getRandomVehicleByType(neighbour.vehicles, "tractor")
 	end
 	if situationVehicle == nil then
+		return nil
+	end
+
+	-- Verify equipment availability for jobs that need specific implements.
+	-- If the neighbour doesn't have the right gear, don't build the scenario (AI can't do the work).
+	if IAFieldwork ~= nil and type(IAFieldwork.neighbourHasFleetEquipmentForJobType) == "function"
+		and jobType ~= nil and jobType ~= IAFieldwork.JobType.HARVEST
+		and not IAFieldwork.neighbourHasFleetEquipmentForJobType(neighbour, jobType) then
+		if self.ianeighbours.debug then
+			print("--- IAGameLoopHelper:buildFieldworkScenarioFromOpenFieldwork() - neighbour lacks equipment for jobType=" .. tostring(jobType) .. ", not building scenario")
+		end
 		return nil
 	end
 
@@ -1733,7 +1999,10 @@ function IAGameLoopHelper:doesFieldMatchSituationConfig(id,fieldState, config)
 			return false
 		end
 	end
-	-- triggerGrowthState: field's growthState must be in config's list (e.g. harvest-ready)
+	-- triggerGrowthState: field's growthState must be in config's list (e.g. harvest-ready).
+	-- FS25 crops use variant growth state names ("greenMiddle2", "greenBigSecond", "greenBig2")
+	-- that differ from the base names in situations XML. Normalize by stripping trailing digits
+	-- and "Second" suffix before comparing, so both exact and normalized forms match.
 	if config.triggerGrowthState ~= nil and #config.triggerGrowthState > 0 then
 		if fieldDebug then
 			print("--- IAGameLoopHelper:doesFieldMatchSituationConfig() - "..tostring(id)..": Growth States: " .. arrayToString(config.triggerGrowthState))
@@ -1743,13 +2012,20 @@ function IAGameLoopHelper:doesFieldMatchSituationConfig(id,fieldState, config)
 			return false
 		end
 		local gsName = getFruitTypeGrowthStateName(fieldState.fruitTypeIndex, fieldGrowthState)
+		local gsNameNorm = gsName
+		if gsNameNorm ~= nil then
+			-- "greenMiddle2" / "greenBig2" → "greenMiddle" / "greenBig"
+			gsNameNorm = string.gsub(gsNameNorm, "%d+$", "")
+			-- "greenBigSecond" / "greenSmallSecond" → "greenBig" / "greenSmall"
+			gsNameNorm = string.gsub(gsNameNorm, "Second$", "")
+		end
 		local matchesGrowth = false
 		for _, gs in ipairs(config.triggerGrowthState) do
 			
 			if fieldDebug then
-				print("--- IAGameLoopHelper:doesFieldMatchSituationConfig() - "..tostring(id)..": Growth State: " .. tostring(gs) .. " - " .. tostring(gsName))
+				print("--- IAGameLoopHelper:doesFieldMatchSituationConfig() - "..tostring(id)..": Growth State: " .. tostring(gs) .. " - " .. tostring(gsName) .. (gsNameNorm ~= gsName and (" (norm=" .. tostring(gsNameNorm) .. ")") or ""))
 			end
-			if gs == gsName then
+			if gs == gsName or gs == gsNameNorm then
 				if fieldDebug then
 					print("--- IAGameLoopHelper:doesFieldMatchSituationConfig() - "..tostring(id)..": Matches Growth State: " .. tostring(gsName))
 				end
@@ -1811,6 +2087,40 @@ function IAGameLoopHelper:doesFieldMatchSituationConfig(id,fieldState, config)
 			end
 		end
 		if not matchesSprayLevel then
+			return false
+		end
+	end
+	-- triggerStoneLevel: field's stoneLevel must be in config's list (e.g. 1,2 for stone picking trigger)
+	if config.triggerStoneLevel ~= nil and #config.triggerStoneLevel > 0 then
+		local fieldStoneLevel = fieldState.stoneLevel
+		if fieldStoneLevel == nil then
+			return false
+		end
+		local matchesStoneLevel = false
+		for _, sl in ipairs(config.triggerStoneLevel) do
+			if tonumber(fieldStoneLevel) == tonumber(sl) then
+				matchesStoneLevel = true
+				break
+			end
+		end
+		if not matchesStoneLevel then
+			return false
+		end
+	end
+	-- triggerLimeLevel: field's limeLevel must be in config's list (e.g. 0 for needing lime)
+	if config.triggerLimeLevel ~= nil and #config.triggerLimeLevel > 0 then
+		local fieldLimeLevel = fieldState.limeLevel
+		if fieldLimeLevel == nil then
+			return false
+		end
+		local matchesLimeLevel = false
+		for _, ll in ipairs(config.triggerLimeLevel) do
+			if tonumber(fieldLimeLevel) == tonumber(ll) then
+				matchesLimeLevel = true
+				break
+			end
+		end
+		if not matchesLimeLevel then
 			return false
 		end
 	end
@@ -2240,6 +2550,39 @@ function IAGameLoopHelper:isAnyFleetVehicleForConfigBorrowedByPlayer(neighbour, 
 				end
 			end
 		end
+	end
+	return false
+end
+
+--- True when the neighbour lacks the fleet equipment required for this fieldwork row's job type.
+--- Used by selectNewFieldwork to skip AI rows that can't be performed without the right implements.
+--- Contract rows (contractEnabled) are not checked here; they're for the player to handle.
+--- @param table neighbour
+--- @param table openFieldwork validated schedule entry with .config
+--- @return boolean
+function IAGameLoopHelper:isFieldworkRowMissingRequiredEquipment(neighbour, openFieldwork)
+	if neighbour == nil or openFieldwork == nil or openFieldwork.config == nil then
+		return false
+	end
+	local config = openFieldwork.config
+	local fwRaw = config.fieldwork
+	if fwRaw == nil or fwRaw == "" then
+		return false
+	end
+	local jt = nil
+	if IAFieldwork ~= nil and type(IAFieldwork.normalizeFieldworkJobType) == "function" then
+		jt = IAFieldwork.normalizeFieldworkJobType(string.lower(tostring(fwRaw)))
+	end
+	if jt == nil then
+		return false
+	end
+	-- Harvest is always AI-capable (the neighbour usually has a harvester).
+	if jt == IAFieldwork.JobType.HARVEST then
+		return false
+	end
+	-- Check if the neighbour has fleet equipment for this job.
+	if IAFieldwork ~= nil and type(IAFieldwork.neighbourHasFleetEquipmentForJobType) == "function" then
+		return not IAFieldwork.neighbourHasFleetEquipmentForJobType(neighbour, jt)
 	end
 	return false
 end
@@ -2761,7 +3104,10 @@ function IAGameLoopHelper:getUnassignedHomebasePlaces()
 		if place ~= nil and place.id ~= nil then
 			local st = string.lower(tostring((place.getSemanticType ~= nil and place:getSemanticType()) or place.type or ""))
 			if st == "character_homebase" then
-				if place.x == nil or place.z == nil then
+				local sizeType = (place.sizeType ~= nil) and string.lower(tostring(place.sizeType)) or nil
+				if sizeType == "silo" or sizeType == "large_area" then
+					-- Storage/area places are not assignable as homebase parking slots.
+				elseif place.x == nil or place.z == nil then
 					-- Skip unresolved placeable-relative
 				elseif not assigned[place.id] then
 					table.insert(unassigned, place)
@@ -3286,15 +3632,11 @@ function IAGameLoopHelper:collectOpenFieldworkCandidates(neighbour)
 	end
 
 	if #fieldworkConfigs == 0 then
-		if self.ianeighbours.debug then
-			print("--- IAGameLoopHelper:collectOpenFieldworkCandidates() - No fieldwork situation configs match neighbour "..tostring(neighbour.name))
-		end
+		--IAprintDebug("IAGameLoopHelper:collectOpenFieldworkCandidates", "No fieldwork situation configs match neighbour "..tostring(neighbour.name), neighbour, nil, nil)
 		return candidates
 	end
 
-	if self.ianeighbours.debug then
-		print("--- IAGameLoopHelper:collectOpenFieldworkCandidates() - "..tostring(neighbour.name).." assignedFarmlands="..tostring(#neighbour.assignedFarmlands)..", fieldworkConfigs="..tostring(#fieldworkConfigs)..", month="..tostring(getEnvironmentMonth1to12()))
-	end
+	--IAprintDebug("IAGameLoopHelper:collectOpenFieldworkCandidates", tostring(neighbour.name).." assignedFarmlands="..tostring(#neighbour.assignedFarmlands)..", fieldworkConfigs="..tostring(#fieldworkConfigs)..", month="..tostring(getEnvironmentMonth1to12()), neighbour, nil, nil)
 
 	local farmlands = g_farmlandManager:getFarmlands()
 	local seedCandidateCount = 0
@@ -3318,15 +3660,13 @@ function IAGameLoopHelper:collectOpenFieldworkCandidates(neighbour)
 			end
 		end
 
-		if farmland ~= nil and farmland.field ~= nil and farmland.field.fieldState ~= nil then
+		if farmland ~= nil and farmland.field ~= nil then
 			local mission = farmland.field.currentMission
 			local hasPlayerContract = self:hasActivePlayerFieldOutcomeForFarmland(farmlandId)
 			if (mission ~= nil and mission.farmId ~= nil) or hasPlayerContract then
-				if self.ianeighbours.debug then
-					print("--- IAGameLoopHelper:collectOpenFieldworkCandidates() - Field "..tostring(farmlandId).." is in use by player (mission="..tostring(mission ~= nil)..", playerContract="..tostring(hasPlayerContract).."), skipping")
-				end
+				--IAprintDebug("IAGameLoopHelper:collectOpenFieldworkCandidates", "Field "..tostring(farmlandId).." is in use by player (mission="..tostring(mission ~= nil)..", playerContract="..tostring(hasPlayerContract).."), skipping", neighbour, nil, nil)
 			else
-				local fieldState = farmland.field.fieldState
+				local fieldState = IAHelper_getFieldStateFresh(farmland.field)
 				for _, config in ipairs(fieldworkConfigs) do
 					if self:doesFieldMatchSituationConfig(farmlandId, fieldState, config) then
 						local isSeed = config.fieldwork ~= nil and string.lower(tostring(config.fieldwork)) == "seed"
@@ -3338,31 +3678,15 @@ function IAGameLoopHelper:collectOpenFieldworkCandidates(neighbour)
 								local configSeedIndex = IAFieldwork.resolveFruitTypeNameOrIndex(config.seedFruitTypeIndex)
 								if configSeedIndex == nil or configSeedIndex ~= candidate.nextCropFruitTypeIndex then
 									addCandidate = false
-									if self.ianeighbours.debug then
-										local ft = (g_fruitTypeManager and g_fruitTypeManager.getFruitTypeByIndex) and g_fruitTypeManager:getFruitTypeByIndex(candidate.nextCropFruitTypeIndex)
-										local nextName = (ft and ft.name) or tostring(candidate.nextCropFruitTypeIndex)
-										print("--- IAGameLoopHelper:collectOpenFieldworkCandidates() - SEED candidate rejected: farmland "..tostring(farmlandId)..", situation "..tostring(config.id).." seedFruitTypeIndex="..tostring(config.seedFruitTypeIndex).." (index "..tostring(configSeedIndex)..") does not match nextCrop "..tostring(nextName).." ("..tostring(candidate.nextCropFruitTypeIndex)..")")
-									end
+									--IAprintDebug("IAGameLoopHelper:collectOpenFieldworkCandidates", "SEED candidate rejected: farmland "..tostring(farmlandId)..", situation "..tostring(config.id).." seedFruitTypeIndex="..tostring(config.seedFruitTypeIndex).." (index "..tostring(configSeedIndex)..") does not match nextCrop", neighbour, nil, nil)
 								end
 							end
 							if addCandidate then
 								seedCandidateCount = seedCandidateCount + 1
-								if self.ianeighbours.debug then
-									local nextIdx = candidate.nextCropFruitTypeIndex
-									local nameStr = "nil"
-									if nextIdx ~= nil and g_fruitTypeManager and g_fruitTypeManager.getFruitTypeByIndex then
-										local ft = g_fruitTypeManager:getFruitTypeByIndex(nextIdx)
-										nameStr = (ft and ft.name) or tostring(nextIdx)
-									elseif nextIdx ~= nil then
-										nameStr = tostring(nextIdx)
-									end
-									print("--- IAGameLoopHelper:collectOpenFieldworkCandidates() - SEED candidate: farmland "..tostring(farmlandId)..", situation "..tostring(config.id)..", nextCrop="..tostring(nameStr).." ("..tostring(nextIdx or "nil")..")")
-								end
+								--IAprintDebug("IAGameLoopHelper:collectOpenFieldworkCandidates", "SEED candidate: farmland "..tostring(farmlandId)..", situation "..tostring(config.id)..", nextCrop="..tostring(candidate.nextCropFruitTypeIndex), neighbour, nil, nil)
 							end
 						else
-							if self.ianeighbours.debug then
-								print("--- IAGameLoopHelper:collectOpenFieldworkCandidates() - Match: farmland "..tostring(farmlandId)..", situation "..tostring(config.id).." ("..tostring(config.fieldwork)..")")
-							end
+							--IAprintDebug("IAGameLoopHelper:collectOpenFieldworkCandidates", "Match: farmland "..tostring(farmlandId)..", situation "..tostring(config.id).." ("..tostring(config.fieldwork)..")", neighbour, nil, nil)
 						end
 						if addCandidate then
 							table.insert(candidates, candidate)
@@ -3374,9 +3698,7 @@ function IAGameLoopHelper:collectOpenFieldworkCandidates(neighbour)
 		end
 	end
 
-	if self.ianeighbours.debug and #candidates > 0 then
-		print("--- IAGameLoopHelper:collectOpenFieldworkCandidates() - total="..tostring(#candidates).." (SEED rows="..tostring(seedCandidateCount)..")")
-	end
+	--IAprintDebug("IAGameLoopHelper:collectOpenFieldworkCandidates", "total="..tostring(#candidates).." (SEED rows="..tostring(seedCandidateCount)..")", neighbour, nil, nil)
 
 	return candidates
 end
@@ -3534,7 +3856,7 @@ function IAGameLoopHelper:getAllOpenFieldwork(neighbour)
 	end
 	if neighbour.assignedFarmlands == nil or #neighbour.assignedFarmlands == 0 then
 		if self.ianeighbours.debug then
-			print("--- IAGameLoopHelper:getAllOpenFieldwork() - Neighbour "..neighbour.name.." has no assigned farmlands")
+			--print("--- IAGameLoopHelper:getAllOpenFieldwork() - Neighbour "..neighbour.name.." has no assigned farmlands")
 		end
 		return {}
 	end
@@ -3652,12 +3974,12 @@ function IAGameLoopHelper:selectNewFieldwork(neighbour)
 			elseif entry.contractEnabled == true
 				and not (IASettings ~= nil and type(IASettings.isMissionOfferModeClassic) == "function" and IASettings.isMissionOfferModeClassic())
 			then
-				-- Contract row still pending player decision: block AI until accept/decline/15:00 fallback resolves it.
-				-- In classic mode this branch is skipped (no phone calls exist), so the row falls through to normal AI work.
+				-- Contract row still pending player decision: leave it in place and continue
+				-- scanning later rows so the neighbour can still take other fieldwork tasks.
 				if self.ianeighbours.debug then
-					print("--- IAGameLoopHelper:selectNewFieldwork() - Task at idx "..tostring(idx).." is contract-pending for " .. tostring(neighbour.name) .. ", waiting for accept/decline/15:00 fallback")
+					print("--- IAGameLoopHelper:selectNewFieldwork() - Task at idx "..tostring(idx).." is contract-pending for " .. tostring(neighbour.name) .. ", skipping for now")
 				end
-				return nil
+				idx = idx + 1
 			elseif self:isAnyFleetVehicleForConfigBorrowedByPlayer(neighbour, openFieldwork.config) then
 				-- Equipment required for this row is currently borrowed by the player
 				-- (typical case: player accepted only part of a bundled contract).
@@ -3665,6 +3987,14 @@ function IAGameLoopHelper:selectNewFieldwork(neighbour)
 				-- once the gear is returned. Do NOT table.remove.
 				if self.ianeighbours.debug then
 					print("--- IAGameLoopHelper:selectNewFieldwork() - Task at idx "..tostring(idx).." skipped (required equipment borrowed by player) for "..tostring(neighbour.name))
+				end
+				idx = idx + 1
+			elseif self:isFieldworkRowMissingRequiredEquipment(neighbour, openFieldwork) then
+				-- Neighbour lacks the equipment for this job type.
+				-- Keep the row in the schedule so the day-end rollover path can still complete
+				-- the field if the day advances before equipment becomes available.
+				if self.ianeighbours.debug then
+					print("--- IAGameLoopHelper:selectNewFieldwork() - Task at idx "..tostring(idx).." skipped (no fleet equipment; retaining for day-end completion) for "..tostring(neighbour.name))
 				end
 				idx = idx + 1
 			else

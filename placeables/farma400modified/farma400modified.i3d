@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="farma400modified.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.13"/>
+  </Asset>
+
+  <Files>
+    <File fileId="18" filename="$data/placeables/unia/shared/uniaSilosLogo_diffuse.png"/>
+    <File fileId="3" filename="$data/placeables/unia/shared/uniaSilos_diffuse.png"/>
+    <File fileId="7" filename="$data/placeables/unia/shared/uniaSilos_mask.png"/>
+    <File fileId="4" filename="$data/placeables/unia/shared/uniaSilos_normal.png"/>
+    <File fileId="5" filename="$data/placeables/unia/shared/uniaSilos_specular.png"/>
+    <File fileId="19" filename="$data/placeables/vogelsang/fillmasterS/fillmasterS_diffuse.png"/>
+    <File fileId="20" filename="$data/placeables/vogelsang/fillmasterS/fillmasterS_normal.png"/>
+    <File fileId="21" filename="$data/placeables/vogelsang/fillmasterS/fillmasterS_specular.png"/>
+    <File fileId="6" filename="$data/shaders/buildingShader.xml"/>
+    <File fileId="15" filename="$data/shaders/decalShader.xml"/>
+    <File fileId="17" filename="$data/shaders/placeableShader.xml"/>
+    <File fileId="12" filename="$data/shared/assets/assetLibraryDecals_diffuse.png"/>
+    <File fileId="13" filename="$data/shared/assets/assetLibraryDecals_normal.png"/>
+    <File fileId="16" filename="$data/shared/assets/assetLibraryStickers_diffuse.png"/>
+    <File fileId="2" filename="$data/shared/default_normal.png"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="assetLibraryDecals_mat" materialId="5" specularColor="0.439216 1 1" alphaBlending="true" customShaderId="15">
+      <Texture fileId="12"/>
+      <Normalmap fileId="13"/>
+    </Material>
+    <Material name="assetLibraryStickers_mat" materialId="6" customShaderId="17">
+      <Texture fileId="16"/>
+      <Normalmap fileId="2"/>
+    </Material>
+    <Material name="fillmasterS_mat" materialId="7" customShaderId="17">
+      <Texture fileId="19"/>
+      <Normalmap fileId="20"/>
+      <Glossmap fileId="21"/>
+    </Material>
+    <Material name="lambert1" materialId="8" diffuseColor="0.501961 0.501961 0.501961 1">
+    </Material>
+    <Material name="lambert2" materialId="9" diffuseColor="0.501961 0.501961 0.501961 1">
+      <Normalmap fileId="2"/>
+    </Material>
+    <Material name="uniaSilos_mat" materialId="10" customShaderId="6">
+      <Texture fileId="3"/>
+      <Normalmap fileId="4"/>
+      <Glossmap fileId="5"/>
+      <Custommap name="mMaskMap" fileId="7"/>
+      <CustomParameter name="dirtMossSmoothness" value="0.12 0.82"/>
+    </Material>
+    <Material name="uniaSilosLogo_mat" materialId="11" customShaderId="17">
+      <Texture fileId="18"/>
+      <Normalmap fileId="2"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="farma400modified.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <TransformGroup name="uniaFarma400" nodeId="32">
+      <TransformGroup name="clearAreas" nodeId="33">
+        <TransformGroup name="clearAreaStart01" translation="-7 0 -7" nodeId="34">
+          <TransformGroup name="clearAreaWidth01" translation="1.5e-05 0 7" nodeId="35"/>
+          <TransformGroup name="clearAreaHeight01" translation="14 0 0" nodeId="36"/>
+        </TransformGroup>
+        <TransformGroup name="clearAreaStart02" translation="-3 0 0" nodeId="37">
+          <TransformGroup name="clearAreaWidth02" translation="0 0 7" nodeId="38"/>
+          <TransformGroup name="clearAreaHeight02" translation="6 0 0" nodeId="39"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="levelAreas" nodeId="40">
+        <TransformGroup name="levelAreaStart01" translation="-8 0 -8" nodeId="41">
+          <TransformGroup name="levelAreaWidth01" translation="1.5e-05 0 9" nodeId="42"/>
+          <TransformGroup name="levelAreaHeight01" translation="16 0 0" nodeId="43"/>
+        </TransformGroup>
+        <TransformGroup name="levelAreaStart02" translation="-4 0 0" nodeId="44">
+          <TransformGroup name="levelAreaWidth02" translation="0 0 8" nodeId="45"/>
+          <TransformGroup name="levelAreaHeight02" translation="8 0 0" nodeId="46"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="testAreas" nodeId="47">
+        <TransformGroup name="testAreaStart01" translation="-7 0 -7" nodeId="48">
+          <TransformGroup name="testAreaEnd01" translation="14 13 7" nodeId="49"/>
+        </TransformGroup>
+        <TransformGroup name="testAreaStart02" translation="-3 0 0" nodeId="50">
+          <TransformGroup name="testAreaEnd02" translation="6 15 7" nodeId="51"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="tipOcclusionUpdateAreas" nodeId="52">
+        <TransformGroup name="tipOcclusionUpdateAreaStart01" translation="-7 0 -7" nodeId="53">
+          <TransformGroup name="tipOcclusionUpdateAreaEnd01" translation="14 0 14" nodeId="54"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="silo" nodeId="55">
+        <TransformGroup name="loadingStation" translation="-0.01187 4.26277 5.03722" nodeId="56">
+          <TransformGroup name="loadingTriggers" translation="0 -0.215055 0" nodeId="57">
+            <Shape name="loadingTrigger" translation="0.002711 0.495517 0.44969" shapeId="1" static="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x40000000" nodeId="58" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+            <TransformGroup name="dischargeNode" nodeId="59"/>
+            <TransformGroup name="dischargeEffect" translation="0 -0.105872 0.450763" nodeId="60">
+              <Shape name="pipeEffect" translation="0 0.700242 0" rotation="90 0 0" shapeId="2" clipDistance="300" nodeId="61" castsShadows="true" receiveShadows="true" materialIds="9"/>
+              <Shape name="pipeEffectSmoke" translation="0 -2.56733 0" shapeId="3" clipDistance="100" nodeId="62" castsShadows="true" receiveShadows="true" materialIds="9"/>
+            </TransformGroup>
+            <TransformGroup name="aiLoadingNode" translation="0 -3.70297 0.537158" rotation="0 -90 0" nodeId="63"/>
+          </TransformGroup>
+          <TransformGroup name="markerLoading" translation="0.01187 -4.26277 0.056003" rotation="0 -90 0" nodeId="64"/>
+        </TransformGroup>
+        <TransformGroup name="unloadingStation" translation="-0.005935 0.159928 5.85394" nodeId="65">
+          <Shape name="exactFillRootNode" translation="0.005935 -0.184815 -0.215387" shapeId="4" kinematic="true" compound="true" collisionFilterGroup="0x40000000" collisionFilterMask="0x20000000" nodeId="66" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+          <TransformGroup name="grainGutterLinkNode" translation="0.005935 -0.159928 -0.328653" scale="0.65 0.65 0.65" nodeId="67"/>
+          <TransformGroup name="aiUnloadingNode" translation="-0.005935 0.184815 -0.240578" rotation="0 -90 0" nodeId="68"/>
+          <TransformGroup name="markerUnloading" translation="0.005935 -0.159928 0.328653" rotation="0 -90 0" nodeId="69"/>
+          <Shape name="baleTrigger" translation="-0.001439 1.92165 -0.240162" shapeId="5" kinematic="true" compound="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x40000" nodeId="179" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+        </TransformGroup>
+        <TransformGroup name="mapPosition" translation="0 0 5.5" nodeId="70"/>
+        <TransformGroup name="storage" nodeId="71"/>
+        <Shape name="infoTrigger" shapeId="6" static="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x100000" nodeId="72" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+        <Shape name="aiSpline" translation="0.87703 0 5.56336" shapeId="7" nodeId="73" castsShadows="false" receiveShadows="false"/>
+        <TransformGroup name="uniaKarma16" translation="0 0.317239 1.71452" clipDistance="500" nodeId="75">
+          <TransformGroup name="clearAreas" nodeId="76">
+            <TransformGroup name="clearAreaStart01" translation="-2 0 -1.5" nodeId="77">
+              <TransformGroup name="clearAreaWidth01" translation="0 0 6.5" nodeId="78"/>
+              <TransformGroup name="clearAreaHeight01" translation="4 0 0" nodeId="79"/>
+            </TransformGroup>
+          </TransformGroup>
+          <TransformGroup name="levelAreas" nodeId="80">
+            <TransformGroup name="levelAreaStart01" translation="-2 0 -1.5" nodeId="81">
+              <TransformGroup name="levelAreaWidth01" translation="0 0 6.5" nodeId="82"/>
+              <TransformGroup name="levelAreaHeight01" translation="4 0 0" nodeId="83"/>
+            </TransformGroup>
+          </TransformGroup>
+          <TransformGroup name="testAreas" nodeId="84">
+            <TransformGroup name="testAreaStart01" translation="-2 0 -1.5" nodeId="85">
+              <TransformGroup name="testAreaEnd01" translation="4 9 6.5" nodeId="86"/>
+            </TransformGroup>
+          </TransformGroup>
+          <TransformGroup name="tipOcclusionUpdateAreas" nodeId="87">
+            <TransformGroup name="tipOcclusionUpdateAreaStart01" translation="-2 0 -2" nodeId="88">
+              <TransformGroup name="tipOcclusionUpdateAreaEnd01" translation="4 0 7" nodeId="89"/>
+            </TransformGroup>
+          </TransformGroup>
+          <TransformGroup name="silo" nodeId="90">
+            <TransformGroup name="unloadingStation" nodeId="91">
+              <Shape name="exactFillRootNode" translation="0 -0.139137 3.5" shapeId="8" static="true" collisionFilterGroup="0x40000000" collisionFilterMask="0x20000000" nodeId="92" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+              <TransformGroup name="unloadingStationAINode" translation="0 0 3.7" rotation="0 90 0" nodeId="93"/>
+            </TransformGroup>
+            <TransformGroup name="loadingStation" nodeId="94">
+              <Shape name="loadingTrigger" translation="0 2.06123 3.5" shapeId="9" static="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x40000000" nodeId="95" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+              <TransformGroup name="loadingStationAINode" translation="0 0 3.8" rotation="0 90 0" nodeId="96"/>
+            </TransformGroup>
+            <TransformGroup name="storage" nodeId="97"/>
+            <TransformGroup name="mapPosition" translation="5 0 10" nodeId="98"/>
+            <Shape name="infoTrigger" translation="0 -0.334507 0" shapeId="10" static="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x100000" nodeId="99" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+            <Shape name="refillPlayerTrigger" translation="1.81137 0 0" shapeId="11" static="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x100000" nodeId="100" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+            <TransformGroup name="refillMarker" translation="1.81137 0 0" nodeId="101"/>
+            <TransformGroup name="markerLoading" translation="0 0 2.46934" nodeId="102"/>
+          </TransformGroup>
+          <TransformGroup name="visuals" rotation="0 55.1268 0" nodeId="103">
+            <TransformGroup name="visuals_lod" lodDistance="0 80" nodeId="104">
+              <TransformGroup name="uniaKarma16_lod0" nodeId="105">
+                <Shape name="uniaKarma16_vis" shapeId="12" clipDistance="300" nodeId="106" castsShadows="true" receiveShadows="true" materialIds="10"/>
+                <Shape name="screws" translation="4e-06 1.82232 0.073637" shapeId="13" clipDistance="30" nodeId="107" castsShadows="true" receiveShadows="true" materialIds="5"/>
+                <Shape name="stickers" translation="-0.214866 1.8939 0.111416" shapeId="14" clipDistance="30" nodeId="108" castsShadows="true" receiveShadows="true" materialIds="6"/>
+              </TransformGroup>
+              <TransformGroup name="uniaKarma16_lod1" nodeId="109">
+                <Shape name="karmaLOD" shapeId="15" clipDistance="500" nodeId="110" castsShadows="true" receiveShadows="true" materialIds="10"/>
+              </TransformGroup>
+            </TransformGroup>
+            <Shape name="logo" translation="-0.001928 7.9463 1.09502" shapeId="16" clipDistance="80" nodeId="111" castsShadows="true" receiveShadows="true" materialIds="11"/>
+          </TransformGroup>
+          <TransformGroup name="collisions" nodeId="112">
+            <Shape name="collision" translation="0 1.18018 0" shapeId="17" static="true" collisionFilterGroup="0x1034" collisionFilterMask="0xfffffbff" nodeId="113" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+            <Shape name="tipCollision" shapeId="18" static="true" collisionFilterGroup="0x8" collisionFilterMask="0x1" nodeId="114" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="8"/>
+          </TransformGroup>
+          <Shape name="occluder" shapeId="19" clipDistance="220" nodeId="115" castsShadows="true" receiveShadows="true" nonRenderable="true" occluder="true" materialIds="8"/>
+          <Shape name="visualFillTower" translation="-0.028678 -0.522 1.26" shapeId="20" clipDistance="300" nodeId="116" castsShadows="true" receiveShadows="true" materialIds="7"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="visuals" nodeId="117"/>
+      <TransformGroup name="teleportNode" translation="3.66594 0 1.65738" rotation="0 -21.6537 0" nodeId="118"/>
+    </TransformGroup>
+  </Scene>
+
+</i3D>

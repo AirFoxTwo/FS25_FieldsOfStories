@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+	<translationContributors/>
+	<texts>
+            <text name="gui_dialog_title" text="Conversación con"/>
+            <text name="gui_dialog_answerlabel" text="Tú:"/>
+            <text name="gui_dialog_button_ok" text="Aceptar"/>
+            <text name="gui_dialog_button_cancel" text="Cancelar"/>
+            <text name="ui_ingameMenuFieldsOfStories" text="Fields of Stories"/>
+            <text name="input_IAStartConversation" text="Conversación / Teléfono"/>
+            <text name="input_IAUsePhone" text="Usar el teléfono"/>
+            <text name="gui_hud_start_conversation" text="Iniciar conversación"/>
+            <text name="gui_voice_pack_warn_title" text="Fields of Stories – Paquete de voces"/>
+            <text name="gui_voice_pack_warn_message" text="Estás jugando a Fields of Stories sin paquete de voces (opcional). Versión necesaria: %s"/>
+            <text name="gui_voice_pack_warn_recheck" text="Volver a comprobar"/>
+            <text name="gui_voice_pack_warn_ok_notification" text="Paquete de voces correcto: la versión coincide con Fields of Stories."/>
+            <text name="ia_homebase_setup_warning" text="Fields of Stories: Las bases no están completas. Coloca las áreas de base necesarias para finalizar la configuración."/>
+            <text name="gui_dialog_button_ignore" text="Ignorar"/>
+            <text name="gui_mapplaces_gen_title" text="Fields of Stories – Generando lugares del mapa"/>
+            <text name="gui_mapplaces_gen_message" text="Experimental: no se encontró ninguna configuración guardada para este mapa. Si continúas, «Fields of Stories» creará automáticamente cientos o miles de lugares en el mapa. El juego parecerá congelado hasta que termine la generación."/>
+            <text name="gui_mapplaces_gen_message2" text="Para una mejor experiencia, recorre el mapa y añade tus propios lugares (Mayús + F3) o elimina los incorrectos.&#10;&#10;Para más información, abre el menú de Ayuda del juego y lee los temas de Fields of Stories."/>
+            <text name="gui_mapplaces_gen_before_load" text="Pulsa Aceptar para empezar a cargar y generar los lugares del mapa. El juego puede parecer congelado hasta que termine. Es normal."/>
+            <text name="gui_firstload_tutorial_title" text="Fields of Stories – Guía"/>
+            <text name="gui_firstload_tutorial_message" text="Sigue esta guía para sacar el máximo partido al mod. Para todos los detalles de cada función, abre el menú de Ayuda del juego y lee los temas de Fields of Stories."/>
+            <text name="gui_firstload_tutorial_message2" text="1. Activación del mod: el mod se cargará automáticamente. En los primeros minutos puede haber limitaciones de rendimiento, ya que se cargan muchos vehículos y datos."/>
+            <text name="gui_firstload_tutorial_message3" text="2. Generación de lugares: en los mapas de mods, la generación automática ya ha empezado a reconocer casas, carreteras y bosques. Sigue la guía del menú de Ayuda (categoría Configuración) para tener la mejor experiencia en mapas de mods."/>
+            <text name="gui_firstload_tutorial_message4" text="3. Deja que las experiencias lleguen a ti: es mejor no sacarlo todo de golpe de Fields of Stories. Podrás encontrarte con personajes por el mundo, recibir llamadas cuando menos lo esperes y recorrer el mapa descubriendo las granjas."/>
+            <text name="gui_firstload_tutorial_message5" text="4. Apoya a los granjeros: sé amable y servicial, y a la larga tendrás buenas relaciones y muchas ventajas."/>
+            <text name="gui_firstload_tutorial_message6" text="5. Consulta la hoja de ruta: el mod aún es una pequeña parte de la visión del proyecto:&#10;-ayudantes y contratistas,&#10;-personajes que se mueven y conducen,&#10;-grandes eventos,&#10;-docenas de tipos de misiones; todo es posible, pero lleva tiempo y tu apoyo."/>
+            <text name="gui_phone_title" text="%s"/>
+            <text name="gui_phone_title_default" text="Teléfono"/>
+            <text name="construction_foS_category" text="Fields of Stories"/>
+            <text name="construction_foS_tab_placeables" text="Lugares generales"/>
+            <text name="construction_foS_tab_character_homebase" text="Casa del personaje"/>
+            <text name="fos_char_homebase_name" text="Base del personaje: %s"/>
+            <text name="fos_char_homebase_desc" text="Base colocable para el personaje n.º %s. Coloca un silo y un corral de granja."/>
+            <text name="fos_char_homebase_name_1" text="Mary Carter (Familiar, Granjera)"/>
+            <text name="fos_char_homebase_desc_1" text="Hogar de Mary Carter."/>
+            <text name="fos_char_homebase_name_2" text="John Carter (Familiar, Granjero)"/>
+            <text name="fos_char_homebase_desc_2" text="Hogar de John Carter."/>
+            <text name="fos_char_homebase_name_10" text="Sharon Whitaker (Funcionaria)"/>
+            <text name="fos_char_homebase_desc_10" text="Hogar de Sharon Whitaker."/>
+            <text name="fos_char_homebase_name_11" text="Kyle Bennett (Civil)"/>
+            <text name="fos_char_homebase_desc_11" text="Hogar de Kyle Bennett."/>
+            <text name="fos_char_homebase_name_13" text="Lukas Brenner (Vecino, Forestal)"/>
+            <text name="fos_char_homebase_desc_13" text="Hogar de Lukas Brenner."/>
+            <text name="fos_char_homebase_name_14" text="Martin Walker (Funcionario, Alcalde)"/>
+            <text name="fos_char_homebase_desc_14" text="Hogar de Martin Walker."/>
+            <text name="fos_char_homebase_name_15" text="Susan Keller (Socia comercial, Comerciante de grano)"/>
+            <text name="fos_char_homebase_desc_15" text="Hogar de Susan Keller."/>
+            <text name="fos_char_homebase_name_16" text="Andy Hoffman (Socio comercial, Concesionario de maquinaria agrícola)"/>
+            <text name="fos_char_homebase_desc_16" text="Hogar de Andy Hoffman."/>
+            <text name="fos_char_homebase_name_17" text="Paul Meyer (Socio comercial, Contratista agrícola)"/>
+            <text name="fos_char_homebase_desc_17" text="Hogar de Paul Meyer."/>
+            <text name="fos_char_homebase_name_18" text="Marcus Brown (Vecino, Granjero)"/>
+            <text name="fos_char_homebase_desc_18" text="Hogar de Marcus Brown."/>
+            <text name="fos_char_homebase_name_19" text="Jacob Miller (Vecino, Granjero)"/>
+            <text name="fos_char_homebase_desc_19" text="Hogar de Jacob Miller."/>
+            <text name="fos_char_homebase_name_20" text="Emma Kensington (Vecina, Granjera)"/>
+            <text name="fos_char_homebase_desc_20" text="Hogar de Emma Kensington."/>
+            <text name="fos_char_homebase_name_21" text="Brian Winter (Vecino, Granjero)"/>
+            <text name="fos_char_homebase_desc_21" text="Hogar de Brian Winter."/>
+            <text name="gui_phone_message" text="Llamada entrante"/>
+            <text name="gui_phone_answer" text="Responder"/>
+            <text name="gui_phone_decline" text="Rechazar"/>
+            <text name="gui_phone_close" text="Cerrar"/>
+            <text name="gui_phone_no_incoming" text="No hay llamadas entrantes."/>
+            <text name="gui_phone_caller_unknown" text="Alguien"/>
+            <text name="gui_phone_incoming_notification" text="Llamada entrante de %s. Abre tu teléfono para responder o rechazar."/>
+            <text name="gui_mapinit_dialog_title" text="Configurar lugares"/>
+            <text name="gui_mapinit_dialog_message" text="Añade y elimina lugares para las situaciones de los personajes. Ten en cuenta la cantidad recomendada que se muestra en la lista. Primero, selecciona el tamaño del lugar arriba (a pie, con vehículo o vehículo con apero)."/>
+            <text name="gui_mapinit_dialog_first_title" text="Configurar lugares"/>
+            <text name="gui_mapinit_dialog_first_message" text="Abre el menú de construcción para crear lugares por todo el mapa, o activa el modo clásico de la versión 1.0, que requiere recorrer la mapa para guardar lugares."/>
+            <text name="gui_mapinit_characters_title" text="Detalles del personaje"/>
+            <text name="gui_mapinit_characters_message" text="Revisa los detalles del personaje y configúralos."/>
+            <text name="gui_mapinit_general_actions_title" text="Acciones generales"/>
+            <text name="gui_mapinit_general_actions_message" text="Funciones para configurar o limpiar tu mapa."/>
+            <text name="gui_mapinit_tab_story" text="Historia"/>
+            <text name="gui_mapinit_tab_settings" text="Ajustes"/>
+            <text name="gui_mapinit_story_relationship" text="Relación"/>
+            <text name="gui_mapinit_story_relationship_level" text="Nivel de relación"/>
+            <text name="gui_mapinit_story_relationship_points" text="Puntos de relación"/>
+            <text name="gui_mapinit_story_relationship_points_fmt" text="%d / %d"/>
+            <text name="gui_relationship_family" text="Familia"/>
+            <text name="gui_relationship_known" text="Conocido"/>
+            <text name="gui_relationship_friend" text="Amigo"/>
+            <text name="gui_relationship_close_friend" text="Amigo íntimo"/>
+            <text name="gui_relationship_strained" text="Tensa"/>
+            <text name="gui_mapinit_tab_help" text="Ayuda"/>
+            <text name="gui_mapinit_help_info_title" text="Dónde encontrar ayuda"/>
+            <text name="gui_mapinit_help_info_body" text="La guía completa de Fields of Stories está en el menú de Ayuda del juego. Pulsa Esc para abrir el menú, ve a Ayuda y mira las categorías «Juego de rol» y «Configuración» para leer sobre cada función: conocer vecinos, conversaciones, relaciones, contratos de campo, bases, creación de lugares y más.&#10;La pestaña Ajustes de este diálogo contiene las herramientas de lugares y personajes para configurar un mapa."/>
+            <text name="gui_help_category_title" text="Juego de rol"/>
+            <text name="gui_help_category_setup_title" text="Configuración"/>
+            <text name="gui_help_overview_title" text="Resumen"/>
+            <text name="gui_help_overview_body" text="Fields of Stories convierte tu mundo de juego en un vecindario vivo. Las personas a tu alrededor no son PNJ anónimos: viven en sus casas, siguen rutinas diarias, trabajan sus campos y mantienen distintas relaciones contigo.&#10;&#10;Qué puedes hacer:&#10;- Conocer a los vecinos por el mundo y hablar con ellos cara a cara.&#10;- Atender llamadas cuando un granjero necesita ayuda con el trabajo del campo.&#10;- Aceptar contratos de campo, opcionalmente tomando prestada la maquinaria del vecino.&#10;- Mejorar tu relación personal con cada personaje con el tiempo.&#10;&#10;Esta sección de Ayuda explica cada función en detalle."/>
+            <text name="gui_help_characters_title" text="Personajes"/>
+            <text name="gui_help_characters_body" text="Estos son los vecinos de tu mundo. Cada uno tiene su propia personalidad, rol y oficio, además de su propia historia.&#10;&#10;Entre los roles que podrás encontrar hay granjeros, un forestal, el alcalde, un concesionario de maquinaria, un contratista agrícola, una comerciante de grano, familiares y civiles corrientes. El rol y el oficio de un personaje determinan qué hace durante el día y de qué puedes hablar con él.&#10;&#10;Pasa tiempo con los personajes cuyas historias te interesen más."/>
+            <text name="gui_help_places_title" text="Crear lugares del mapa"/>
+            <text name="gui_help_places_body" text="Los lugares son los anclajes que dan vida a un mapa. Le indican al mod dónde pueden estar, aparcar, comprar, relajarse y vivir los personajes. En los mapas compatibles ya está configurado; este tema es para tus propios mapas.&#10;&#10;Cómo crear un lugar (menú de construcción, recomendado):&#10;1. Abre el menú de construcción (herramienta de construcción) y selecciona la categoría «Fields of Stories».&#10;2. Abre la pestaña «Lugares generales» y elige un marcador de lugar (p. ej. Lugar público, Tienda, Gasolinera, ...).&#10;3. Mueve el marcador al sitio deseado, gíralo y haz clic para colocarlo. El marcador se convierte en un lugar real y se elimina automáticamente.&#10;4. Mientras colocas, pulsa Mayús+Q para cambiar el tamaño del lugar. Un contorno verde muestra la huella y un panel en pantalla indica los tamaños y cuántos lugares se necesitan aún.&#10;5. Para eliminar lugares, coloca la herramienta «Eliminar lugar» cerca de un lugar existente (elimina el más cercano en 5 m) o pulsa Mayús+Supr para eliminar todos los lugares del tipo seleccionado a la vez.&#10;&#10;Método clásico (recorriendo el mapa): abre el menú con Mayús+F3, ve a la pestaña Ajustes, elige un tamaño de lugar arriba, sitúate (o aparca tu vehículo) exactamente donde debe ir el lugar y haz clic en el tipo de lugar que quieras. La posición actual se guarda y recibes la confirmación «Lugar guardado». Cuantos más lugares guardes, más dinámico y único será el juego.&#10;&#10;Tamaños de lugar:&#10;- Personaje: solo a pie, para situaciones de pie sin vehículos.&#10;- Vehículo: sitio para un coche o tractor.&#10;- Vehículo con apero: un vehículo más un remolque o apero (opcional).&#10;- Vehículo sobredimensionado (solo base): una plaza de aparcamiento extraancha para cosechadoras y autopropulsados.&#10;- Área grande: una zona amplia y abierta para situaciones que necesitan espacio, como la preparación de maquinaria, mercados o eventos.&#10;- Silo: marca el lugar del silo del granjero (solo granjas base). El silo aparece aquí y se usa como punto de entrega y rellenado.&#10;&#10;Tipos de lugar comunes y su propósito:&#10;- Base de personaje: donde vive un vecino (ver «Bases»).&#10;- Tienda, gasolinera, taller, cobertizo, punto de venta, industria, infraestructura pública: lugares públicos funcionales.&#10;- Borde de carretera, camino de tierra, árboles: encuentros en la carretera.&#10;- Lugar público y lugar de relax público: lugares sociales y de ocio; el lugar de relax privado es para rutinas más tranquilas.&#10;- Granja del jugador: eventos en tu propia granja.&#10;&#10;Generador de mapas para mapas nuevos:&#10;En un mapa desconocido, el generador puede crear muchos lugares automáticamente a partir de los datos del mapa. Ten paciencia: se pueden crear muchos lugares y el juego puede parecer congelado un instante mientras trabaja.&#10;&#10;Configuraciones de mapa listas: para muchos mapas puedes descargar una configuración terminada, o subir y compartir la tuya a través del sitio web oficial del mod, accesible desde la página de GitHub del mod."/>
+            <text name="gui_help_char_age" text="Edad"/>
+            <text name="gui_help_char_gender" text="Género"/>
+            <text name="gui_help_char_gender_male" text="Hombre"/>
+            <text name="gui_help_char_gender_female" text="Mujer"/>
+            <text name="gui_help_char_relationship" text="Relación"/>
+            <text name="gui_help_char_role" text="Rol"/>
+            <text name="gui_help_char_job" text="Oficio"/>
+            <text name="gui_help_char_belongsToFarm" text="Pertenece a la granja"/>
+            <text name="gui_help_char_behaviour" text="Comportamiento"/>
+            <text name="gui_help_char_yes" text="Sí"/>
+            <text name="gui_help_char_no" text="No"/>
+            <text name="gui_help_char_name_21" text="Brian Winter"/>
+            <text name="gui_help_char_name_20" text="Emma Kensington"/>
+            <text name="gui_help_char_name_19" text="Jacob Miller"/>
+            <text name="gui_help_char_name_18" text="Marcus Brown"/>
+            <text name="gui_help_char_name_17" text="Paul Meyer"/>
+            <text name="gui_help_char_name_16" text="Andy Hoffman"/>
+            <text name="gui_help_char_name_15" text="Susan Keller"/>
+            <text name="gui_help_char_name_14" text="Martin Walker"/>
+            <text name="gui_help_char_name_13" text="Lukas Brenner"/>
+            <text name="gui_help_char_name_11" text="Kyle Bennett"/>
+            <text name="gui_help_char_name_10" text="Sharon Whitaker"/>
+            <text name="gui_help_char_name_2" text="John Carter"/>
+            <text name="gui_help_char_name_1" text="Mary Carter"/>
+            <text name="gui_help_char_desc_21" text="Rol: Vecino | Oficio: Granjero&#10;Edad: 31–50 | Relación: Conocido | Comportamiento: Estresado, Profesional&#10;&#10;Brian es un dueño de granja relativamente joven que ha tomado el negocio familiar e intenta reorientarlo con métodos y tecnologías modernos. Se centra en la eficiencia, la sanidad animal y la gestión basada en datos, estrategias que lo llevan a depender mucho de sensores, sistemas digitales y flujos de trabajo optimizados.&#10;&#10;En su día a día, Brian suele parecer tenso, pues debe mantener la estabilidad del negocio y a la vez emprender su modernización completa. Esta transición conlleva presión organizativa, tensión económica y, con frecuencia, resistencias de quienes lo rodean o de su propia familia. Por eso suele tener poca paciencia con los retrasos o los métodos tradicionales.&#10;&#10;En sus relaciones con vecinos y socios, mantiene una actitud profesional y seria. Se comunica con claridad, espera fiabilidad y prefiere acuerdos directos sin rodeos. Los métodos ambiguos o ineficaces lo frustran rápido, una reacción que a veces lo hace parecer distante o impaciente."/>
+            <text name="gui_help_char_desc_20" text="Rol: Vecina | Oficio: Granjera&#10;Edad: 31–50 | Relación: Conocido | Comportamiento: Amable, Servicial&#10;&#10;Junto con su marido, Emma dirige una explotación agrícola diversificada especializada en el cultivo de hortalizas y cereales. Una parte de la cosecha se vende directamente en los mercados locales, mientras que las cantidades mayores se comercializan a través de mayoristas y compradores regionales. Su granja está bien organizada y muy enfocada a la eficiencia y la calidad.&#10;&#10;Con vecinos y socios, Emma es abierta, amable y servicial. Se la considera alguien que se comunica de forma directa y prefiere buscar soluciones juntos antes que debatir sin fin sobre los problemas. Está muy bien conectada en el sector agrícola regional, donde mantiene relaciones estables y justas.&#10;&#10;Su carácter servicial se nota especialmente en épocas de mucho trabajo, como la siembra o la cosecha. Siempre que puede, echa una mano a otras granjas, o acepta ayuda ella misma, sin dudarlo. Valora mucho el apoyo mutuo dentro de la comunidad agrícola y ve la colaboración como parte esencial de su vida diaria."/>
+            <text name="gui_help_char_desc_19" text="Rol: Vecino | Oficio: Granjero&#10;Edad: 50+ | Relación: Amigo | Comportamiento: Cauto, Neutral&#10;&#10;Jacob es un ganadero lechero experimentado de tercera generación que dirige una granja familiar mediana, que gestiona junto con sus dos hijos. La granja ha crecido a lo largo de muchos años y está firmemente arraigada en estructuras tradicionales, que ha ido evolucionando con ajustes cuidadosos para adaptarse a las exigencias modernas.&#10;&#10;Con los demás, Jacob se muestra tranquilo, sereno y más bien reservado. Escucha antes de hablar y rara vez decide por impulso. Sobre todo en asuntos de negocio o con los vecinos, procura evitar riesgos innecesarios y mantenerse al margen de los conflictos siempre que puede.&#10;&#10;Su cautela es más evidente ante las inversiones, las nuevas tecnologías o los grandes cambios en la explotación. Prefiere los métodos probados y examina a fondo las innovaciones antes de integrarlas. Este enfoque le ha permitido gestionar la granja con estabilidad, aunque a veces se lo perciba como demasiado lento o conservador."/>
+            <text name="gui_help_char_desc_18" text="Rol: Vecino | Oficio: Granjero&#10;Edad: 31–50 | Relación: Amigo | Comportamiento: Estresado, Poco cooperativo&#10;&#10;Marcus es un granjero local que lleva muchos años al frente de una granja relativamente pequeña y muy tradicional. La mayor parte de su maquinaria es vieja; la repara y sigue usándola todo lo posible, una costumbre que complica y ralentiza cada vez más su trabajo diario.&#10;&#10;En el día a día, Marcus suele parecer tenso y algo distante. La presión constante de las reparaciones, el tiempo que exige su trabajo y las exigencias crecientes de la agricultura moderna lo han dejado cansado e irritable con los años. A menudo mira con escepticismo los métodos nuevos o la tecnología moderna, por malas experiencias con inversiones o cambios pasados.&#10;&#10;No siempre es cooperativo con los vecinos y otros granjeros. Llegar a acuerdos puede ser difícil, porque se siente presionado con facilidad o se resiste a cambiar los procedimientos establecidos. Sus conflictos nacen menos de la animadversión personal y más de sentirse desbordado: de la sensación de perder el control de la situación."/>
+            <text name="gui_help_char_desc_17" text="Rol: Socio comercial | Oficio: Contratista agrícola&#10;Edad: 31–50 | Relación: Conocido | Comportamiento: Poco cooperativo, Estresado&#10;&#10;Paul dirige una empresa de contratas agrícolas y ofrece servicios como cosecha, esparcido de estiércol, laboreo y otros trabajos de campo a las granjas locales. Su actividad depende mucho de los plazos, el clima y los picos de temporada, factores que a menudo hacen su jornada agitada y muy exigente en cuanto a planificación.&#10;&#10;Con sus clientes, Paul suele mostrarse brusco y con poca paciencia. Se centra en terminar los trabajos rápido y en aprovechar bien su maquinaria. Normalmente rechaza las discusiones largas o los cambios de última hora, que añaden presión a una agenda ya de por sí apretada.&#10;&#10;Por su gran carga de trabajo y la presión constante de los plazos, a menudo parece estresado y tenso. Sobre todo en época de cosecha o con clima crítico, puede parecer poco cooperativo si las operaciones no salen exactamente según lo previsto. En esos casos, su preocupación no son los conflictos personales, sino la necesidad absoluta de que el negocio siga funcionando.&#10;&#10;Pese a su carácter arisco, Paul es muy competente y experimentado en todos los aspectos del trabajo de campo. Si los acuerdos se establecen con claridad y antelación, trabaja de forma fiable y eficiente. A cambio, espera la misma claridad y compromiso de sus socios."/>
+            <text name="gui_help_char_desc_16" text="Rol: Socio comercial | Oficio: Concesionario de maquinaria agrícola&#10;Edad: 31–50 | Relación: Amigo íntimo | Comportamiento: Profesional, Amable&#10;&#10;Andy es dueño de un concesionario de maquinaria agrícola y está muy bien conectado en todo el sector agrícola regional. Su negocio abarca la venta, el mantenimiento y la reparación de maquinaria, así como la obtención de repuestos. Por su trabajo diario, mantiene un contacto estrecho con granjeros, talleres y fabricantes, lo que le da un conocimiento preciso de las necesidades prácticas de la agricultura moderna.&#10;&#10;Con clientes y socios, se muestra abierto, amable y orientado a soluciones. Sabe comunicarse de igual a igual y se gana la confianza de explotaciones de todos los tamaños, desde pequeñas granjas familiares hasta grandes fincas. Su objetivo principal es encontrar soluciones prácticas y reales, en lugar de largas discusiones sobre posibilidades teóricas.&#10;&#10;Como socio, Andy es considerado fiable y justo. Cumple sus compromisos, demuestra flexibilidad y buena voluntad cuando la situación lo permite y se esfuerza por resolver los problemas rápido y sin burocracia innecesaria. Sobre todo ante averías técnicas o reparaciones urgentes, suele estar disponible con poco aviso y se dedica a minimizar el tiempo de inactividad de sus clientes."/>
+            <text name="gui_help_char_desc_15" text="Rol: Socia comercial | Oficio: Comerciante de grano&#10;Edad: 31–50 | Relación: Conocido | Comportamiento: Neutral, Desconfiada&#10;&#10;Susan trabaja como comerciante de grano independiente y viaja regularmente por la región para comprar grano a las granjas locales y revenderlo a molinos y plantas de transformación regionales. Conoce bien el mercado, vigila de cerca precios y rendimientos y reacciona rápido a los cambios de oferta y demanda.&#10;&#10;Con granjeros y socios, se muestra práctica, reservada y poco emotiva. Da mucha importancia a los acuerdos claros, la calidad verificable y las cantidades transparentes. Solo confía poco a poco, pues se basa en hechos y cifras fiables de su entorno de negocio, más que en promesas o impresiones.&#10;&#10;Susan es muy observadora y detecta enseguida las incoherencias en ofertas o entregas. Por eso algunos la ven estricta o desconfiada, aunque solo es prudencia profesional. Prefiere contratos claros y da poco valor a los acuerdos informales o los cambios espontáneos."/>
+            <text name="gui_help_char_desc_14" text="Rol: Funcionario | Oficio: Alcalde&#10;Edad: 50+ | Relación: Conocido | Comportamiento: Profesional, Autoritario&#10;&#10;Martin lleva muchos años como alcalde de la localidad y está considerado una figura experimentada e influyente del pueblo. Conoce desde hace décadas a la mayoría de las familias, empresas y cambios de la región, y da mucha importancia a que la comunidad proyecte al exterior una imagen de orden, estabilidad y buena organización. Se toma especialmente en serio las finanzas municipales, las infraestructuras y la reputación pública del pueblo.&#10;&#10;Con los demás, Martin se presenta normalmente como sereno, práctico y decidido. Habla con calma pero con autoridad, y está acostumbrado a que sus decisiones se respeten. A menudo conduce las discusiones con diplomacia; sin embargo, puede mostrarse firme si se ignoran las normas o se cuestionan abiertamente sus decisiones."/>
+            <text name="gui_help_char_desc_13" text="Rol: Vecino | Oficio: Forestal&#10;Edad: 31–50 | Relación: Amigo | Comportamiento: Cauto, Profesional&#10;&#10;Lukas trabaja como forestal y es responsable del cuidado y la gestión de los bosques de los alrededores. Sus tareas incluyen, entre otras, revisar las repoblaciones, mantener los caminos forestales, vigilar las medidas de conservación de la naturaleza y organizar y verificar los permisos de caza. Conoce los bosques de la región al dedillo y pasa gran parte de su vida al aire libre, en la naturaleza.&#10;&#10;Pese a su carácter más bien reservado, se lo considera fiable y justo. Siempre está dispuesto a compartir sus conocimientos con los amigos, sobre todo en lo referente al trabajo forestal, la madera, la caza o la conservación de la naturaleza. Valora a las personas honestas y directas y se lleva bien con quienes actúan con responsabilidad y cumplen su palabra."/>
+            <text name="gui_help_char_desc_11" text="Rol: Civil&#10;Edad: 31–50 | Relación: Amigo íntimo | Comportamiento: Neutral, Amable&#10;&#10;Kyle trabaja como entrenador personal y pasa gran parte de su vida en el gimnasio o haciendo actividades deportivas. La forma física, la disciplina y un estilo de vida sano le importan, sin resultar nunca un sermón. Le gusta motivar a los demás y suele ganarse rápido a la gente con su actitud abierta y relajada.&#10;&#10;Como buen amigo de Joe, es fiable y servicial, sobre todo cuando alguien necesita apoyo práctico o motivación. Tiende a animar a la gente y ofrecer distracciones en lugar de detenerse en las dificultades. Por lo general evita los conflictos y prefiere mantener un ambiente ligero."/>
+            <text name="gui_help_char_desc_10" text="Rol: Funcionaria&#10;Edad: 50+ | Relación: Tensa | Comportamiento: Autoritaria, Cauta&#10;&#10;Sharon trabaja en la administración municipal, donde vela por procedimientos claros y una convivencia armoniosa. Para los granjeros, esto suele implicar asuntos como el silencio nocturno, la limpieza y las molestias por olores o ruido. Fuera del trabajo, suele intentar alejarse de la organización y la supervisión constantes; rechaza hablar de esos temas en su tiempo libre.&#10;&#10;Se la considera tranquila, práctica y más bien reservada, aunque puede ser amable y con humor cuando conoce mejor a alguien. Suele abordar las conversaciones de forma sobria y directa. En su tiempo libre disfruta leyendo, paseando o cuidando su jardín. Tiende a evitar las multitudes y los ambientes bulliciosos. El orden y la fiabilidad son importantes para ella, tanto en lo profesional como en lo privado. Aun así, se esfuerza conscientemente por estar más relajada después del trabajo y por no llevarse el trabajo a casa constantemente."/>
+            <text name="gui_help_char_desc_2" text="Rol: Familiar | Oficio: Granjero | Pertenece a la granja: Sí&#10;Edad: 21–30 | Relación: Familia | Comportamiento: Estresado&#10;&#10;John Carter es el hermano de Joe Carter, el personaje del jugador, y creció a su lado en la granja familiar. Desde pequeño, la agricultura fue una parte natural e integral de su vida; por eso sigue esforzándose por contribuir a la rutina diaria de la granja todo lo que sus capacidades le permiten. Sin embargo, debido a una condición médica que lo limita físicamente desde hace varios años, ahora solo puede realizar tareas más ligeras y sencillas. Esto le pesa más de lo que deja ver.&#10;&#10;Antes, John era mucho más activo en los campos y en trabajos físicamente exigentes. Hoy le cuesta aceptar que muchas cosas ya no funcionan como antes. Se siente especialmente inútil, o como una carga para su familia, cuando otros tienen que asumir el trabajo pesado, aunque nadie se lo haga sentir a propósito."/>
+            <text name="gui_help_char_desc_1" text="Rol: Familiar | Oficio: Granjera | Pertenece a la granja: Sí&#10;Edad: 31–50 | Relación: Familia | Comportamiento: Amable, Profesional, Servicial&#10;&#10;Mary Carter es la esposa de Joe Carter (el jugador) y está profundamente integrada tanto en la vida familiar como en la rutina diaria de la granja. Aunque no es granjera de formación, echa una mano con regularidad en las tareas de la granja, ya sea en el establo o en el campo, siempre que hace falta. Sobre todo en épocas de mucho trabajo, interviene de forma natural, esforzándose por apoyar a su marido y a su familia ocupándose de las cosas entre bastidores.&#10;&#10;Se la considera una persona tranquila, cálida y fiable que suele abordar los conflictos con calma, objetividad y paciencia. Es abierta y servicial con los demás, aunque también espera honestidad y respeto mutuo a cambio. Con los desconocidos puede parecer al principio algo reservada, pero enseguida se abre cuando la tratan con amabilidad.&#10;&#10;En su vida diaria, suele ocuparse de los asuntos organizativos del hogar, la familia y la granja. Se esfuerza por que, pese a la gran carga de trabajo, se mantengan la cohesión familiar y un ambiente agradable. En general, intenta afrontar las situaciones estresantes con serenidad y soluciones pragmáticas, aunque a veces asuma demasiada responsabilidad."/>
+            <text name="gui_help_conversations_title" text="Encuentros y conversaciones"/>
+            <text name="gui_help_conversations_body" text="Los vecinos están repartidos por el mapa viviendo su vida. Encontrarlos y hablar con ellos es, junto con los patrones de comportamiento realistas, una parte central del mod.&#10;&#10;Cómo iniciar una conversación:&#10;1. Acércate a un personaje a pie. Cuando estés lo bastante cerca (unos 5 metros), podrás realizar la acción «Iniciar conversación».&#10;2. Pulsa Mayús+R para empezar la conversación.&#10;3. Escucha la conversación o lee los subtítulos.&#10;4. Cuando aparezcan varias respuestas, elige la frase que quieras decir. Tu elección moldea la conversación y cómo cambia tu relación.&#10;5. En el futuro podrás hablar tanto de charla informal como de acciones reales (p. ej. tomar prestada maquinaria).&#10;&#10;Encontrar a la gente: los personajes aparecen por todo el mapa. Un granjero en un vehículo suele ser difícil de alcanzar, pero si te acercas a pie a unos 20 metros, se detendrá, apagará la máquina y bajará al cabo de un rato para que puedas hablar con él.&#10;&#10;Las conversaciones con voz se reproducen cuando hay un paquete de voces instalado; si no, puedes simplemente leer el texto."/>
+            <text name="gui_help_controls_title" text="Controles"/>
+            <text name="gui_help_controls_body" text="Mayús+R: Inicia una conversación con una persona cercana. Si no hay nadie cerca, se abre el teléfono en su lugar.&#10;Mayús+F3: Abre el menú de historia y ajustes de Fields of Stories.&#10;&#10;En el menú de construcción (mientras colocas un marcador de Fields of Stories):&#10;Mayús+Q: Cambia el tamaño del lugar.&#10;Mayús+Supr: Elimina todos los lugares del tipo seleccionado."/>
+            <text name="gui_help_relationships_title" text="Relaciones"/>
+            <text name="gui_help_relationships_body" text="Cada vecino recuerda lo que siente por ti. Los buenos encuentros generan confianza con el tiempo; los malos te cuestan.&#10;&#10;Cómo funciona:&#10;- Cada personaje tiene un nivel de relación (empieza en 1) y puntos que se llenan hacia el siguiente nivel.&#10;- Una conversación amistosa da puntos (y una pequeña recompensa en dinero equivalente).&#10;- Cuando la barra de puntos está llena, sube el nivel de relación y los puntos se reinician para el siguiente nivel. Los niveles más altos necesitan más puntos, pero también otorgan mayores bonificaciones al alcanzarlos.&#10;- Las respuestas groseras o despectivas pueden costar puntos. A veces, incluso una respuesta aparentemente amable puede provocar un sentimiento negativo y empeorar tu relación. Los puntos nunca bajan de cero y nunca reducen un nivel ya alcanzado.&#10;&#10;Los contratos de campo también cuentan: un contrato completado mejora tu relación con ese granjero, mientras que fallar, cancelar o dejar que expire la reduce en la misma medida.&#10;&#10;Al final de una conversación aparecen mensajes como «Relación mejorada» o «Nivel de relación aumentado»."/>
+            <text name="gui_help_story_title" text="Pestaña Historia"/>
+            <text name="gui_help_story_body" text="La pestaña Historia te da un resumen rápido de cada personaje y de tu relación con él. Abre el menú con Mayús+F3 y elige la pestaña Historia.&#10;&#10;A la izquierda hay una lista desplegable de todos los vecinos; haz clic en un nombre para seleccionarlo. A la derecha ves el retrato del personaje seleccionado, tu relación actual (como Conocido, Amigo o Familia), el nivel de relación y una barra de progreso que muestra cuántos puntos has ganado hacia el siguiente nivel.&#10;&#10;Úsala para ver de un vistazo a quién conoces ya bien y a quién deberías visitar más a menudo. Consulta el tema Relaciones para saber cómo se ganan y pierden los puntos y niveles."/>
+            <text name="gui_help_contracts_title" text="Contratos de campo y llamadas"/>
+            <text name="gui_help_contracts_body" text="A veces los granjeros tienen más trabajo del que pueden abarcar y te llaman para pedir ayuda. Estas ofertas son trabajos reales y remunerados en sus campos. Pueden darte toda una serie de campos para completar.&#10;&#10;La llamada:&#10;1. Un granjero puede llamarte durante el día (aproximadamente entre las 08:00 y las 15:00). Oyes un tono y ves un aviso de llamada.&#10;2. Abre el teléfono y pulsa Responder para escuchar la oferta, o Rechazar / Esc para descartarla.&#10;3. El mismo granjero puede volver a intentarlo más tarde. Hay un límite diario de llamadas de contrato (configurable en los ajustes del juego). Si no contestas en absoluto, habrá un total de tres intentos más de llamarte.&#10;&#10;Elegir el trabajo: en la conversación telefónica normalmente puedes aceptar toda la superficie del campo o solo la primera mitad, y elegir si usas tu propio equipo o tomas prestada la maquinaria del vecino. Esto requiere que el granjero pueda prescindir de sus máquinas. Por supuesto, también puedes simplemente rechazar la petición.&#10;&#10;Sin préstamo: completas el contrato con tus propias máquinas. El trabajo se paga por hectárea y se da por hecho en cuanto el campo alcanza el estado requerido. El campo se comprueba con puntos de sondeo y el umbral de finalización es configurable en los ajustes del juego.&#10;&#10;Estos contratos se solicitan siempre por teléfono y solo serán visibles en el menú de misiones habitual después de aceptarlos.&#10;&#10;Recompensa y reputación: un contrato completado te paga y mejora tu relación con el granjero. Fallar, cancelar o dejar que expire hace lo contrario."/>
+            <text name="gui_help_contracts_body2" text="Con préstamo: el vecino te presta exactamente los aperos necesarios (aunque los lastres y el tractor no se prestan). Si hace falta, las máquinas prestadas empiezan ya llenas de semilla, producto de pulverización, fertilizante, estiércol o purín, que podrás rellenar en la granja del vecino cuando lo necesites.&#10;Tomar prestado significa un pago algo menor que usar tu propio equipo. Importante: un contrato con equipo prestado se queda en el 99 por ciento hasta que lleves cada máquina prestada de vuelta a la granja del vecino y la desenganches allí. Solo entonces se considera completo el contrato.&#10;&#10;Si tomas prestado el equipo, encontrarás un marcador en el mapa que muestra dónde recoger las máquinas. Allí podrás rellenar los consumibles (p. ej. purín, semilla o herbicida) y, al final del contrato, aparcar de nuevo las máquinas."/>
+            <text name="gui_help_contracts_body3" text="Contratos de cosecha y entrega&#10;&#10;Algunos contratos de trabajo de campo también exigen entregar la cosecha:&#10;&#10;Entrega de cosecha: cosecha un cultivo (p. ej. maíz, trigo, colza) y entrega el grano al silo del granjero. El juego registra lo que tu cosechadora recoge y lo compara con lo que entregas. Debes entregar al menos el 99 % de lo cosechado.&#10;&#10;Entrega de siega de hierba: siega la hierba y entrégala (en pacas o a granel) al silo del granjero.&#10;&#10;Recogida y entrega: cosecha o siega el cultivo y llévalo al silo del granjero, marcado en el mapa con un círculo rojo. El silo es accesible temporalmente durante el contrato: descargar en otro sitio (p. ej. vender la cosecha) no cuenta.&#10;&#10;Trabajos de consumibles (cal, fertilizante, purín, pulverización, semilla, estiércol): el silo del granjero está surtido con el consumible necesario para que puedas rellenar tu apero allí en lugar de comprarlo.&#10;&#10;Si varios contratos de entrega comparten el mismo silo y tipo de cultivo, las entregas se reparten proporcionalmente entre ellos.&#10;&#10;Lista de tareas: los detalles de la misión muestran Trabajo de campo, Entrega y (si tomaste prestadas máquinas) Devolver equipo como tareas separadas con el progreso de entrega actual.&#10;&#10;Completar a la fuerza: un botón «Completar a la fuerza» en el menú de contratos cierra un contrato casi terminado (más del 70 %).&#10;&#10;Visualización del progreso:&#10;0-80 % cubre el trabajo de campo; 80-99 % significa que el trabajo está hecho pero la entrega sigue pendiente. Al 100 % ambos están terminados: recoge el contrato en el menú de misiones para cobrar.&#10;&#10;Bonus de entrega extra:&#10;el granjero espera que se entregue toda la cosecha: no te quedes nada. Puedes seguir entregando después de que el contrato llegue al 100 %. Al cobrarlo, cualquier excedente por encima de lo que había en el silo al terminar otorga un bonus de relación de +50."/>
+            <text name="gui_help_contract_cap_call_info" text="Cuando un granjero necesita una mano, oyes un tono y ves un aviso de llamada entrante (aproximadamente entre las 08:00 y las 15:00)."/>
+            <text name="gui_help_contract_cap_call" text="Abre el teléfono y pulsa Responder para escuchar la oferta, o Rechazar / Esc para descartarla.&#10;&#10;Puedes ajustar el número de llamadas de trabajo en los ajustes del juego. Se refiere al número de granjeros que buscan ayuda, no al número de llamadas.&#10;&#10;Importante: si no contestas en absoluto una llamada, habrá un total de tres intentos más de llamarte."/>
+            <text name="gui_help_contract_cap_choices" text="En la llamada eliges el trabajo: todo el campo o solo la primera mitad, y si usas tu propio equipo o tomas prestadas las máquinas del vecino."/>
+            <text name="gui_help_contract_cap_borrow_map" text="Si tomas prestado equipo, un marcador en el mapa muestra dónde recoger las máquinas y dónde devolverlas después."/>
+            <text name="gui_help_contract_cap_borrow_attach" text="En la granja enganchas los aperos prestados y rellenas allí semilla, pulverización, fertilizante o purín cuando haga falta."/>
+            <text name="gui_help_contract_cap_fieldwork" text="Haz el trabajo de campo. Con equipo prestado, el contrato se queda al 99 % hasta que lleves cada máquina de vuelta a la granja y la desenganches."/>
+            <text name="gui_help_schedule_title" text="Los granjeros y su trabajo de campo"/>
+            <text name="gui_help_schedule_body" text="Los granjeros de la IA no son simples ayudantes animados. Planifican y realizan de verdad el trabajo en sus propias tierras, día a día y estación tras estación.&#10;&#10;El plan diario: una vez por día de juego, cada granjero mira el estado real de sus campos y elabora una lista de tareas. La recorre durante el día, aproximadamente desde las 06:00 hasta la noche, saliendo, trabajando y volviendo a casa después.&#10;&#10;Qué hacen, por orden de prioridad: cosechar cultivos maduros, luego sembrar, luego pulverizar, luego esparcir fertilizante, estiércol o purín, y luego arar, gradar y cultivar. Una tarea solo se elige cuando el campo realmente la necesita (el cultivo adecuado, la etapa de crecimiento, el estado del suelo o las malas hierbas).&#10;&#10;Siguiendo las estaciones: la siembra sigue el calendario de plantación real de cada cultivo, y otros trabajos se asocian a meses lógicos, de modo que el trabajo visible coincide con la época del año. Al sembrar, los granjeros rotan cultivos lógicos (como colza, trigo, cebada, avena y soja) e intentan evitar el cultivo anterior.&#10;&#10;Externalización: cada día, un granjero puede ofrecer una tarea concreta como contrato telefónico. Estos contratos se solicitan por teléfono y, una vez aceptados, se ven en el menú de misiones habitual. Si no lo aceptas por la tarde, la hace él mismo.&#10;&#10;Puedes ver el plan del día de un granjero en el menú Ajustes, en Personajes, incluyendo qué tareas están reservadas para ti, ofrecidas como contrato o gestionadas por su propia IA."/>
+            <text name="gui_help_privatelife_title" text="Vida privada"/>
+            <text name="gui_help_privatelife_body" text="Fuera del trabajo, los personajes tienen su propia vida. Cada vecino tiene un hogar al que vuelve, y muchos siguen rutinas personales a lo largo del día.&#10;&#10;Podrías sorprenderlos:&#10;- Relajándose en casa u ordenando la casa.&#10;- Pasando tiempo con amigos, de pícnic o jugando con los niños.&#10;- Paseando, sacando al perro o leyendo un libro.&#10;- Haciendo recados cotidianos o repostando el coche.&#10;- Revisando el vehículo en la carretera o yendo al taller para reparaciones.&#10;&#10;Las rutinas dependen de la hora del día (mañana, día, tarde y noche) y del rol y oficio del personaje, de modo que un granjero, el alcalde y un civil pasan su tiempo libre de forma distinta.&#10;&#10;Esto es exactamente lo que hace que el mundo se sienta vivo: si recorres el mapa a distintas horas, te encontrarás con gente en todo tipo de situaciones. Acercarte a pie te permite iniciar una conversación y conocerlos mejor."/>
+            <text name="gui_help_homebases_title" text="Bases"/>
+            <text name="gui_help_homebases_body" text="Una base es el hogar de un personaje: el lugar donde vive, al que vuelve por la tarde y donde se le puede encontrar cuando no está de servicio. Sin una base, un personaje no existe realmente en el juego: cada vecino necesita al menos una.&#10;&#10;Dos puntos de aparición por personaje: cada personaje debe tener al menos dos lugares de hogar, uno con el tamaño «Personaje» (a pie; es donde la persona está y duerme) y uno con el tamaño «Vehículo» (donde aparca su coche). Así, cada vecino tiene un punto de aparición a pie y otro en vehículo.&#10;&#10;Crear lugares de hogar (menú de construcción, recomendado):&#10;1. Abre el menú de construcción (herramienta de construcción) y selecciona la categoría «Fields of Stories» y luego la pestaña «Casa del personaje».&#10;2. Elige el elemento del personaje deseado (p. ej. «Mary Carter»).&#10;3. Colócalo en la residencia. Usa Mayús+Q para cambiar el tamaño («Personaje» para la persona, «Vehículo» para su coche, «Área grande» para la granja, «Silo» para el silo).&#10;&#10;Método clásico: abre el menú con Mayús+F3, ve a la pestaña Ajustes, elige el tamaño de lugar adecuado arriba («Personaje» o «Vehículo»), sitúate a pie o aparca tu vehículo exactamente en el sitio deseado de la residencia y selecciona «Hogar de [Nombre]» en la lista de lugares para guardar la posición. También puedes, en la sección Personajes, usar «Añadir base más cercana» para asignar el lugar más cercano directamente al personaje seleccionado.&#10;&#10;Eliminar lugares de hogar existentes: si quieres restablecer las residencias de un personaje, selecciónalo en la sección Personajes y usa el botón «Eliminar lugares de hogar». Esto desvincula todos los lugares de hogar asignados a ese personaje: los lugares en sí permanecen y pueden reasignarse después.&#10;&#10;Las bases son un buen sitio para encontrar a alguien, sobre todo a primera hora de la mañana o a última hora de la noche.&#10;&#10;Granjeros: para ellos, la base es también la granja y necesita además espacio para la maquinaria. Aprenderás a diseñar bien una granja en el capítulo «Diseñar granjas»."/>
+            <text name="gui_help_homebasedesign_title" text="Diseñar granjas"/>
+            <text name="gui_help_homebasedesign_body" text="Este capítulo trata de las granjas de los personajes granjeros. Para un granjero, la base es también su granja: cuando las máquinas no se usan o están en un contrato, se aparcan allí. Así que planifica la granja con amplitud, porque un granjero posee muchos vehículos y aperos (actualmente unos 10 aperos, 1 cosechadora, 2 tractores y un coche; el contratista agrícola incluso 23 aperos, 6 autopropulsados, 2 tractores y un coche).&#10;&#10;Cómo crear los sitios: abre el menú con Mayús+F3, ve a la pestaña Ajustes, elige el tamaño de lugar adecuado arriba y guarda una «Base de personaje» en el sitio deseado (encontrarás el procedimiento exacto en el capítulo «Crear lugares del mapa»).&#10;&#10;Qué tamaños de lugar necesita una granja:&#10;- «Personaje» (a pie): para el propio granjero.&#10;- «Vehículo»: para coches y tractores.&#10;- «Vehículo sobredimensionado»: para cosechadoras y autopropulsados.&#10;- «Vehículo + apero»: para aperos y remolques.&#10;- «Área grande»: para situaciones amplias en la granja, como la preparación de maquinaria.&#10;- «Silo»: para el silo del granjero, que sirve de punto de entrega y rellenado para los contratos de cosecha y siega.&#10;Si no encuentras sitio para cada máquina, no pasa nada: según el uso, se aparcan o se ocultan."/>
+            <text name="gui_help_homebasedesign_body2" text="Hacer accesible la granja: para tomar prestadas las máquinas de un granjero, su granja debe ser transitable. Tienes que poder llevar un vehículo hasta las máquinas aparcadas y volver a salir. Al colocar las granjas, asegúrate de que ninguna valla, puerta, muro, árbol u otro objeto bloquee la entrada y la salida.&#10;&#10;Eliminar una puerta: si una puerta o portón bloquea el acceso, puedes eliminarla directamente en Fields of Stories. Sitúate o conduce cerca de la puerta (a unos 20 m), abre el menú con Mayús+F3 en la pestaña Ajustes y pulsa «Eliminar puerta más cercana». El objeto más cercano cuyo nombre de nodo contenga «gate» se elimina permanentemente del mapa y sigue desaparecido tras recargar. Las imágenes siguientes muestran cómo al quitar la puerta se despeja el acceso para poder tomar prestadas las máquinas."/>
+            <text name="gui_help_voices_title" text="Voces e idioma"/>
+            <text name="gui_help_voices_body" text="Las conversaciones pueden estar completamente dobladas. El audio hablado viene en un paquete de voces aparte para que el mod siga siendo ligero.&#10;&#10;Instalar un paquete de voces: descarga el paquete de voces (consulta la página de GitHub del mod para la ubicación exacta: AirFoxTwo/FS25_FieldsOfStories) y descomprímelo de modo que su carpeta «conversations» quede en la carpeta modSettings del mod (modSettings/FS25_FIELDS_OF_STORIES). Si el paquete falta o está desactualizado, aparece un diálogo de aviso con los botones «Volver a comprobar» e «Ignorar». Puedes seguir jugando sin él; las conversaciones mostrarán igualmente los subtítulos, solo que sin audio hablado.&#10;&#10;Idiomas: el mod está totalmente traducido al inglés y al alemán. El texto mostrado sigue automáticamente el idioma del juego. Los paquetes de voces vienen en versiones inglesa y alemana, y el mod reproduce el audio que coincida con el paquete instalado y, en su defecto, con el idioma del juego.&#10;&#10;Generación de conversaciones (avanzado): cada personaje tiene sus propios textos de conversación contigo. En total suman más de 10 000 partes escritas y dobladas. Cada conversación se ha comprobado manualmente (al menos su plausibilidad). No obstante, no se pueden descartar errores de redacción o gramática.&#10;&#10;Generación de voces (avanzado): cada personaje tiene su propia voz, generada a partir de un diseño de voz por síntesis. Estas voces se graban después para todos los textos de conversación mediante clonación de voz en una NVIDIA RTX 5080 local. El plan es mejorar la calidad con más optimización o incluso actores de voz reales, lo que conlleva un esfuerzo considerable."/>
+            <text name="gui_help_support_title" text="Soporte y comentarios"/>
+            <text name="gui_help_support_body" text="¿Has encontrado un error o tienes una idea para mejorar el mod? Tus comentarios son muy bienvenidos.&#10;&#10;Los comentarios, informes de errores y solicitudes de funciones se envían mejor a través de la página de GitHub del mod: AirFoxTwo/FS25_FieldsOfStories&#10;&#10;Al informar de un problema, ayuda mucho incluir:&#10;- una breve descripción de lo que pasó y de lo que esperabas,&#10;- los pasos para reproducirlo,&#10;- el mapa en el que juegas,&#10;- tu archivo de registro si puedes adjuntarlo.&#10;&#10;Los informes claros y detallados aceleran enormemente las correcciones. Gracias por ayudar a mejorar Fields of Stories."/>
+            <text name="gui_mapinit_remove_mod_disclaimer" text="Nota: después de esto, hay que guardar la partida."/>
+            <text name="gui_mapinit_remove_mod" text="Eliminar datos del mod"/>
+            <text name="gui_mapinit_open_construction_menu" text="Abrir menú de construcción"/>
+            <text name="gui_mapinit_classic_init_mode" text="Modo de inicialización clásico"/>
+            <text name="gui_mapinit_place_size_label" text="Tamaño del lugar:"/>
+            <text name="gui_mapinit_place_size_character" text="Personaje"/>
+            <text name="gui_mapinit_place_size_vehicle" text="Vehículo"/>
+            <text name="gui_mapinit_place_size_vehicle_attachment" text="Vehículo + apero"/>
+            <text name="gui_mapinit_place_size_oversize_vehicle" text="Vehículo sobredimensionado"/>
+            <text name="gui_mapinit_place_size_large_area" text="Área grande"/>
+            <text name="gui_mapinit_place_size_silo" text="Silo"/>
+            <text name="gui_mapinit_place_type_label" text="Tipo de lugar:"/>
+            <text name="gui_mapinit_place_type_shop" text="Tienda"/>
+            <text name="gui_mapinit_place_type_gas_station" text="Gasolinera"/>
+            <text name="gui_mapinit_place_type_character_homebase" text="Base de personaje"/>
+            <text name="gui_mapinit_place_type_roadside" text="Borde de carretera"/>
+            <text name="gui_mapinit_place_type_dirt_road" text="Camino de tierra"/>
+            <text name="gui_mapinit_place_type_public_place" text="Lugar público"/>
+            <text name="gui_mapinit_place_type_player_farm" text="Granja del jugador"/>
+            <text name="gui_mapinit_place_type_public_relax_place" text="Lugar de relax público"/>
+            <text name="gui_mapinit_place_type_private_relax_place" text="Lugar de relax privado"/>
+            <text name="gui_mapinit_place_type_sell_point" text="Punto de venta"/>
+            <text name="gui_mapinit_place_type_other" text="Otro"/>
+            <text name="gui_mapinit_place_type_church" text="Iglesia"/>
+            <text name="gui_mapinit_place_type_public_infrastructure" text="Infraestructura pública"/>
+            <text name="gui_mapinit_place_type_roadside_trees" text="Árboles al borde de la carretera"/>
+            <text name="gui_mapinit_place_type_industry" text="Industria"/>
+            <text name="gui_mapinit_place_type_workshop" text="Taller"/>
+            <text name="gui_mapinit_place_type_shed" text="Cobertizo"/>
+            <text name="gui_mapinit_place_type_fieldwork" text="Trabajo de campo"/>
+            <text name="fos_place_character_public_place" text="Lugar: Marcador de lugar público"/>
+            <text name="fos_place_character_public_place_desc" text="Fields of Stories - Una plaza pública animada donde los PNJ se reúnen, charlan y pasan su tiempo libre"/>
+            <text name="fos_place_character_shop" text="Lugar: Marcador de tienda"/>
+            <text name="fos_place_character_shop_desc" text="Fields of Stories - Una zona comercial donde los PNJ van a mirar y comprar productos"/>
+            <text name="fos_place_character_gas_station" text="Lugar: Marcador de gasolinera"/>
+            <text name="fos_place_character_gas_station_desc" text="Fields of Stories - Una gasolinera donde los PNJ repostan sus vehículos y se encuentran con otros"/>
+            <text name="fos_place_character_roadside" text="Lugar: Marcador de borde de carretera"/>
+            <text name="fos_place_character_roadside_desc" text="Fields of Stories - Un lugar al borde de la carretera donde los PNJ se detienen a charlar o descansan de conducir"/>
+            <text name="fos_place_character_dirt_road" text="Lugar: Marcador de camino de tierra"/>
+            <text name="fos_place_character_dirt_road_desc" text="Fields of Stories - Un camino de tierra tranquilo donde los PNJ disfrutan de paseos y encuentros rústicos"/>
+            <text name="fos_place_character_player_farm" text="Lugar: Marcador de granja del jugador"/>
+            <text name="fos_place_character_player_farm_desc" text="Fields of Stories - Marca la granja del jugador, el corazón de tus operaciones agrícolas"/>
+            <text name="fos_place_character_public_relax_place" text="Lugar: Marcador de zona de relax"/>
+            <text name="fos_place_character_public_relax_place_desc" text="Fields of Stories - Una zona de relax pública donde los PNJ se relajan y disfrutan de su tiempo libre"/>
+            <text name="fos_place_character_private_relax_place" text="Lugar: Marcador de zona de relax privada"/>
+            <text name="fos_place_character_private_relax_place_desc" text="Fields of Stories - Un retiro apartado donde los PNJ buscan privacidad y reflexión tranquila"/>
+            <text name="fos_place_character_sell_point" text="Lugar: Marcador de punto de venta"/>
+            <text name="fos_place_character_sell_point_desc" text="Fields of Stories - Un punto de comercio donde los PNJ entregan mercancías y hacen negocios"/>
+            <text name="fos_place_character_church" text="Lugar: Marcador de iglesia"/>
+            <text name="fos_place_character_church_desc" text="Fields of Stories - Un lugar de culto donde los PNJ asisten a servicios y reuniones comunitarias"/>
+            <text name="fos_place_character_public_infrastructure" text="Lugar: Marcador de infraestructura"/>
+            <text name="fos_place_character_public_infrastructure_desc" text="Fields of Stories - Un centro de servicios públicos e infraestructura para la comunidad local"/>
+            <text name="fos_place_character_industry" text="Lugar: Marcador de industria"/>
+            <text name="fos_place_character_industry_desc" text="Fields of Stories - Una zona industrial donde los PNJ trabajan y producen bienes"/>
+            <text name="fos_place_character_workshop" text="Lugar: Marcador de taller"/>
+            <text name="fos_place_character_workshop_desc" text="Fields of Stories - Un taller de reparación donde los PNJ mantienen y arreglan su equipo"/>
+            <text name="fos_place_character_shed" text="Lugar: Marcador de cobertizo"/>
+            <text name="fos_place_character_shed_desc" text="Fields of Stories - Un cobertizo de almacenamiento donde los PNJ guardan sus herramientas y equipo"/>
+            <text name="fos_place_character_remove" text="Herramienta: Eliminar lugar"/>
+            <text name="fos_place_character_remove_desc" text="Fields of Stories - Elimina el marcador de lugar más cercano en 5 metros al colocarse"/>
+            <text name="gui_fos_place_created" text="Lugar creado: %s (%s)"/>
+            <text name="gui_fos_bulk_remove_title" text="Eliminación masiva de lugares"/>
+            <text name="gui_fos_bulk_remove_confirm" text="¿Eliminar %d lugar(es) de tipo «%s»?"/>
+            <text name="gui_fos_bulk_remove_confirm_char" text="¿Eliminar %d lugar(es) de «%s»?"/>
+            <text name="gui_fos_bulk_remove_btn_yes" text="Eliminar todo"/>
+            <text name="gui_fos_bulk_remove_btn_no" text="Cancelar"/>
+            <text name="gui_fos_bulk_remove_none" text="No hay lugares de este tipo que eliminar."/>
+            <text name="gui_fos_bulk_remove_done" text="Se eliminaron %d lugar(es)."/>
+            <text name="input_IAMapInitDialog" text="Menú Fields of Stories"/>
+            <text name="input_IAI3DReferencesDebug" text="Fields of Stories - Mostrar puntos de depuración en todos los nodos de referencia i3d"/>
+            <text name="input_IADumpUserAttributes" text="Fields of Stories - Volcar al registro los atributos de usuario de los nodos del mapa"/>
+            <text name="input_IAPlaceSizeSelect" text="Selección de tamaño de lugar (Fields of Stories)"/>
+            <text name="input_IAPlaceBulkRemove" text="Eliminación masiva de lugares (Fields of Stories)"/>
+            <text name="gui_fos_place_size_select" text="Tamaño del lugar"/>
+            <text name="gui_mapinit_add_nearest_homebase" text="Añadir base más cercana"/>
+            <text name="gui_mapinit_add_nearest_homebase_info" text="El lugar más cercano se asignó al personaje %s."/>
+            <text name="gui_mapinit_notify_place_saved" text="Lugar guardado: %s"/>
+            <text name="gui_mapinit_notify_remove_nearest_ok" text="Lugar más cercano eliminado."/>
+            <text name="gui_mapinit_notify_remove_nearest_none" text="No se encontró ningún lugar que eliminar."/>
+            <text name="gui_mapinit_notify_end_init" text="Fase de inicialización terminada."/>
+            <text name="gui_mapinit_notify_remove_mod" text="Se borraron los datos del mod Fields of Stories. Guarda la partida."/>
+            <text name="gui_mapinit_notify_reset_character" text="El personaje %s se restableció."/>
+            <text name="gui_mapinit_notify_delete_character" text="%s se eliminó del mod."/>
+            <text name="gui_mapinit_notify_remove_homeplaces" text="Se eliminaron los lugares de hogar de %s."/>
+            <text name="gui_mapinit_remove_nearest" text="Eliminar lugar más cercano"/>
+            <text name="gui_mapinit_show_place_markers" text="Mostrar marcadores de lugares"/>
+            <text name="gui_mapinit_hide_place_markers" text="Ocultar marcadores de lugares"/>
+            <text name="gui_mapinit_hide_nearest_gate" text="Eliminar puerta más cercana"/>
+            <text name="gui_mapinit_notify_hide_gate_ok" text="Puerta más cercana eliminada: %s"/>
+            <text name="gui_mapinit_notify_hide_gate_none" text="No se encontró ningún objeto de puerta cerca."/>
+            <text name="gui_mapinit_end_init" text="Terminar fase de inicialización"/>
+            <text name="gui_mapinit_nudge_vehicle_left" text="Vehículo: 5 m a la derecha"/>
+            <text name="gui_mapinit_notify_nudge_vehicle_no_vehicle" text="Súbete a un vehículo para usar esto."/>
+            <text name="gui_mapinit_notify_nudge_vehicle_ai" text="Detén la IA del vehículo antes de moverlo."/>
+            <text name="gui_mapinit_notify_nudge_vehicle_failed" text="No se pudo mover el vehículo: %s"/>
+            <text name="gui_mapinit_reset_character" text="Restablecer personaje"/>
+            <text name="gui_mapinit_delete_character" text="Eliminar personaje"/>
+            <text name="gui_mapinit_remove_homeplaces" text="Eliminar lugares de hogar"/>
+            <text name="gui_mapinit_detail_name" text="Nombre"/>
+            <text name="gui_mapinit_detail_job" text="Oficio"/>
+            <text name="gui_mapinit_detail_role" text="Rol"/>
+            <text name="gui_mapinit_detail_relationship" text="Relación"/>
+            <text name="gui_mapinit_detail_relationship_fmt" text="%s (Nivel %d, %d / %d pts)"/>
+            <text name="gui_mapinit_detail_vehicles" text="Vehículos"/>
+            <text name="gui_mapinit_detail_current_situation" text="Situación actual"/>
+            <text name="gui_mapinit_detail_schedule" text="Trabajo planificado para hoy"/>
+            <text name="gui_mapinit_detail_at_place_fmt" text="en %s"/>
+            <text name="ingame_relationship_improved" text="Relación mejorada con %s (+%s puntos)"/>
+            <text name="ingame_relationship_levelup" text="Nivel de relación aumentado con %s (Nivel %s)"/>
+            <text name="ingame_relationship_decreased" text="Relación empeorada con %s (-%s puntos)"/>
+            <text name="ingame_situation_at_player_farm" text="%s te espera en tu granja."/>
+            <text name="ia_field_outcome_mission_title_for_neighbour" text="%s para %s"/>
+            <text name="ia_field_outcome_mission_desc_short" text="Usa un %s para terminar esta tarea."/>
+            <text name="ia_field_outcome_mission_desc_seed" text="Usa un %s para sembrar %s."/>
+            <text name="ia_field_outcome_neighbour_generic" text="tu vecino"/>
+            <text name="ia_field_outcome_task_done" text="Hecho"/>
+            <text name="ia_field_outcome_task_open" text="Abierto"/>
+            <text name="ia_field_outcome_task_fieldwork" text="Trabajo de campo: %s"/>
+            <text name="ia_field_outcome_task_delivery" text="Entrega"/>
+            <text name="ia_field_outcome_task_return" text="Devolver equipo"/>
+            <text name="ia_field_outcome_task_delivery_progress" text="%s / %s entregado"/>
+            <text name="ia_field_outcome_task_delivery_not_started" text="No empezado"/>
+            <text name="ia_field_outcome_task_return_after_fieldwork" text="Tras el trabajo de campo"/>
+            <text name="ia_fieldwork_label_harvest_corn" text="Cosechar maíz"/>
+            <text name="ia_force_complete_button" text="Completar a la fuerza"/>
+            <text name="ia_force_complete_no_mission" text="No hay ningún contrato activo de Fields of Stories seleccionado."/>
+            <text name="ia_field_outcome_target_fertilizer" text="Objetivo: fertilizante mineral en la etapa %d en el campo."/>
+            <text name="ia_field_outcome_target_slurry" text="Objetivo: aplicación de purín (estiércol líquido) o residuos de fermentación (digestato) hasta la etapa de fertilización %d."/>
+            <text name="ia_field_outcome_target_manure" text="Objetivo: esparcido de estiércol sólido hasta la etapa de fertilización %d."/>
+            <text name="ia_field_outcome_target_lime" text="Objetivo: aplicación de cal (etapa de fertilización %d)."/>
+            <text name="ia_field_outcome_target_lime_deliver" text="Objetivo: aplicar cal de forma uniforme por todo el campo."/>
+            <text name="ia_field_outcome_target_stone_picking" text="Objetivo: retirar todas las piedras del campo."/>
+            <text name="ia_field_outcome_target_grass_mowing" text="Objetivo: segar la hierba y entregarla en la granja."/>
+            <text name="ia_field_outcome_target_harvest_deliver_corn" text="Objetivo: cosechar el maíz y entregar el grano en la granja."/>
+            <text name="ia_field_outcome_target_herbicide" text="Objetivo: pulverizar herbicida hasta que las malas hierbas alcancen el estado acordado."/>
+            <text name="ia_field_outcome_target_seed" text="Objetivo: %s establecido en todo el campo."/>
+            <text name="ia_fieldwork_equip_cultivate" text="cultivador"/>
+            <text name="ia_fieldwork_equip_harrow" text="grada"/>
+            <text name="ia_fieldwork_equip_stubble_cultivation" text="grada de discos o cultivador de rastrojo"/>
+            <text name="ia_fieldwork_equip_harvest" text="cosechadora"/>
+            <text name="ia_fieldwork_equip_mineral_fertilizer" text="abonadora de fertilizante mineral"/>
+            <text name="ia_fieldwork_equip_slurry" text="cisterna de purín"/>
+            <text name="ia_fieldwork_equip_manure" text="esparcidor de estiércol"/>
+            <text name="ia_fieldwork_equip_lime" text="esparcidor de cal"/>
+            <text name="ia_fieldwork_equip_stone_picker" text="recogedor de piedras"/>
+            <text name="ia_fieldwork_equip_grass_mower" text="segadora y remolque de forraje o empacadora"/>
+            <text name="ia_fieldwork_equip_harvest_deliver_corn" text="cosechadora y remolque de grano"/>
+            <text name="ia_fieldwork_equip_herbicide" text="pulverizador con herbicida"/>
+            <text name="ia_fieldwork_equip_seed" text="sembradora"/>
+            <text name="ia_fieldwork_equip_plow" text="arado"/>
+            <text name="ia_fieldwork_equip_generic" text="tractor y el apero adecuado"/>
+            <text name="ia_fieldwork_label_cultivate" text="Cultivar"/>
+            <text name="ia_fieldwork_label_harrow" text="Gradar"/>
+            <text name="ia_fieldwork_label_stubble_cultivation" text="Cultivo de rastrojo"/>
+            <text name="ia_fieldwork_label_harvest" text="Cosechar"/>
+            <text name="ia_fieldwork_label_fertilize_mineral" text="Fertilización mineral"/>
+            <text name="ia_fieldwork_label_slurry" text="Esparcido de purín"/>
+            <text name="ia_fieldwork_label_manure" text="Esparcido de estiércol"/>
+            <text name="ia_fieldwork_label_lime" text="Encalado"/>
+            <text name="ia_fieldwork_label_stone_picking" text="Recogida de piedras"/>
+            <text name="ia_fieldwork_label_grass_mowing" text="Segar hierba y entregar"/>
+            <text name="ia_fieldwork_label_grass_mowing_short" text="Segar hierba"/>
+            <text name="ia_fieldwork_label_harvest_deliver_corn" text="Cosechar maíz y entregar"/>
+            <text name="ia_fieldwork_label_harvest_deliver_with_crop" text="Cosechar %s y entregar"/>
+            <text name="ia_fieldwork_label_spray" text="Pulverizar"/>
+            <text name="ia_fieldwork_label_seed" text="Sembrar"/>
+            <text name="ia_fieldwork_label_seed_with_crop" text="Siembra de %s"/>
+            <text name="ia_fieldwork_label_plow" text="Arar"/>
+            <text name="ia_fieldwork_label_condition" text="Estado del campo"/>
+            <text name="ia_field_outcome_mission_finished" text="Contrato de campo de Fields of Stories completado."/>
+            <text name="ia_field_outcome_mission_failed" text="El contrato de campo de Fields of Stories terminó sin éxito."/>
+            <text name="ia_field_outcome_deliver_wrong_location" text="¡Debes entregar la cosecha en la granja, no venderla en otro sitio!"/>
+            <text name="ia_delivery_marker_label" text="Punto de entrega de la granja"/>
+            <text name="ia_field_outcome_mission_deliver_note" text="Entrega la cosecha en la granja (marcada en el mapa)."/>
+            <text name="ia_field_outcome_delivery_complete" text="¡Entrega completada! Las mercancías han llegado a la granja."/>
+            <text name="ia_mission_borrow_refill_at_farm" text="El equipo prestado está vacío: rellénalo en la granja de %s."/>
+            <text name="ia_mission_borrow_return_to_farm" text="El trabajo de campo ha terminado: devuelve el equipo prestado a la granja de %s (desengánchalo en el patio)."/>
+            <text name="ia_mission_borrow_pickup_marker" text="Recogida de equipo prestado"/>
+            <text name="ia_mission_borrow_yard_marker" text="Equipo prestado: recogida y devolución"/>
+            <text name="ia_settings_section_title" text="Fields of Stories"/>
+            <text name="ia_settings_contractCallsPerDay_title" text="Llamadas de contrato por día"/>
+            <text name="ia_settings_contractCallsPerDay_info" text="Número máximo de llamadas de contrato por día de juego entre todos los vecinos."/>
+            <text name="ia_settings_contractCallsPerDay_none" text="Ninguna"/>
+            <text name="ia_settings_contractCallsPerDay_1" text="1"/>
+            <text name="ia_settings_contractCallsPerDay_2" text="2"/>
+            <text name="ia_settings_contractCallsPerDay_3" text="3"/>
+            <text name="ia_settings_contractCallsPerDay_4" text="4"/>
+            <text name="ia_settings_contractCallsPerDay_unlimited" text="Ilimitado"/>
+            <text name="ia_settings_missionOfferMode_title" text="Modo de oferta de misiones"/>
+            <text name="ia_settings_missionOfferMode_info" text="Clásico: las misiones vanilla se quedan en el mapa, sin llamadas de contrato. Realista: solo llamadas de contrato de vecinos, se eliminan las misiones vanilla."/>
+            <text name="ia_settings_missionOfferMode_classic" text="Clásico"/>
+            <text name="ia_settings_missionOfferMode_realistic" text="Realista"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_title" text="Campos de contrato por vecino"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_info" text="Número máximo de campos/parcelas que un vecino puede externalizar como contratos por día."/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_1" text="1"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_2" text="2"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_3" text="3"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_4" text="4"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_5" text="5"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_unlimited" text="Ilimitado"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_title" text="Umbral de finalización del trabajo de campo"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_info" text="Porcentaje de sondas del campo que deben coincidir con el estado esperado para que una misión de trabajo se considere completada."/>
+            <text name="ia_settings_fieldworkCompletionThreshold_60" text="60 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_65" text="65 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_70" text="70 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_75" text="75 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_80" text="80 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_85" text="85 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_90" text="90 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_95" text="95 %"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_100" text="100 %"/>
+            <text name="ia_settings_voiceVolume_title" text="Volumen de las voces"/>
+            <text name="ia_settings_voiceVolume_info" text="Volumen de las frases habladas de los vecinos."/>
+            <text name="ia_settings_voiceVolume_10" text="10 %"/>
+            <text name="ia_settings_voiceVolume_20" text="20 %"/>
+            <text name="ia_settings_voiceVolume_30" text="30 %"/>
+            <text name="ia_settings_voiceVolume_40" text="40 %"/>
+            <text name="ia_settings_voiceVolume_50" text="50 %"/>
+            <text name="ia_settings_voiceVolume_60" text="60 %"/>
+            <text name="ia_settings_voiceVolume_70" text="70 %"/>
+            <text name="ia_settings_voiceVolume_80" text="80 %"/>
+            <text name="ia_settings_voiceVolume_90" text="90 %"/>
+            <text name="ia_settings_voiceVolume_100" text="100 %"/>
+            <text name="ia_npc_unavailable" text=" (No disponible)"/>
+            <text name="gui_language" text="ea"/>
+	</texts>
+</l10n>

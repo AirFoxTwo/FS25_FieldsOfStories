@@ -33,13 +33,14 @@ In his interactions with neighbors and business partners, he maintains a profess
 Im Alltag wirkt Brian häufig angespannt, da er gleichzeitig den Betrieb stabil halten und umfassend modernisieren muss. Die Umstellung bringt organisatorischen Druck, finanzielle Belastung und nicht selten auch Widerstand aus dem Umfeld oder der Familie mit sich. Diese Situation führt dazu, dass er oft wenig Geduld für Verzögerungen oder traditionelle Arbeitsweisen hat.
 
 Im Umgang mit Nachbarn und Geschäftspartnern tritt er professionell und sachlich auf. Er kommuniziert klar, erwartet Verlässlichkeit und bevorzugt direkte Absprachen ohne lange Umwege. Unklare oder ineffiziente Arbeitsweisen frustrieren ihn schnell, was ihn gelegentlich distanziert oder ungeduldig wirken lässt.</roleScenarioDescriptionDe>
+      <vehicle id="129" vehicleId="1974" name="NARDI N60-35" manufacturer="NARDI" xmlFilename="data/vehicles/nardi/n60_35/n60_35.xml" type="attachment" category="cutterTrailers"/>
       <vehicle id="90" vehicleId="60" name="FLIEGL ASW 271" manufacturer="FLIEGL" xmlFilename="data/vehicles/fliegl/asw271/asw271.xml" type="attachment" category="Trailer"/>
       <vehicle id="83" vehicleId="11" name="AGROMASZ POV 5 XL" manufacturer="AGROMASZ" xmlFilename="data/vehicles/agromasz/pov5xl/pov5xl.xml" type="attachment" category="Plow"/>
       <vehicle id="82" vehicleId="1236" name="JOHNDEERE PickUp 1150" manufacturer="JOHNDEERE" xmlFilename="data/vehicles/johndeere/pickup1150/pickup1150.xml" type="attachment" category="Weight"/>
       <vehicle id="78" vehicleId="712" name="BERGMANN TSW 6240 W" manufacturer="BERGMANN" xmlFilename="data/vehicles/bergmann/tsw6240w/tsw6240w.xml" type="attachment" category="Manure Spreader"/>
       <vehicle id="77" vehicleId="682" name="VAEDERSTAD Carrier XL 625" manufacturer="VAEDERSTAD" xmlFilename="data/vehicles/vaderstad/carrierxl625/carrierxl625.xml" type="attachment" category="Disc Harrow"/>
       <vehicle id="67" vehicleId="95" name="KUHN PROLANDER 7500" manufacturer="KUHN" xmlFilename="data/vehicles/kuhn/prolander7500/prolander7500.xml" type="attachment" category="Cultivator"/>
-      <vehicle id="66" vehicleId="72" name="JOHNDEERE RDF35" manufacturer="JOHNDEERE" xmlFilename="data/vehicles/johndeere/headerrd35f/headerrd35f.xml" type="attachment" category="Header / Cutter"/>
+      <vehicle id="66" vehicleId="72" name="JOHNDEERE RDF35" manufacturer="JOHNDEERE" xmlFilename="data/vehicles/johndeere/headerrd35f/headerrd35f.xml" type="attachment" category="Header / Cutter" headerTrailer="129"/>
       <vehicle id="65" vehicleId="82" name="JOHNDEERE S7" manufacturer="JOHNDEERE" xmlFilename="data/vehicles/johndeere/seriess7/seriess7.xml" type="combine"/>
       <vehicle id="64" vehicleId="390" name="FLIEGL PFW 18000 MaxxLine Plus" manufacturer="FLIEGL" xmlFilename="data/vehicles/fliegl/pfw18000maxxlineplus/pfw18000maxxlineplus.xml" type="attachment" category="Slurry Tank"/>
       <vehicle id="63" vehicleId="336" name="AMAZONE UX 5201 Super" manufacturer="AMAZONE" xmlFilename="data/vehicles/amazone/ux5201super/ux5201super.xml" type="attachment" category="Sprayer"/>
@@ -63,12 +64,13 @@ Her supportive nature is especially evident during stressful periods, such as pl
 Im Umgang mit Nachbarn und Geschäftspartnern ist Emma offen, freundlich und hilfsbereit. Sie gilt als jemand, der unkompliziert kommuniziert und gerne gemeinsam Lösungen findet, statt Probleme lange auszudiskutieren. Besonders in der regionalen Landwirtschaft ist sie gut vernetzt und pflegt stabile, faire Beziehungen.
 
 Ihre unterstützende Art zeigt sich vor allem in stressigen Zeiten wie Aussaat oder Ernte. Wenn es möglich ist, hilft sie anderen Betrieben aus oder nimmt selbst Hilfe an, ohne lange zu zögern. Sie legt Wert auf gegenseitige Unterstützung innerhalb der landwirtschaftlichen Gemeinschaft und sieht Zusammenarbeit als wichtigen Bestandteil ihres Alltags.</roleScenarioDescriptionDe>
+      <vehicle id="130" vehicleId="1973" name="NARDI N40BX" manufacturer="NARDI" xmlFilename="data/vehicles/nardi/n40bx/n40bx.xml" type="attachment" category="cutterTrailers"/>
       <vehicle id="92" vehicleId="58" name="FENDT 900 Vario" manufacturer="FENDT" xmlFilename="data/vehicles/fendt/vario900/vario900.xml" type="tractor large"/>
       <vehicle id="84" vehicleId="11" name="AGROMASZ POV 5 XL" manufacturer="AGROMASZ" xmlFilename="data/vehicles/agromasz/pov5xl/pov5xl.xml" type="attachment" category="Plow"/>
       <vehicle id="81" vehicleId="1131" name="AGCO 1500" manufacturer="AGCO" xmlFilename="data/vehicles/agco/weight1500/weight1500.xml" type="attachment" category="Weight"/>
       <vehicle id="76" vehicleId="390" name="FLIEGL PFW 18000 MaxxLine Plus" manufacturer="FLIEGL" xmlFilename="data/vehicles/fliegl/pfw18000maxxlineplus/pfw18000maxxlineplus.xml" type="attachment" category="Slurry Tank"/>
       <vehicle id="75" vehicleId="680" name="UNIA ARES XL" manufacturer="UNIA" xmlFilename="data/vehicles/unia/aresxl/aresxl.xml" type="attachment" category="Disc Harrow"/>
-      <vehicle id="62" vehicleId="50" name="FENDT FreeFlow 25FT" manufacturer="FENDT" xmlFilename="data/vehicles/fendt/freeflow25ft/freeflow25ft.xml" type="attachment" category="Header / Cutter"/>
+      <vehicle id="62" vehicleId="50" name="FENDT FreeFlow 25FT" manufacturer="FENDT" xmlFilename="data/vehicles/fendt/freeflow25ft/freeflow25ft.xml" type="attachment" category="Header / Cutter" headerTrailer="130"/>
       <vehicle id="61" vehicleId="52" name="FENDT 5275 C SL" manufacturer="FENDT" xmlFilename="data/vehicles/fendt/series5275csl/series5275csl.xml" type="combine"/>
       <vehicle id="60" vehicleId="393" name="HARDI AEON 5200 DELTA FORCE" manufacturer="HARDI" xmlFilename="data/vehicles/hardi/aeon5200/aeon5200.xml" type="attachment" category="Sprayer"/>
       <vehicle id="59" vehicleId="338" name="AMAZONE ZG-TS 10001" manufacturer="AMAZONE" xmlFilename="data/vehicles/amazone/zgts10001/zgts10001.xml" type="attachment" category="Fertilizer Spreader"/>
@@ -93,13 +95,14 @@ His cautious nature is most evident when it comes to investments, new technologi
 Im Umgang mit anderen wirkt Jakob ruhig, kontrolliert und eher zurückhaltend. Er hört erst zu, bevor er sich äußert, und trifft Entscheidungen selten spontan. Besonders in geschäftlichen oder nachbarschaftlichen Fragen achtet er darauf, keine unnötigen Risiken einzugehen und Konflikte möglichst zu vermeiden.
 
 Seine vorsichtige Art zeigt sich vor allem bei Investitionen, neuen Technologien oder größeren Veränderungen im Betriebsablauf. Er bevorzugt bewährte Methoden und prüft Neuerungen sehr genau, bevor er sie in den Betrieb integriert. Diese Haltung hat ihm geholfen, den Hof stabil zu führen, auch wenn er dadurch manchmal als zu langsam oder konservativ wahrgenommen wird.</roleScenarioDescriptionDe>
+      <vehicle id="131" vehicleId="1973" name="NARDI N40BX" manufacturer="NARDI" xmlFilename="data/vehicles/nardi/n40bx/n40bx.xml" type="attachment" category="cutterTrailers"/>
       <vehicle id="91" vehicleId="142" name="VALTRA S" manufacturer="VALTRA" xmlFilename="data/vehicles/valtra/sseries/sseries.xml" type="tractor large"/>
       <vehicle id="85" vehicleId="11" name="AGROMASZ POV 5 XL" manufacturer="AGROMASZ" xmlFilename="data/vehicles/agromasz/pov5xl/pov5xl.xml" type="attachment" category="Plow"/>
       <vehicle id="80" vehicleId="1183" name="CLAAS W 1800" manufacturer="CLAAS" xmlFilename="data/vehicles/claas/w1800/w1800.xml" type="attachment" category="Weight"/>
       <vehicle id="74" vehicleId="680" name="UNIA ARES XL" manufacturer="UNIA" xmlFilename="data/vehicles/unia/aresxl/aresxl.xml" type="attachment" category="Disc Harrow"/>
       <vehicle id="73" vehicleId="715" name="BRANTNER TA 12050 Power Spread +" manufacturer="BRANTNER" xmlFilename="data/vehicles/brantner/ta12050/ta12050.xml" type="attachment" category="Manure Spreader"/>
       <vehicle id="70" vehicleId="139" name="UNIA FENIX 3000/3" manufacturer="UNIA" xmlFilename="data/vehicles/unia/fenix3000/fenix3000.xml" type="attachment" category="Seeder"/>
-      <vehicle id="58" vehicleId="41" name="CLAAS VARIO 620" manufacturer="CLAAS" xmlFilename="data/vehicles/claas/vario620/vario620.xml" type="attachment" category="Header / Cutter"/>
+      <vehicle id="58" vehicleId="41" name="CLAAS VARIO 620" manufacturer="CLAAS" xmlFilename="data/vehicles/claas/vario620/vario620.xml" type="attachment" category="Header / Cutter" headerTrailer="131"/>
       <vehicle id="57" vehicleId="38" name="CLAAS EVION 450" manufacturer="CLAAS" xmlFilename="data/vehicles/claas/evion450/evion450.xml" type="combine"/>
       <vehicle id="56" vehicleId="345" name="BERTHOUD Vantage 4300" manufacturer="BERTHOUD" xmlFilename="data/vehicles/berthoud/vantage4300/vantage4300.xml" type="attachment" category="Sprayer"/>
       <vehicle id="55" vehicleId="337" name="AMAZONE ZA-TS 3200" manufacturer="AMAZONE" xmlFilename="data/vehicles/amazone/zats3200/zats3200.xml" type="attachment" category="Fertilizer Spreader"/>
@@ -124,12 +127,13 @@ He is not always cooperative in his dealings with neighbors and fellow farmers. 
 Im täglichen Umgang wirkt Markus häufig angespannt und wenig zugänglich. Der ständige Druck durch Reparaturen, Zeitaufwand und steigende Anforderungen in der Landwirtschaft hat ihn über die Jahre müde und reizbar gemacht. Neue Methoden oder moderne Technik begegnet er oft mit Skepsis, da er schlechte Erfahrungen mit Investitionen oder Umstellungen gemacht hat.
 
 Im Kontakt mit Nachbarn und anderen Landwirten ist er nicht immer kooperativ. Absprachen können schwierig sein, da er sich schnell unter Druck gesetzt fühlt oder Veränderungen im Ablauf ablehnt. Konflikte entstehen bei ihm weniger aus persönlicher Ablehnung, sondern eher aus Überforderung und dem Gefühl, den Überblick zu verlieren.</roleScenarioDescriptionDe>
+      <vehicle id="132" vehicleId="1971" name="MASSEYFERGUSON MF 8570 Trailer" manufacturer="MASSEYFERGUSON" xmlFilename="data/vehicles/masseyferguson/mf8570trailer/mf8570trailer.xml" type="attachment" category="cutterTrailers"/>
       <vehicle id="128" vehicleId="680" name="UNIA ARES XL" manufacturer="UNIA" xmlFilename="data/vehicles/unia/aresxl/aresxl.xml" type="attachment" category="Disc Harrow"/>
       <vehicle id="93" vehicleId="22" name="BRANTNER Z 18051/2 XXL Power Flex" manufacturer="BRANTNER" xmlFilename="data/vehicles/brantner/z18051/z18051.xml" type="attachment" category="Trailer"/>
       <vehicle id="86" vehicleId="98" name="LEMKEN Juwel 6 M V" manufacturer="LEMKEN" xmlFilename="data/vehicles/lemken/juwel6/juwel6.xml" type="attachment" category="Plow"/>
       <vehicle id="79" vehicleId="1131" name="AGCO 1500" manufacturer="AGCO" xmlFilename="data/vehicles/agco/weight1500/weight1500.xml" type="attachment" category="Weight"/>
       <vehicle id="72" vehicleId="378" name="FARMTECH Supercis 800" manufacturer="FARMTECH" xmlFilename="data/vehicles/farmtech/supercis800/supercis800.xml" type="attachment" category="Slurry Tank"/>
-      <vehicle id="53" vehicleId="109" name="MASSEYFERGUSON MF 8570 %s" manufacturer="MASSEYFERGUSON" xmlFilename="data/vehicles/masseyferguson/mf8570header/mf8570header.xml" type="attachment" category="Header / Cutter"/>
+      <vehicle id="53" vehicleId="109" name="MASSEYFERGUSON MF 8570 %s" manufacturer="MASSEYFERGUSON" xmlFilename="data/vehicles/masseyferguson/mf8570header/mf8570header.xml" type="attachment" category="Header / Cutter" headerTrailer="132"/>
       <vehicle id="52" vehicleId="108" name="MASSEYFERGUSON MF 8570" manufacturer="MASSEYFERGUSON" xmlFilename="data/vehicles/masseyferguson/mf8570/mf8570.xml" type="combine"/>
       <vehicle id="50" vehicleId="394" name="HARDI MEGA 1200L" manufacturer="HARDI" xmlFilename="data/vehicles/hardi/mega1200l/mega1200l.xml" type="attachment" category="Sprayer"/>
       <vehicle id="49" vehicleId="337" name="AMAZONE ZA-TS 3200" manufacturer="AMAZONE" xmlFilename="data/vehicles/amazone/zats3200/zats3200.xml" type="attachment" category="Fertilizer Spreader"/>
@@ -158,6 +162,8 @@ Im Umgang mit Kunden wirkt Paul oft kurz angebunden und wenig geduldig. Er ist d
 Durch die hohe Arbeitslast und den ständigen Termindruck wirkt er häufig gestresst und angespannt. Besonders in der Erntezeit oder bei wetterkritischen Phasen kann er unkooperativ erscheinen, wenn Abläufe nicht exakt nach Plan laufen. Dabei geht es ihm weniger um persönliche Konflikte, sondern um die Notwendigkeit, den Betrieb am Laufen zu halten.
 
 Trotz seiner ruppigen Art ist Paul fachlich sehr kompetent und erfahren in allen Bereichen der Feldarbeit. Wenn Absprachen klar und frühzeitig getroffen werden, arbeitet er zuverlässig und effizient. Er erwartet jedoch dasselbe Maß an Klarheit und Verbindlichkeit von seinen Geschäftspartnern.</roleScenarioDescriptionDe>
+      <vehicle id="135" vehicleId="1974" name="NARDI N60-35" manufacturer="NARDI" xmlFilename="data/vehicles/nardi/n60_35/n60_35.xml" type="attachment" category="cutterTrailers"/>
+      <vehicle id="133" vehicleId="1968" name="DEMCO HDHT 52" manufacturer="DEMCO" xmlFilename="data/vehicles/demco/hdht52/hdht52.xml" type="attachment" category="cutterTrailers"/>
       <vehicle id="125" vehicleId="1236" name="JOHNDEERE PickUp 1150" manufacturer="JOHNDEERE" xmlFilename="data/vehicles/johndeere/pickup1150/pickup1150.xml" type="attachment" category="Weight"/>
       <vehicle id="124" vehicleId="1909" name="OXBO BP2140e" manufacturer="OXBO" xmlFilename="data/vehicles/oxbo/bp2140e/bp2140e.xml" type="greenbeanharvesters"/>
       <vehicle id="123" vehicleId="1910" name="OXBO EPD540e" manufacturer="OXBO" xmlFilename="data/vehicles/oxbo/epd540e/epd540e.xml" type="peaharvesters"/>
@@ -167,7 +173,7 @@ Trotz seiner ruppigen Art ist Paul fachlich sehr kompetent und erfahren in allen
       <vehicle id="119" vehicleId="1919" name="ROPA KEILER 2 RK22" manufacturer="ROPA" xmlFilename="data/vehicles/ropa/keiler2/keiler2.xml" type="attachment" category="potatoHarvesters"/>
       <vehicle id="118" vehicleId="1768" name="GRIMME GL 420" manufacturer="GRIMME" xmlFilename="data/vehicles/grimme/gl420/gl420.xml" type="attachment" category="potatoPlanting"/>
       <vehicle id="117" vehicleId="1920" name="ROPA Maus 5" manufacturer="ROPA" xmlFilename="data/vehicles/ropa/maus5/maus5.xml" type="beetloading"/>
-      <vehicle id="116" vehicleId="1921" name="ROPA RR-XL 9x45" manufacturer="ROPA" xmlFilename="data/vehicles/ropa/rrxl9/rrxl9.xml" type="attachment" category="beetHarvesterCutters"/>
+      <vehicle id="116" vehicleId="1921" name="ROPA RR-XL 9x45" manufacturer="ROPA" xmlFilename="data/vehicles/ropa/rrxl9/rrxl9.xml" type="attachment" category="beetHarvesterCutters" />
       <vehicle id="115" vehicleId="1923" name="ROPA Tiger 6S" manufacturer="ROPA" xmlFilename="data/vehicles/ropa/tiger6s/tiger6s.xml" type="beetharvesters"/>
       <vehicle id="114" vehicleId="1846" name="KRONE VariPack V 190 XC Plus" manufacturer="KRONE" xmlFilename="data/vehicles/krone/varipackv190xc/varipackv190xc.xml" type="attachment" category="balersRound"/>
       <vehicle id="113" vehicleId="1841" name="KRONE BiG Pack 1290 HDP VC" manufacturer="KRONE" xmlFilename="data/vehicles/krone/bigpack1290hdpvc/bigpack1290hdpvc.xml" type="attachment" category="balersSquare"/>
@@ -176,8 +182,8 @@ Trotz seiner ruppigen Art ist Paul fachlich sehr kompetent und erfahren in allen
       <vehicle id="110" vehicleId="1844" name="KRONE EasyFlow 300 S" manufacturer="KRONE" xmlFilename="data/vehicles/krone/easyflow300s/easyflow300s.xml" type="attachment" category="forageHarvesterCutters"/>
       <vehicle id="109" vehicleId="1843" name="KRONE X-Collect 900-3" manufacturer="KRONE" xmlFilename="data/vehicles/krone/collect900_3/collect900_3.xml" type="attachment" category="forageHarvesterCutters"/>
       <vehicle id="108" vehicleId="1842" name="KRONE BiG X 1180" manufacturer="KRONE" xmlFilename="data/vehicles/krone/bigx1180/bigx1180.xml" type="forageharvesters"/>
-      <vehicle id="107" vehicleId="854" name="NEWHOLLAND 980CR 18-30" manufacturer="NEWHOLLAND" xmlFilename="data/vehicles/newholland/cr980_1830/cr980_1830.xml" type="attachment" category="Corn Header"/>
-      <vehicle id="106" vehicleId="117" name="NEWHOLLAND FD250 FlexDraper®" manufacturer="NEWHOLLAND" xmlFilename="data/vehicles/newholland/fd250/fd250.xml" type="attachment" category="Header / Cutter"/>
+      <vehicle id="107" vehicleId="854" name="NEWHOLLAND 980CR 18-30" manufacturer="NEWHOLLAND" xmlFilename="data/vehicles/newholland/cr980_1830/cr980_1830.xml" type="attachment" category="Corn Header" headerTrailer="135"/>
+      <vehicle id="106" vehicleId="117" name="NEWHOLLAND FD250 FlexDraper®" manufacturer="NEWHOLLAND" xmlFilename="data/vehicles/newholland/fd250/fd250.xml" type="attachment" category="Header / Cutter" headerTrailer="133"/>
       <vehicle id="105" vehicleId="115" name="NEWHOLLAND CR11" manufacturer="NEWHOLLAND" xmlFilename="data/vehicles/newholland/cr11/cr11.xml" type="combine"/>
       <vehicle id="104" vehicleId="390" name="FLIEGL PFW 18000 MaxxLine Plus" manufacturer="FLIEGL" xmlFilename="data/vehicles/fliegl/pfw18000maxxlineplus/pfw18000maxxlineplus.xml" type="attachment" category="Slurry Tank"/>
       <vehicle id="103" vehicleId="338" name="AMAZONE ZG-TS 10001" manufacturer="AMAZONE" xmlFilename="data/vehicles/amazone/zgts10001/zgts10001.xml" type="attachment" category="Fertilizer Spreader"/>
@@ -251,7 +257,7 @@ Er versucht, die Interessen der Gemeinde möglichst pragmatisch abzuwägen, auch
       </behaviour>
       <roleScenarioDescription>Lukas works as a forester and is responsible for the care and management of the surrounding forest areas. His duties include, among other things, inspecting reforestation efforts, maintaining forest paths, monitoring nature conservation measures, and organizing and verifying hunting permits. He knows the region's forests intimately and spends a large portion of his daily life outdoors in nature.
 
-Despite his rather reserved nature, he is regarded as a reliable and fair-minded individual. He is always happy to share his knowledge with friends, particularly when it comes to forestry work, timber, hunting, or nature conservation. He values honest and straightforward people and gets along well with those who act responsibly and keep their word.</roleScenarioDescription>
+Despite his rather reserved nature, he is regarded as a reliable and fair-minded individual. He is always happy to share his knowledge with friends, particularly when it comes to forestry work, timber, hunting, or nature conservation. He values ​​honest and straightforward people and gets along well with those who act responsibly and keep their word.</roleScenarioDescription>
       <roleScenarioDescriptionDe>Lukas arbeitet als Förster und ist für die Betreuung und Verwaltung der umliegenden Waldgebiete zuständig. Zu seinen Aufgaben gehören unter anderem die Kontrolle von Aufforstungen, die Pflege von Waldwegen, die Überwachung von Naturschutzmaßnahmen sowie die Organisation und Prüfung von Jagdgenehmigungen. Er kennt die Wälder der Region sehr genau und verbringt einen Großteil seines Alltags draußen in der Natur.
 
 Trotz seiner eher zurückhaltenden Art gilt er als verlässlicher und fairer Mensch. Freunden hilft er gerne mit seinem Wissen weiter, besonders wenn es um Waldarbeit, Holz, Jagd oder Naturschutz geht. Er schätzt ehrliche und direkte Menschen und kommt mit Personen gut aus, die verantwortungsvoll handeln und ihr Wort halten.</roleScenarioDescriptionDe>
@@ -287,10 +293,10 @@ Sie gilt als ruhig, sachlich und eher zurückhaltend, kann aber freundlich und h
       <behaviour>
         <item>Stressed</item>
       </behaviour>
-      <roleScenarioDescription>John Huber is the brother of Joe Carter —the player character—and grew up alongside him on the family farm. From an early age, farming was a natural and integral part of his life; consequently, he continues to strive to contribute to the daily farm routine as much as his abilities allow. However, due to a medical condition that has physically limited him for several years, he is now able to undertake only lighter and simpler tasks. This weighs on him more heavily than he openly reveals.
+      <roleScenarioDescription>John Carter is the brother of Joe Carter - the player character - and grew up alongside him on the family farm. From an early age, farming was a natural and integral part of his life; consequently, he continues to strive to contribute to the daily farm routine as much as his abilities allow. However, due to a medical condition that has physically limited him for several years, he is now able to undertake only lighter and simpler tasks. This weighs on him more heavily than he openly reveals.
 
 In the past, John was significantly more active in the fields and involved in physically demanding labor. Today, he struggles to come to terms with the fact that many things no longer function as they once did. He feels particularly useless—or like a burden to his family—when others have to take on the heavy work, even though no one intentionally makes him feel this way.</roleScenarioDescription>
-      <roleScenarioDescriptionDe>John Huber ist der Bruder von Joe  Huber (Spieler) und gemeinsam mit ihm auf dem Familienhof aufgewachsen. Die Landwirtschaft war für ihn schon früh ein selbstverständlicher Teil des Lebens, weshalb er bis heute versucht, so gut wie möglich am Hofalltag mitzuwirken. Durch eine Erkrankung, die ihn seit einigen Jahren körperlich einschränkt, kann er jedoch nur noch leichtere und einfachere Arbeiten übernehmen. Das belastet ihn mehr, als er offen zeigt.
+      <roleScenarioDescriptionDe>John Huber ist der Bruder von Joe Huber (Spieler) und gemeinsam mit ihm auf dem Familienhof aufgewachsen. Die Landwirtschaft war für ihn schon früh ein selbstverständlicher Teil des Lebens, weshalb er bis heute versucht, so gut wie möglich am Hofalltag mitzuwirken. Durch eine Erkrankung, die ihn seit einigen Jahren körperlich einschränkt, kann er jedoch nur noch leichtere und einfachere Arbeiten übernehmen. Das belastet ihn mehr, als er offen zeigt.
 
 Früher war John deutlich aktiver auf dem Feld und bei körperlich anstrengenden Tätigkeiten dabei. Heute fällt es ihm schwer, akzeptieren zu müssen, dass vieles nicht mehr so funktioniert wie früher. Besonders wenn andere die schwere Arbeit übernehmen müssen, fühlt er sich schnell nutzlos oder als Belastung für die Familie, obwohl ihm niemand dieses Gefühl bewusst vermittelt.</roleScenarioDescriptionDe>
       <vehicle id="10" vehicleId="5" colorIndex="2" name="SKODA Kodiaq" manufacturer="SKODA" xmlFilename="data/vehicles/skoda/kodiaq/kodiaq.xml" type="car" npcOffsetX="1.3" npcOffsetY="0" npcOffsetZ="0" npcOffsetRotation="0"/>
@@ -301,7 +307,7 @@ Früher war John deutlich aktiver auf dem Feld und bei körperlich anstrengenden
         <item>Professional</item>
         <item>Supportive</item>
       </behaviour>
-      <roleScenarioDescription>Mary Carter is the wife of Joe Huber (the Player) and is deeply integrated into both family life and the daily routine of the farm. Although she is not a formally trained farmer, she regularly pitches in with farm chores—whether in the barn or out in the fields—whenever a helping hand is needed. Particularly during busy periods, she steps in as a matter of course, striving to support her husband and family by taking care of things behind the scenes.
+      <roleScenarioDescription>Mary Carter is the wife of Joe Carter (the Player) and is deeply integrated into both family life and the daily routine of the farm. Although she is not a formally trained farmer, she regularly pitches in with farm chores—whether in the barn or out in the fields—whenever a helping hand is needed. Particularly during busy periods, she steps in as a matter of course, striving to support her husband and family by taking care of things behind the scenes.
 
 She is regarded as a quiet, warm-hearted, and dependable individual who typically approaches conflicts in a calm, objective, and patient manner. She is open and helpful toward others, though she also expects honesty and mutual respect in return. To strangers, she may initially appear somewhat reserved, but she quickly warms up once approached with friendliness.
 

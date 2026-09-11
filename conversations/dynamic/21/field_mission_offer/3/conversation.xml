@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<conversation>
+	<entry id="1" previousId="0" speaker="npc"
+		text_en="Morning! Any chance you've got some time today? {jobType} needs doing on roughly {totalHectares} hectares."
+		text_de="Morgen! Hast du heute vielleicht etwas Zeit? {jobType} müsste auf etwa {totalHectares} Hektar erledigt werden."
+		callbackOnPlaybackEnd="">
+		<voiceSegments>
+			<segment type="named" id="dm3_1_1"/>
+			<segment type="variable" name="jobType"/>
+			<segment type="named" id="dm3_1_2"/>
+			<segment type="variable" name="totalHectares"/>
+			<segment type="named" id="dm3_1_3"/>
+		</voiceSegments>
+	</entry>
+	<entry id="2" previousId="1" speaker="player"
+		text_en="Yeah, no problem."
+		text_de="Ja, kein Problem."
+		callbackOnSelectImmediate="accept">
+		<voiceSegments>
+			<segment type="named" id="dm3_2_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="3" previousId="1" speaker="player"
+		text_en="I can do it, though I need {vehicleNameWithArticle}"
+		text_de="Ich kann es machen, allerdings brauch ich {vehicleNameWithArticle}"
+		callbackOnSelectImmediate="accept_with_equipment">
+		<voiceSegments>
+			<segment type="named" id="dm3_3_1"/>
+			<segment type="variable" name="vehicleNameWithArticle"/>
+		</voiceSegments>
+	</entry>
+    <entry id="4" previousId="1" speaker="player"
+		text_en="I'm swamped, but I could manage the first half. Would that still help?"
+		text_de="Ich bin voll eingespannt, aber ich könnte die erste Hälfte machen. Wär dir das trotzdem was wert?"
+		callbackOnSelectImmediate="accept_half">
+		<voiceSegments>
+			<segment type="named" id="dm_4_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="5" previousId="1" speaker="player"
+		text_en="I could manage about half of it. Could I borrow {vehicleNameWithArticle} for that part?"
+		text_de="Die hälfte würde ich schaffen, kann ich mir denn {vehicleNameWithArticle} leihen?"
+		callbackOnSelectImmediate="accept_half_with_equipment">
+		<voiceSegments>
+			<segment type="named" id="dm_5_1"/>
+			<segment type="variable" name="vehicleNameWithArticle"/>
+			<segment type="named" id="dm_5_2"/>
+		</voiceSegments>
+	</entry>
+	<entry id="6" previousId="1" speaker="player"
+		text_en="Not today, unfortunately. I'm already flat out."
+		text_de="Heute leider nicht. Ich bin bereits völlig ausgelastet."
+		callbackOnSelectImmediate="decline">
+		<voiceSegments>
+			<segment type="named" id="dm3_6_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="7" previousId="2" speaker="npc"
+		text_en="Brilliant, thanks. That takes a load off my shoulders. {extraRefillNote}"
+		text_de="Perfekt, danke. Das nimmt mir eine große Last von den Schultern. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm3_7_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="8" previousId="3" speaker="npc"
+		text_en="Sounds good. The machine's waiting for you at the yard. {extraRefillNote}"
+		text_de="Klingt gut. Die Maschine wartet auf dem Hof auf dich. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm3_8_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="9" previousId="6" speaker="npc"
+		text_en="Fair enough. Good luck with your own work then."
+		text_de="Ist in Ordnung. Viel Glück bei deiner eigenen Arbeit dann."
+		callbackOnPlaybackEnd="after_decline">
+		<voiceSegments>
+			<segment type="named" id="dm3_9_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="10" previousId="4" speaker="npc"
+		text_en="Brilliant, thanks. That takes a load off my shoulders. {extraRefillNote}"
+		text_de="Perfekt, danke. Das nimmt mir eine große Last von den Schultern. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm3_10_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="11" previousId="5" speaker="npc"
+		text_en="Sounds good. The machine's waiting for you at the yard. {extraRefillNote}"
+		text_de="Klingt gut. Die Maschine wartet auf dem Hof auf dich. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm3_11_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+</conversation>

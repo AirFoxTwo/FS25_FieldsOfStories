@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+	<translationContributors/>
+	<texts>
+            <text name="gui_dialog_title" text="Gesprek met"/>
+            <text name="gui_dialog_answerlabel" text="Jij:"/>
+            <text name="gui_dialog_button_ok" text="OK"/>
+            <text name="gui_dialog_button_cancel" text="Annuleren"/>
+            <text name="ui_ingameMenuFieldsOfStories" text="Fields of Stories"/>
+            <text name="input_IAStartConversation" text="Gesprek / Telefoon"/>
+            <text name="input_IAUsePhone" text="Telefoon gebruiken"/>
+            <text name="gui_hud_start_conversation" text="Gesprek starten"/>
+            <text name="gui_voice_pack_warn_title" text="Fields of Stories – Voicepack"/>
+            <text name="gui_voice_pack_warn_message" text="Je speelt Fields of Stories zonder voicepack (optioneel). Vereiste versie: %s"/>
+            <text name="gui_voice_pack_warn_recheck" text="Opnieuw controleren"/>
+            <text name="gui_voice_pack_warn_ok_notification" text="Voicepack OK: versie komt overeen met Fields of Stories."/>
+            <text name="ia_homebase_setup_warning" text="Fields of Stories: De thuisbases zijn niet compleet. Plaats de vereiste thuisbasisgebieden om de installatie af te ronden."/>
+            <text name="gui_dialog_button_ignore" text="Negeren"/>
+            <text name="gui_mapplaces_gen_title" text="Fields of Stories – Mapplaatsen genereren"/>
+            <text name="gui_mapplaces_gen_message" text="Experimenteel: er is geen opgeslagen configuratie voor deze kaart gevonden. Als je doorgaat, maakt «Fields of Stories» automatisch honderden tot duizenden plaatsen op de kaart. Het spel lijkt bevroren totdat het genereren klaar is."/>
+            <text name="gui_mapplaces_gen_message2" text="Voor een betere ervaring: rij over de kaart en voeg je eigen plaatsen toe (Shift + F3) of verwijder foute plaatsen.&#10;&#10;Voor meer informatie open je het Help-menu in het spel en lees je de Fields of Stories-onderwerpen."/>
+            <text name="gui_mapplaces_gen_before_load" text="Druk op OK om het laden en genereren van mapplaatsen te starten. Het spel kan bevroren lijken tot dit klaar is. Dat is normaal."/>
+            <text name="gui_firstload_tutorial_title" text="Fields of Stories – Gids"/>
+            <text name="gui_firstload_tutorial_message" text="Volg deze gids om het meeste uit de mod te halen. Voor alle details over elke functie open je het Help-menu in het spel en lees je de Fields of Stories-onderwerpen."/>
+            <text name="gui_firstload_tutorial_message2" text="1. Mod activeren: de mod wordt automatisch geladen. In de eerste minuten kunnen er prestatiebeperkingen zijn omdat er veel voertuigen en gegevens worden geladen."/>
+            <text name="gui_firstload_tutorial_message3" text="2. Plaatsen genereren: op modkaarten is het automatisch genereren van plaatsen al begonnen om huizen, wegen en bossen te herkennen. Volg de gids in het Help-menu (categorie Setup) voor de beste ervaring op modkaarten."/>
+            <text name="gui_firstload_tutorial_message4" text="3. Laat de ervaringen naar je toe komen: het is beter om niet meteen alles uit Fields of Stories te trekken. Je ervaart hoe je personages in de wereld ontmoet, oproepen krijgt wanneer je het minst verwacht, en over de kaart rijdt en de boerderijen ontdekt."/>
+            <text name="gui_firstload_tutorial_message5" text="4. Steun de boeren: wees vriendelijk en behulpzaam, dan krijg je op de lange termijn goede relaties en veel voordelen."/>
+            <text name="gui_firstload_tutorial_message6" text="5. Let op de roadmap: de mod is nog maar een klein deel van de visie van het project:&#10;-helpers en loonwerkers,&#10;-personages die bewegen en rijden,&#10;-grote evenementen,&#10;-tientallen missietypen; dit is allemaal mogelijk, maar het kost tijd en jouw steun."/>
+            <text name="gui_phone_title" text="%s"/>
+            <text name="gui_phone_title_default" text="Telefoon"/>
+            <text name="construction_foS_category" text="Fields of Stories"/>
+            <text name="construction_foS_tab_placeables" text="Algemene plaatsen"/>
+            <text name="construction_foS_tab_character_homebase" text="Personage thuis"/>
+            <text name="fos_char_homebase_name" text="Personage thuisbasis: %s"/>
+            <text name="fos_char_homebase_desc" text="Thuisbasis-object voor personage #%s. Plaatst een silo en een boerenerf."/>
+            <text name="fos_char_homebase_name_1" text="Mary Carter (Familielid, Boerin)"/>
+            <text name="fos_char_homebase_desc_1" text="Woonplaats van Mary Carter."/>
+            <text name="fos_char_homebase_name_2" text="John Carter (Familielid, Boer)"/>
+            <text name="fos_char_homebase_desc_2" text="Woonplaats van John Carter."/>
+            <text name="fos_char_homebase_name_10" text="Sharon Whitaker (Ambtenaar)"/>
+            <text name="fos_char_homebase_desc_10" text="Woonplaats van Sharon Whitaker."/>
+            <text name="fos_char_homebase_name_11" text="Kyle Bennett (Burger)"/>
+            <text name="fos_char_homebase_desc_11" text="Woonplaats van Kyle Bennett."/>
+            <text name="fos_char_homebase_name_13" text="Lukas Brenner (Buur, Boswachter)"/>
+            <text name="fos_char_homebase_desc_13" text="Woonplaats van Lukas Brenner."/>
+            <text name="fos_char_homebase_name_14" text="Martin Walker (Ambtenaar, Burgemeester)"/>
+            <text name="fos_char_homebase_desc_14" text="Woonplaats van Martin Walker."/>
+            <text name="fos_char_homebase_name_15" text="Susan Keller (Zakenpartner, Graanhandelaar)"/>
+            <text name="fos_char_homebase_desc_15" text="Woonplaats van Susan Keller."/>
+            <text name="fos_char_homebase_name_16" text="Andy Hoffman (Zakenpartner, Landbouwmachinedealer)"/>
+            <text name="fos_char_homebase_desc_16" text="Woonplaats van Andy Hoffman."/>
+            <text name="fos_char_homebase_name_17" text="Paul Meyer (Zakenpartner, Agrarisch loonwerker)"/>
+            <text name="fos_char_homebase_desc_17" text="Woonplaats van Paul Meyer."/>
+            <text name="fos_char_homebase_name_18" text="Marcus Brown (Buur, Boer)"/>
+            <text name="fos_char_homebase_desc_18" text="Woonplaats van Marcus Brown."/>
+            <text name="fos_char_homebase_name_19" text="Jacob Miller (Buur, Boer)"/>
+            <text name="fos_char_homebase_desc_19" text="Woonplaats van Jacob Miller."/>
+            <text name="fos_char_homebase_name_20" text="Emma Kensington (Buurt, Boerin)"/>
+            <text name="fos_char_homebase_desc_20" text="Woonplaats van Emma Kensington."/>
+            <text name="fos_char_homebase_name_21" text="Brian Winter (Buur, Boer)"/>
+            <text name="fos_char_homebase_desc_21" text="Woonplaats van Brian Winter."/>
+            <text name="gui_phone_message" text="Inkomend gesprek"/>
+            <text name="gui_phone_answer" text="Opnemen"/>
+            <text name="gui_phone_decline" text="Weigeren"/>
+            <text name="gui_phone_close" text="Sluiten"/>
+            <text name="gui_phone_no_incoming" text="Geen inkomend gesprek."/>
+            <text name="gui_phone_caller_unknown" text="Iemand"/>
+            <text name="gui_phone_incoming_notification" text="Inkomend gesprek van %s. Open je telefoon om op te nemen of te weigeren."/>
+            <text name="gui_mapinit_dialog_title" text="Plaatsen configureren"/>
+            <text name="gui_mapinit_dialog_message" text="Voeg plaatsen toe en verwijder ze voor personage-situaties. Let op de aanbevolen hoeveelheid in de lijst. Selecteer eerst de plaatsgrootte bovenaan (te voet, met voertuig of voertuig met werktuig)."/>
+            <text name="gui_mapinit_dialog_first_title" text="Plaatsen configureren"/>
+            <text name="gui_mapinit_dialog_first_message" text="Open het bouwmenu om plaatsen over de hele kaart te maken, of schakel de klassieke modus van versie 1.0 in, waarvoor je rond moet rijden om plaatsen op te slaan."/>
+            <text name="gui_mapinit_characters_title" text="Personage-details"/>
+            <text name="gui_mapinit_characters_message" text="Bekijk de personage-details en configureer ze."/>
+            <text name="gui_mapinit_general_actions_title" text="Algemene acties"/>
+            <text name="gui_mapinit_general_actions_message" text="Functies om je kaart te configureren of op te schonen."/>
+            <text name="gui_mapinit_tab_story" text="Verhaal"/>
+            <text name="gui_mapinit_tab_settings" text="Instellingen"/>
+            <text name="gui_mapinit_story_relationship" text="Relatie"/>
+            <text name="gui_mapinit_story_relationship_level" text="Relatieniveau"/>
+            <text name="gui_mapinit_story_relationship_points" text="Relatiepunten"/>
+            <text name="gui_mapinit_story_relationship_points_fmt" text="%d / %d"/>
+            <text name="gui_relationship_family" text="Familie"/>
+            <text name="gui_relationship_known" text="Bekend"/>
+            <text name="gui_relationship_friend" text="Vriend"/>
+            <text name="gui_relationship_close_friend" text="Goede vriend"/>
+            <text name="gui_relationship_strained" text="Stroef"/>
+            <text name="gui_mapinit_tab_help" text="Help"/>
+            <text name="gui_mapinit_help_info_title" text="Waar vind je hulp"/>
+            <text name="gui_mapinit_help_info_body" text="De volledige Fields of Stories-gids staat in het Help-menu in het spel. Druk op Esc om het menu te openen, ga naar Help en kijk onder de categorieën «Roleplay» en «Setup» om alles te lezen: buren ontmoeten, gesprekken, relaties, veldcontracten, thuisbases, mapplaatsen maken en meer.&#10;Het tabblad Instellingen in dit venster bevat de plaats- en personage-tools om een kaart in te stellen."/>
+            <text name="gui_help_category_title" text="Roleplay"/>
+            <text name="gui_help_category_setup_title" text="Setup"/>
+            <text name="gui_help_overview_title" text="Overzicht"/>
+            <text name="gui_help_overview_body" text="Fields of Stories verandert je spelwereld in een levende buurt. De mensen om je heen zijn geen anonieme NPC's: ze wonen in hun eigen huis, volgen dagelijkse routines, bewerken hun velden en hebben verschillende relaties met jou.&#10;&#10;Wat je kunt doen:&#10;- Buren in de wereld ontmoeten en face-to-face met ze praten.&#10;- Oproepen aannemen wanneer een boer hulp nodig heeft met veldwerk.&#10;- Veldcontracten aannemen, eventueel door de machines van de buur te lenen.&#10;- Je persoonlijke relatie met elk personage in de loop van de tijd verbeteren.&#10;&#10;Dit Help-gedeelte legt elke functie in detail uit."/>
+            <text name="gui_help_characters_title" text="Personages"/>
+            <text name="gui_help_characters_body" text="Dit zijn de buren in jouw wereld. Elk heeft een eigen persoonlijkheid, rol en baan, en een eigen achtergrondverhaal.&#10;&#10;Rollen die je kunt tegenkomen zijn onder meer boeren, een boswachter, de burgemeester, een machinedealer, een agrarisch loonwerker, een graanhandelaar, familieleden en gewone burgers. De rol en baan van een personage bepalen wat ze de hele dag doen en waarover je met ze kunt praten.&#10;&#10;Breng tijd door met de personages wiens verhaal jou het meest interesseert."/>
+            <text name="gui_help_places_title" text="Mapplaatsen maken"/>
+            <text name="gui_help_places_body" text="Plaatsen zijn de ankers die een kaart tot leven brengen. Ze vertellen de mod waar personages kunnen staan, parkeren, winkelen, ontspannen en wonen. Op de ondersteunde kaarten is dit al ingesteld; dit onderwerp is voor je eigen kaarten.&#10;&#10;Hoe maak je een plaats (bouwmenu, aanbevolen):&#10;1. Open het bouwmenu (bouwgereedschap) en selecteer de categorie «Fields of Stories».&#10;2. Open het tabblad «Algemene plaatsen» en kies een plaatsmarkering (bijv. Openbare plaats, Winkel, Tankstation, ...).&#10;3. Verplaats de markering naar de gewenste plek, draai hem en klik om hem te plaatsen. De markering wordt omgezet in een echte plaats en automatisch weer verwijderd.&#10;4. Druk tijdens het plaatsen op Shift+Q om de plaatsgrootte te wisselen. Een groene omtrek toont de voetafdruk en een paneel op het scherm toont de groottes en hoeveel plaatsen er nog nodig zijn.&#10;5. Om plaatsen te verwijderen, plaats je het gereedschap «Plaats verwijderen» bij een bestaande plaats (verwijdert de dichtstbijzijnde binnen 5 m), of druk op Shift+Delete om alle plaatsen van het geselecteerde type in één keer te verwijderen.&#10;&#10;Klassieke manier (rondrijden): open het menu met Shift+F3, ga naar het tabblad Instellingen, kies bovenaan een plaatsgrootte, ga precies staan (of parkeer je voertuig) waar de plaats moet komen en klik op het gewenste plaats-type. De huidige positie wordt opgeslagen en je krijgt de bevestiging «Plaats opgeslagen». Hoe meer plaatsen je opslaat, hoe dynamischer en unieker de gameplay wordt.&#10;&#10;Plaatsgroottes:&#10;- Personage: alleen te voet, voor sta-situaties zonder voertuigen.&#10;- Voertuig: ruimte voor één auto of tractor.&#10;- Voertuig met werktuig: een voertuig plus een aanhanger of werktuig (optioneel).&#10;- Extra groot voertuig (alleen thuisbasis): een extra brede parkeerplek voor maaidorsers en zelfrijdende machines.&#10;- Groot oppervlak: een brede, open ruimte voor situaties die ruimte nodig hebben, zoals machinevoorbereiding, markten of evenementen.&#10;- Silo: markeert de plek voor de silo van de boer (alleen thuisbasis-boerderijen). Het silogebouw verschijnt hier en dient als aflever- en bijvulpunt.&#10;&#10;Veelvoorkomende plaats-typen en hun doel:&#10;- Personage thuisbasis: waar een buur woont (zie «Thuisbases»).&#10;- Winkel, tankstation, werkplaats, schuur, verkooppunt, industrie, openbare infrastructuur: functionele openbare plekken.&#10;- Wegkant, zandweg, bomen: ontmoetingen langs de weg.&#10;- Openbare plaats en openbare ontspanningsplaats: sociale en vrijetijdsplekken; de privé-ontspanningsplaats is voor rustigere routines.&#10;- Spelersboerderij: gebeurtenissen op je eigen boerderij.&#10;&#10;Kaartgenerator voor nieuwe kaarten:&#10;Op een onbekende kaart kan de generator automatisch veel plaatsen maken uit de kaartgegevens. Wees geduldig: er kunnen veel plaatsen worden gemaakt en het spel kan even bevroren lijken terwijl het werkt.&#10;&#10;Kant-en-klare kaartconfiguraties: voor veel kaarten kun je een afgewerkte configuratie downloaden, of je eigen uploaden en delen via de officiële website van de mod, te vinden via de GitHub-pagina van de mod."/>
+            <text name="gui_help_char_age" text="Leeftijd"/>
+            <text name="gui_help_char_gender" text="Geslacht"/>
+            <text name="gui_help_char_gender_male" text="Man"/>
+            <text name="gui_help_char_gender_female" text="Vrouw"/>
+            <text name="gui_help_char_relationship" text="Relatie"/>
+            <text name="gui_help_char_role" text="Rol"/>
+            <text name="gui_help_char_job" text="Baan"/>
+            <text name="gui_help_char_belongsToFarm" text="Hoort bij boerderij"/>
+            <text name="gui_help_char_behaviour" text="Gedrag"/>
+            <text name="gui_help_char_yes" text="Ja"/>
+            <text name="gui_help_char_no" text="Nee"/>
+            <text name="gui_help_char_name_21" text="Brian Winter"/>
+            <text name="gui_help_char_name_20" text="Emma Kensington"/>
+            <text name="gui_help_char_name_19" text="Jacob Miller"/>
+            <text name="gui_help_char_name_18" text="Marcus Brown"/>
+            <text name="gui_help_char_name_17" text="Paul Meyer"/>
+            <text name="gui_help_char_name_16" text="Andy Hoffman"/>
+            <text name="gui_help_char_name_15" text="Susan Keller"/>
+            <text name="gui_help_char_name_14" text="Martin Walker"/>
+            <text name="gui_help_char_name_13" text="Lukas Brenner"/>
+            <text name="gui_help_char_name_11" text="Kyle Bennett"/>
+            <text name="gui_help_char_name_10" text="Sharon Whitaker"/>
+            <text name="gui_help_char_name_2" text="John Carter"/>
+            <text name="gui_help_char_name_1" text="Mary Carter"/>
+            <text name="gui_help_char_desc_21" text="Rol: Buur | Baan: Boer&#10;Leeftijd: 31–50 | Relatie: Bekend | Gedrag: Gestrest, Professioneel&#10;&#10;Brian is een betrekkelijk jonge boerderijeigenaar die het familiebedrijf heeft overgenomen en het probeert te heroriënteren met moderne methoden en technologieën. Zijn focus ligt op efficiëntie, diergezondheid en datagestuurd beheer — strategieën die ertoe leiden dat hij sterk leunt op sensortechnologie, digitale systemen en geoptimaliseerde werkstromen.&#10;&#10;In zijn dagelijks leven lijkt Brian vaak gespannen, omdat hij tegelijk de stabiliteit van het bedrijf moet behouden en de volledige modernisering moet uitvoeren. Deze overgang brengt organisatorische druk, financiële spanning en — heel vaak — weerstand van mensen om hem heen of van zijn eigen familie met zich mee. Daardoor heeft hij vaak weinig geduld voor vertragingen of traditionele werkmethoden.&#10;&#10;In zijn omgang met buren en zakenpartners houdt hij een professionele en zakelijke houding aan. Hij communiceert duidelijk, verwacht betrouwbaarheid en geeft de voorkeur aan directe afspraken zonder onnodige omwegen. Dubbelzinnige of inefficiënte werkmethoden frustreren hem snel — een reactie die hem soms afstandelijk of ongeduldig doet lijken."/>
+            <text name="gui_help_char_desc_20" text="Rol: Buurt | Baan: Boerin&#10;Leeftijd: 31–50 | Relatie: Bekend | Gedrag: Vriendelijk, Behulpzaam&#10;&#10;Samen met haar man runt Emma een gediversifieerd landbouwbedrijf dat gespecialiseerd is in de teelt van groenten en granen. Een deel van de oogst wordt rechtstreeks op lokale markten verkocht, terwijl grotere hoeveelheden via groothandelaren en regionale kopers worden afgezet. Hun boerderij is goed georganiseerd en sterk gericht op efficiëntie en kwaliteit.&#10;&#10;In haar omgang met buren en zakenpartners is Emma open, vriendelijk en behulpzaam. Ze staat bekend als iemand die recht door zee communiceert en liever samen oplossingen zoekt dan eindeloos over problemen te discussiëren. Ze is bijzonder goed verbonden in de regionale agrarische sector, waar ze stabiele en eerlijke relaties onderhoudt.&#10;&#10;Haar behulpzame aard komt vooral naar voren in stressvolle periodes, zoals zaai- of oogstseizoenen. Waar mogelijk helpt ze andere boerderijen — of neemt ze zelf hulp aan — zonder aarzelen. Ze hecht veel waarde aan wederzijdse steun binnen de boerengemeenschap en ziet samenwerking als een essentieel onderdeel van haar dagelijks leven."/>
+            <text name="gui_help_char_desc_19" text="Rol: Buur | Baan: Boer&#10;Leeftijd: 50+ | Relatie: Vriend | Gedrag: Voorzichtig, Neutraal&#10;&#10;Jacob is een ervaren melkveehouder van de derde generatie die een middelgrote familieboerderij runt, samen met zijn twee zonen. De boerderij is in vele jaren gegroeid en stevig geworteld in traditionele structuren, die hij door zorgvuldige aanpassingen heeft laten meegroeien met moderne eisen.&#10;&#10;In zijn omgang met anderen komt Jacob kalm, beheerst en nogal gereserveerd over. Hij luistert voordat hij spreekt en neemt zelden impulsieve beslissingen. Vooral in zakelijke kwesties of omgang met buren vermijdt hij onnodige risico's en blijft hij waar mogelijk uit de buurt van conflicten.&#10;&#10;Zijn voorzichtigheid is het duidelijkst bij investeringen, nieuwe technologieën of grote veranderingen in de bedrijfsvoering. Hij geeft de voorkeur aan bewezen methoden en onderzoekt innovaties grondig voordat hij ze in het bedrijf integreert. Deze aanpak heeft hem in staat gesteld de boerderij stabiel te beheren — ook al wordt hij daardoor soms als te traag of conservatief gezien."/>
+            <text name="gui_help_char_desc_18" text="Rol: Buur | Baan: Boer&#10;Leeftijd: 31–50 | Relatie: Vriend | Gedrag: Gestrest, Onwillig&#10;&#10;Marcus is een lokale boer die al vele jaren een relatief kleine, zeer traditionele boerderij runt. Het grootste deel van zijn materieel is oud; hij repareert het en blijft het zo lang mogelijk gebruiken — een gewoonte die zijn dagelijkse werk steeds ingewikkelder en trager maakt.&#10;&#10;In zijn dagelijkse omgang lijkt Marcus vaak gespannen en enigszins onbenaderbaar. De constante druk van reparaties, de tijd die zijn werk kost en de steeds hogere eisen van de moderne landbouw hebben hem door de jaren heen vermoeid en prikkelbaar gemaakt. Hij bekijkt nieuwe methoden of moderne technologie vaak met scepsis, vanwege negatieve ervaringen met eerdere investeringen of veranderingen.&#10;&#10;Hij is niet altijd meewerkend in de omgang met buren en collega-boeren. Afspraken maken kan moeilijk zijn, omdat hij zich snel onder druk gezet voelt of zich verzet tegen veranderingen in bestaande procedures. Zijn conflicten komen minder voort uit persoonlijke wrok en meer uit het gevoel overweldigd te zijn — het gevoel de controle over de situatie te verliezen."/>
+            <text name="gui_help_char_desc_17" text="Rol: Zakenpartner | Baan: Agrarisch loonwerker&#10;Leeftijd: 31–50 | Relatie: Bekend | Gedrag: Onwillig, Gestrest&#10;&#10;Paul runt een agrarisch loonbedrijf en biedt lokale boerderijen diensten aan zoals oogsten, mest uitrijden, grondbewerking en ander veldwerk. Zijn bedrijf is sterk afhankelijk van tijdsdruk, weersomstandigheden en seizoenspieken — factoren die zijn dagelijkse routine vaak hectisch en zeer veeleisend maken qua planning.&#10;&#10;In zijn omgang met klanten komt Paul vaak kortaf en ongeduldig over. Hij is volledig gericht op het snel afronden van klussen en het efficiënt benutten van zijn machines. Hij wijst lange discussies of last-minute wijzigingen in de werkwijze doorgaans af, omdat die extra druk leggen op zijn toch al krappe schema.&#10;&#10;Door zijn zware werklast en de constante druk van deadlines lijkt hij vaak gestrest en gespannen. Vooral tijdens het oogstseizoen of bij kritiek weer kan hij onwillig lijken als de werkzaamheden niet precies volgens plan verlopen. In zulke gevallen gaat het hem minder om persoonlijke conflicten en meer om de absolute noodzaak om zijn bedrijf draaiende te houden.&#10;&#10;Ondanks zijn norse houding is Paul zeer bekwaam en ervaren in alle aspecten van veldwerk. Mits afspraken duidelijk en ruim van tevoren worden vastgelegd, werkt hij betrouwbaar en efficiënt. Hij verwacht echter hetzelfde niveau van duidelijkheid en inzet van zijn zakenpartners."/>
+            <text name="gui_help_char_desc_16" text="Rol: Zakenpartner | Baan: Landbouwmachinedealer&#10;Leeftijd: 31–50 | Relatie: Goede vriend | Gedrag: Professioneel, Vriendelijk&#10;&#10;Andy bezit een landbouwmachinedealerschap en is uitstekend verbonden in de hele regionale agrarische sector. Zijn bedrijf omvat de verkoop, het onderhoud en de reparatie van landbouwmachines, evenals de levering van reserveonderdelen. Door zijn dagelijkse werk onderhoudt hij nauw contact met boeren, werkplaatsen en fabrikanten, waardoor hij een precies beeld heeft van de praktische eisen van de moderne landbouw.&#10;&#10;In zijn omgang met klanten en zakenpartners komt hij over als open, vriendelijk en oplossingsgericht. Hij weet op gelijk niveau te communiceren en wint het vertrouwen van bedrijven van elke omvang — van kleine familieboerderijen tot grote landgoederen. Zijn voornaamste focus ligt op het vinden van praktische, realistische oplossingen in plaats van lange discussies over theoretische mogelijkheden.&#10;&#10;Als zakenpartner staat Andy bekend als betrouwbaar en eerlijk. Hij komt zijn afspraken na, toont flexibiliteit en goede wil wanneer de situatie het toelaat, en streeft ernaar problemen snel en zonder onnodige bureaucratie op te lossen. Vooral bij technische storingen of dringende reparaties is hij vaak op korte termijn beschikbaar en zet hij zich in om de stilstand voor zijn klanten te minimaliseren."/>
+            <text name="gui_help_char_desc_15" text="Rol: Zakenpartner | Baan: Graanhandelaar&#10;Leeftijd: 31–50 | Relatie: Bekend | Gedrag: Neutraal, Wantrouwig&#10;&#10;Susan werkt als zelfstandig graanhandelaar en reist regelmatig door de regio om graan van lokale boerderijen te kopen en vervolgens door te verkopen aan regionale molens en verwerkingsbedrijven. Ze kent de markt goed, volgt prijzen en opbrengsten nauwlettend en reageert snel op verschuivingen in vraag en aanbod.&#10;&#10;In haar omgang met boeren en zakenpartners komt ze over als zakelijk, gereserveerd en weinig emotioneel. Ze hecht veel belang aan duidelijke afspraken, controleerbare kwaliteit en transparante hoeveelheden. Ze bouwt langzaam vertrouwen op, omdat ze binnen haar zakelijke omgeving vertrouwt op feiten en betrouwbare cijfers — in plaats van op beloften of persoonlijke indrukken.&#10;&#10;Susan is zeer opmerkzaam en ontdekt snel tegenstrijdigheden in aanbiedingen of leveringen. Daardoor zien sommigen haar als streng of wantrouwig, hoewel dat gewoon onderdeel is van haar professionele voorzichtigheid. Ze geeft de voorkeur aan duidelijke contracten en hecht weinig waarde aan informele afspraken of spontane wijzigingen."/>
+            <text name="gui_help_char_desc_14" text="Rol: Ambtenaar | Baan: Burgemeester&#10;Leeftijd: 50+ | Relatie: Bekend | Gedrag: Professioneel, Autoritair&#10;&#10;Martin is al vele jaren burgemeester van de gemeenschap en geldt als een ervaren en invloedrijk figuur in het dorp. Hij kent de meeste families, bedrijven en ontwikkelingen in de regio al decennia en hecht er veel belang aan dat de gemeenschap naar buiten toe een beeld van ordelijkheid, stabiliteit en goede organisatie uitstraalt. Hij neemt zaken als gemeentelijke financiën, infrastructuur en de publieke reputatie van het dorp bijzonder serieus.&#10;&#10;In zijn omgang met anderen presenteert Martin zich doorgaans als beheerst, zakelijk en daadkrachtig. Hij spreekt rustig maar met gezag en is gewend dat zijn beslissingen aandacht krijgen. Hij voert gesprekken vaak diplomatiek; hij kan echter behoorlijk streng zijn als regels worden genegeerd of zijn beslissingen openlijk worden aangevochten."/>
+            <text name="gui_help_char_desc_13" text="Rol: Buur | Baan: Boswachter&#10;Leeftijd: 31–50 | Relatie: Vriend | Gedrag: Voorzichtig, Professioneel&#10;&#10;Lukas werkt als boswachter en is verantwoordelijk voor de verzorging en het beheer van de omliggende bosgebieden. Zijn taken omvatten onder meer het controleren van herbebossing, het onderhouden van bospaden, het toezicht op natuurbehoudsmaatregelen en het organiseren en controleren van jachtvergunningen. Hij kent de bossen van de regio door en door en brengt een groot deel van zijn dagelijks leven buiten in de natuur door.&#10;&#10;Ondanks zijn nogal gereserveerde aard staat hij bekend als betrouwbaar en rechtvaardig. Hij deelt zijn kennis graag met vrienden, vooral als het gaat om boswerk, hout, jacht of natuurbehoud. Hij waardeert eerlijke en oprechte mensen en kan goed overweg met wie verantwoordelijk handelt en zijn woord houdt."/>
+            <text name="gui_help_char_desc_11" text="Rol: Burger&#10;Leeftijd: 31–50 | Relatie: Goede vriend | Gedrag: Neutraal, Vriendelijk&#10;&#10;Kyle werkt als personal trainer en brengt een groot deel van zijn dagelijks leven door in de sportschool of met sportieve activiteiten. Lichamelijke fitheid, discipline en een gezonde levensstijl zijn belangrijk voor hem — zonder ooit belerend over te komen. Hij motiveert graag anderen en slaagt er meestal in mensen snel voor zich te winnen met zijn open en relaxte houding.&#10;&#10;Als goede vriend van Joe is hij betrouwbaar en behulpzaam — vooral wanneer iemand praktische steun of motivatie nodig heeft. Hij richt zich liever op het opbeuren van mensen en het bieden van afleiding dan lang stil te staan bij moeilijkheden. Hij vermijdt over het algemeen conflicten en houdt de sfeer liever licht."/>
+            <text name="gui_help_char_desc_10" text="Rol: Ambtenaar&#10;Leeftijd: 50+ | Relatie: Stroef | Gedrag: Autoritair, Voorzichtig&#10;&#10;Sharon werkt bij de gemeentelijke administratie, waar ze zorgt voor duidelijke procedures en een harmonieus samenleven. Voor boeren gaat dit vaak over zaken als nachtrust, netheid en overlast van geur of geluid. Buiten haar werk probeert ze over het algemeen afstand te nemen van het voortdurende organiseren en toezicht houden; ze weigert zulke discussies in haar vrije tijd te voeren.&#10;&#10;Ze staat bekend als rustig, zakelijk en nogal gereserveerd, hoewel ze vriendelijk en humorvol kan zijn zodra ze iemand beter kent. Ze benadert gesprekken doorgaans nuchter en direct. In haar vrije tijd leest ze graag, wandelt ze of werkt ze in haar tuin. Ze vermijdt grote menigten en drukke omgevingen. Orde en betrouwbaarheid zijn belangrijk voor haar, zowel professioneel als privé. Toch doet ze bewust moeite om na werktijd meer ontspannen te zijn en haar werk niet voortdurend mee naar huis te nemen."/>
+            <text name="gui_help_char_desc_2" text="Rol: Familielid | Baan: Boer | Hoort bij boerderij: Ja&#10;Leeftijd: 21–30 | Relatie: Familie | Gedrag: Gestrest&#10;&#10;John Carter is de broer van Joe Carter — het spelerpersonage — en groeide naast hem op op de familieboerderij. Van jongs af aan was de landbouw een natuurlijk en integraal onderdeel van zijn leven; daarom blijft hij ernaar streven om zoveel mogelijk bij te dragen aan de dagelijkse boerderijroutine als zijn mogelijkheden toelaten. Door een medische aandoening die hem al enkele jaren fysiek beperkt, kan hij nu echter alleen lichtere en eenvoudigere taken uitvoeren. Dit weegt zwaarder op hem dan hij openlijk laat blijken.&#10;&#10;In het verleden was John veel actiever op het land en bij fysiek zwaar werk. Tegenwoordig worstelt hij met het feit dat veel dingen niet meer gaan zoals vroeger. Hij voelt zich vooral nutteloos — of een last voor zijn familie — wanneer anderen het zware werk moeten overnemen, ook al laat niemand hem dat opzettelijk zo voelen."/>
+            <text name="gui_help_char_desc_1" text="Rol: Familielid | Baan: Boerin | Hoort bij boerderij: Ja&#10;Leeftijd: 31–50 | Relatie: Familie | Gedrag: Vriendelijk, Professioneel, Behulpzaam&#10;&#10;Mary Carter is de vrouw van Joe Carter (de speler) en is diep verweven met zowel het gezinsleven als de dagelijkse routine van de boerderij. Hoewel ze geen opgeleide boerin is, springt ze regelmatig bij met boerderijkarweitjes — in de stal of op het land — wanneer er een helpende hand nodig is. Vooral in drukke periodes stapt ze vanzelfsprekend bij en probeert ze haar man en gezin te steunen door dingen achter de schermen te regelen.&#10;&#10;Ze staat bekend als een rustig, warmhartig en betrouwbaar persoon die conflicten doorgaans kalm, objectief en geduldig benadert. Ze is open en behulpzaam naar anderen, maar verwacht in ruil daarvoor wel eerlijkheid en wederzijds respect. Tegenover vreemden kan ze aanvankelijk wat gereserveerd lijken, maar ze ontdooit snel zodra ze vriendelijk wordt benaderd.&#10;&#10;In haar dagelijks leven regelt ze vaak organisatorische zaken rond het huishouden, het gezin en de boerderij. Ze let erop dat ondanks de zware werklast de gezinsband en een prettige sfeer behouden blijven. Over het algemeen probeert ze stressvolle situaties met kalmte en pragmatische oplossingen te doorstaan, ook al neemt ze soms te veel verantwoordelijkheid op zich."/>
+            <text name="gui_help_conversations_title" text="Ontmoeten en praten"/>
+            <text name="gui_help_conversations_body" text="De buren zijn verspreid over de kaart en leiden hun eigen leven. Hen ontmoeten en met hen praten is, naast de realistische gedragspatronen, een centraal onderdeel van de mod.&#10;&#10;Hoe start je een gesprek:&#10;1. Loop te voet naar een personage toe. Wanneer je dichtbij genoeg bent (ongeveer 5 meter), kun je de actie «Gesprek starten» uitvoeren.&#10;2. Druk op Shift+R om het gesprek te beginnen.&#10;3. Luister naar het gesprek of lees de ondertitels.&#10;4. Wanneer er meerdere antwoorden verschijnen, kies je de zin die je wilt zeggen. Jouw keuze bepaalt het gesprek en hoe je relatie verandert.&#10;5. In de toekomst kun je zowel over koetjes en kalfjes praten als over echte acties (bijv. machines lenen).&#10;&#10;Mensen vinden: personages verschijnen overal op de kaart. Een boer in een voertuig is meestal moeilijk te bereiken, maar als je te voet tot ongeveer 20 meter nadert, stopt hij, zet de machine uit en stapt na een tijdje uit zodat je met hem kunt praten.&#10;&#10;Ingesproken gesprekken worden afgespeeld wanneer een voicepack is geïnstalleerd; zo niet, dan kun je gewoon de tekst lezen."/>
+            <text name="gui_help_controls_title" text="Bediening"/>
+            <text name="gui_help_controls_body" text="Shift+R: Start een gesprek met een persoon in de buurt. Als er niemand in de buurt is, opent in plaats daarvan je telefoon.&#10;Shift+F3: Open het verhaal- en instellingenmenu van Fields of Stories.&#10;&#10;In het bouwmenu (tijdens het plaatsen van een Fields of Stories-markering):&#10;Shift+Q: Wissel de plaatsgrootte.&#10;Shift+Delete: Verwijder alle plaatsen van het geselecteerde type."/>
+            <text name="gui_help_relationships_title" text="Relaties"/>
+            <text name="gui_help_relationships_body" text="Elke buur onthoudt hoe hij of zij over jou denkt. Goede ontmoetingen bouwen vertrouwen op; slechte kosten je.&#10;&#10;Hoe het werkt:&#10;- Elk personage heeft een relatieniveau (begint bij 1) en punten die naar het volgende niveau vullen.&#10;- Een vriendelijk gesprek levert punten op (en een kleine bijpassende geldbeloning).&#10;- Wanneer de puntenbalk vol is, stijgt het relatieniveau en worden de punten gereset voor het volgende niveau. Hogere niveaus hebben meer punten nodig, maar geven ook grotere bonussen wanneer je het niveau bereikt.&#10;- Grove of afwijzende antwoorden kunnen punten kosten. Soms kan zelfs een ogenschijnlijk vriendelijk antwoord een negatief gevoel oproepen en je relatie verslechteren. Punten komen nooit onder nul en verlagen nooit een niveau dat je al hebt bereikt.&#10;&#10;Veldcontracten tellen ook mee: een voltooid contract verbetert je relatie met die boer, terwijl falen, annuleren of laten verlopen die evenveel verlaagt.&#10;&#10;Aan het einde van een gesprek verschijnen berichten zoals «Relatie verbeterd» of «Relatieniveau verhoogd»."/>
+            <text name="gui_help_story_title" text="Tabblad Verhaal"/>
+            <text name="gui_help_story_body" text="Het tabblad Verhaal geeft je een snel overzicht van elk personage en je relatie met hen. Open het menu met Shift+F3 en kies het tabblad Verhaal.&#10;&#10;Links staat een schuifbare lijst van alle buren — klik op een naam om die te selecteren. Rechts zie je het portret van het geselecteerde personage, je huidige relatie (zoals Bekend, Vriend of Familie), het relatieniveau en een voortgangsbalk die toont hoeveel relatiepunten je hebt verdiend voor het volgende niveau.&#10;&#10;Gebruik het om in één oogopslag te zien wie je al goed kent en wie je vaker zou moeten bezoeken. Zie het onderwerp Relaties voor hoe punten en niveaus worden verdiend en verloren."/>
+            <text name="gui_help_contracts_title" text="Veldcontracten en oproepen"/>
+            <text name="gui_help_contracts_body" text="Boeren hebben soms meer veldwerk dan ze aankunnen en bellen je om hulp. Deze aanbiedingen zijn echte, betaalde klussen op hun velden. Ze kunnen je een hele reeks velden geven om af te ronden.&#10;&#10;De oproep:&#10;1. Een boer kan je overdag bellen (ongeveer tussen 08:00 en 15:00). Je hoort een beltoon en ziet een oproepmelding.&#10;2. Open je telefoon en druk op Opnemen om het aanbod te horen, of op Weigeren / Esc om het te negeren.&#10;3. Dezelfde boer kan het later opnieuw proberen. Er is een dagelijkse limiet voor contractoproepen (instelbaar in de spelinstellingen). Als je helemaal niet opneemt, volgen er in totaal nog drie pogingen om je te bellen.&#10;&#10;Het werk kiezen: in het telefoongesprek kun je meestal het hele veld of alleen de eerste helft accepteren, en kiezen of je je eigen materieel gebruikt of de machines van de buur leent. Daarvoor moet de boer zijn machines kunnen missen. Natuurlijk kun je het verzoek ook gewoon afwijzen.&#10;&#10;Zonder lenen: je voltooit het contract met je eigen machines. Het werk wordt per hectare betaald en is klaar zodra het veld de vereiste toestand bereikt. Het veld wordt gecontroleerd met meetpunten en de voltooiingsdrempel is instelbaar in de spelinstellingen.&#10;&#10;Deze contracten worden altijd telefonisch aangevraagd en zijn pas na acceptatie zichtbaar in het gebruikelijke missiemenu.&#10;&#10;Beloning en reputatie: een voltooid contract betaalt je uit en verbetert je relatie met de boer. Falen, annuleren of verlopen doet het tegenovergestelde."/>
+            <text name="gui_help_contracts_body2" text="Met lenen: de buur leent je precies de benodigde werktuigen (gewichten en de tractor worden echter niet uitgeleend). Waar nodig beginnen geleende machines al gevuld met zaad, spuitmiddel, kunstmest, mest of drijfmest, die je bij de boerderij van de buur kunt bijvullen wanneer nodig.&#10;Lenen betekent iets minder loon dan het gebruik van je eigen materieel. Belangrijk: een contract met geleend materieel blijft op 99 procent staan totdat je elke geleende machine terugrijdt naar de boerderij van de buur en hem daar afkoppelt. Pas dan geldt het contract als voltooid.&#10;&#10;Als je het materieel leent, vind je een markering op de kaart die laat zien waar de machines kunnen worden opgehaald. Daar kun je de verbruiksartikelen (bijv. drijfmest, zaad of herbicide) bijvullen en aan het einde van het contract de machines weer parkeren."/>
+            <text name="gui_help_contracts_body3" text="Oogst- en aflevercontracten&#10;&#10;Sommige veldwerkcontracten vereisen ook dat je de oogst aflevert:&#10;&#10;Oogstaflevering: oogst een gewas (bijv. maïs, tarwe, koolzaad) en lever het graan af bij de silo van de boer. Het spel houdt bij wat je maaidorser verzamelt en vergelijkt dat met wat je aflevert. Je moet minstens 99 % van wat je hebt geoogst afleveren.&#10;&#10;Aflevering van maaien: maai gras en lever het (als balen of los) af bij de silo van de boer.&#10;&#10;Ophalen en afleveren: oogst of maai het gewas en breng het naar de silo van de boer, die op de kaart met een rode cirkel is gemarkeerd. De silo is voor de duur van het contract tijdelijk toegankelijk — ergens anders lossen (bijv. het gewas verkopen) telt niet.&#10;&#10;Verbruiksklussen (kalk, kunstmest, drijfmest, spuitmiddel, zaad, mest): de silo van de boer is gevuld met het benodigde verbruiksartikel, zodat je je werktuig daar kunt bijvullen in plaats van het te kopen.&#10;&#10;Als meerdere aflevercontracten dezelfde silo en hetzelfde gewastype delen, worden de leveringen evenredig over hen verdeeld.&#10;&#10;Takenlijst: de missiedetails tonen Veldwerk, Aflevering en (als je machines hebt geleend) Materieel terugbrengen als afzonderlijke taken met de huidige aflevervoortgang.&#10;&#10;Geforceerd voltooien: een knop «Geforceerd voltooien» in het contractenmenu sluit een bijna voltooid contract af (meer dan 70 %).&#10;&#10;Voortgangsweergave:&#10;0-80 % beslaat het veldwerk, 80-99 % betekent dat het veldwerk klaar is maar de aflevering nog openstaat. Bij 100 % zijn beide klaar — haal het contract op in het missiemenu om je betaling te ontvangen.&#10;&#10;Extra afleverbonus:&#10;de boer verwacht dat de hele oogst wordt afgeleverd — houd niets voor jezelf. Je kunt blijven afleveren nadat het contract 100 % heeft bereikt. Wanneer je het afhaalt, levert elk overschot boven wat er bij voltooiing in de silo zat een relatiebonus van +50 op."/>
+            <text name="gui_help_contract_cap_call_info" text="Wanneer een boer een handje nodig heeft, hoor je een beltoon en zie je een melding van een inkomende oproep (ongeveer tussen 08:00 en 15:00)."/>
+            <text name="gui_help_contract_cap_call" text="Open je telefoon en druk op Opnemen om het aanbod te horen, of op Weigeren / Esc om het te negeren.&#10;&#10;Je kunt het aantal werkoproepen aanpassen in de spelinstellingen. Dit verwijst naar het aantal boeren dat hulp zoekt, niet naar het aantal oproepen.&#10;&#10;Belangrijk: als je een oproep helemaal niet opneemt, volgen er in totaal nog drie pogingen om je te bellen."/>
+            <text name="gui_help_contract_cap_choices" text="In de oproep kies je het werk: het hele veld of alleen de eerste helft, en of je je eigen materieel gebruikt of de machines van de buur leent."/>
+            <text name="gui_help_contract_cap_borrow_map" text="Als je materieel leent, toont een kaartmarkering waar je de machines kunt ophalen en waar je ze daarna terugbrengt."/>
+            <text name="gui_help_contract_cap_borrow_attach" text="Bij de boerderij koppel je de geleende werktuigen aan en vul je daar zaad, spuitmiddel, kunstmest of drijfmest bij wanneer nodig."/>
+            <text name="gui_help_contract_cap_fieldwork" text="Doe het veldwerk. Met geleend materieel blijft het contract op 99 % staan totdat je elke machine terugbrengt naar de boerderij en afkoppelt."/>
+            <text name="gui_help_schedule_title" text="Boeren en hun veldwerk"/>
+            <text name="gui_help_schedule_body" text="De AI-boeren zijn niet zomaar geanimeerde helpers. Ze plannen en voeren echt veldwerk uit op hun eigen land, dag na dag en seizoen na seizoen.&#10;&#10;Het dagplan: één keer per speldag kijkt elke boer naar de werkelijke staat van zijn velden en stelt een takenlijst op. Die werkt hij overdag af, ongeveer van 06:00 tot de avond: eropuit rijden, werken en daarna weer naar huis.&#10;&#10;Wat ze doen, in volgorde van prioriteit: rijpe gewassen oogsten, dan zaaien, dan spuiten, dan kunstmest, mest of drijfmest uitrijden, en dan ploegen, eggen en cultiveren. Een taak wordt alleen gekozen wanneer het veld die echt nodig heeft (het juiste gewas, groeistadium, bodemtoestand of onkruid).&#10;&#10;De seizoenen volgen: zaaien volgt de echte plantkalender van elk gewas en andere klussen zijn gekoppeld aan logische maanden, zodat het zichtbare werk past bij de tijd van het jaar. Bij het zaaien wisselen boeren zinvolle gewassen af (zoals koolzaad, tarwe, gerst, haver en soja) en proberen ze het vorige gewas te vermijden.&#10;&#10;Uitbesteden: elke dag kan een boer een bepaalde taak als telefonisch contract aanbieden. Deze contracten worden telefonisch aangevraagd en zijn na acceptatie zichtbaar in het gebruikelijke missiemenu. Als je het niet vóór de middag accepteert, doet hij het zelf.&#10;&#10;Je kunt het dagplan van een boer zien in het menu Instellingen onder Personages, inclusief welke taken voor jou zijn gereserveerd, als contract worden aangeboden of door de eigen AI van de boer worden afgehandeld."/>
+            <text name="gui_help_privatelife_title" text="Privéleven"/>
+            <text name="gui_help_privatelife_body" text="Buiten het werk hebben de personages een eigen leven. Elke buur heeft een thuis waar hij naartoe terugkeert, en velen volgen de hele dag persoonlijke routines.&#10;&#10;Dingen die je ze kunt zien doen:&#10;- Thuis ontspannen of het huis opruimen.&#10;- Tijd doorbrengen met vrienden, picknicken of met de kinderen spelen.&#10;- Wandelen, de hond uitlaten of een boek lezen.&#10;- Dagelijkse boodschappen doen of de auto voltanken.&#10;- Het voertuig langs de weg controleren of naar de werkplaats rijden voor reparaties.&#10;&#10;Routines hangen af van het tijdstip van de dag (ochtend, dag, avond en nacht) en van de rol en baan van het personage, zodat een boer, de burgemeester en een burger hun vrije tijd verschillend doorbrengen.&#10;&#10;Dit is precies wat de wereld levendig maakt: als je op verschillende tijden over de kaart zwerft, ontmoet je mensen in allerlei situaties. Door ze te voet te benaderen, kun je een gesprek beginnen en ze beter leren kennen."/>
+            <text name="gui_help_homebases_title" text="Thuisbases"/>
+            <text name="gui_help_homebases_body" text="Een thuisbasis is het thuis van een personage: de plek waar hij woont, waar hij 's avonds naar terugkeert en waar hij te vinden is wanneer hij vrij is. Zonder thuisbasis bestaat een personage niet echt in het spel — elke buur heeft er minstens één nodig.&#10;&#10;Twee spawnpunten per personage: elk personage moet minstens twee woonplaatsen hebben — één met de plaatsgrootte «Personage» (te voet; dit is waar de persoon staat en slaapt) en één met de plaatsgrootte «Voertuig» (waar zijn auto parkeert). Zo heeft elke buur zowel een te-voet- als een voertuig-spawnpunt.&#10;&#10;Woonplaatsen maken (bouwmenu, aanbevolen):&#10;1. Open het bouwmenu (bouwgereedschap) en selecteer de categorie «Fields of Stories» en daarna het tabblad «Personage thuis».&#10;2. Kies het object voor het gewenste personage (bijv. «Mary Carter»).&#10;3. Plaats het bij de woning. Gebruik Shift+Q om de grootte te wisselen («Personage» voor de persoon, «Voertuig» voor zijn auto, «Groot oppervlak» voor de boerderij, «Silo» voor de silo).&#10;&#10;Klassieke manier: open het menu met Shift+F3, ga naar het tabblad Instellingen, kies bovenaan de juiste plaatsgrootte («Personage» of «Voertuig»), ga te voet staan of parkeer je voertuig precies op de gewenste plek bij de woning en selecteer «Thuis van [Naam]» in de plaatsenlijst om de positie op te slaan. Je kunt ook in de sectie Personages «Dichtstbijzijnde thuisbasis toevoegen» gebruiken om de dichtstbijzijnde plaats direct aan het geselecteerde personage toe te wijzen.&#10;&#10;Bestaande woonplaatsen verwijderen: als je de woningen van een personage wilt resetten, selecteer je hem in de sectie Personages en gebruik je de knop «Woonplaatsen verwijderen». Dit ontkoppelt alle woonplaatsen van dat personage — de plaatsen zelf blijven bestaan en kunnen daarna opnieuw worden toegewezen.&#10;&#10;Thuisbases zijn een goede plek om iemand te vinden, vooral vroeg in de ochtend of laat in de avond.&#10;&#10;Boeren: voor hen is de thuisbasis ook de boerderij en heeft die bovendien ruimte voor machines nodig. Je leert hoe je een boerderij goed ontwerpt in het hoofdstuk «Boerderijen ontwerpen»."/>
+            <text name="gui_help_homebasedesign_title" text="Boerderijen ontwerpen"/>
+            <text name="gui_help_homebasedesign_body" text="Dit hoofdstuk gaat over de boerderijen van de boer-personages. Voor een boer is de thuisbasis ook zijn boerderij: wanneer de machines niet in gebruik zijn of op contract staan, staan ze daar geparkeerd. Plan de boerderij dus royaal, want een boer bezit veel voertuigen en werktuigen (momenteel ongeveer 10 werktuigen, 1 maaidorser, 2 tractoren en een auto; de agrarische loonwerker zelfs 23 werktuigen, 6 zelfrijdende machines, 2 tractoren en een auto).&#10;&#10;Hoe maak je de plekken: open het menu met Shift+F3, ga naar het tabblad Instellingen, kies bovenaan de juiste plaatsgrootte en sla een «Personage thuisbasis» op de gewenste plek op (de exacte werkwijze vind je in het hoofdstuk «Mapplaatsen maken»).&#10;&#10;Welke plaatsgroottes een boerderij nodig heeft:&#10;- «Personage» (te voet): voor de boer zelf.&#10;- «Voertuig»: voor auto's en tractoren.&#10;- «Extra groot voertuig»: voor maaidorsers en zelfrijdende machines.&#10;- «Voertuig + werktuig»: voor werktuigen en aanhangers.&#10;- «Groot oppervlak»: voor ruime situaties op de boerderij, zoals machinevoorbereiding.&#10;- «Silo»: voor de silo van de boer, die dient als aflever- en bijvulpunt voor oogst- en maaicontracten.&#10;Als je geen plek kunt vinden voor elke machine, is dat geen probleem — afhankelijk van het gebruik worden ze geparkeerd of verborgen."/>
+            <text name="gui_help_homebasedesign_body2" text="De boerderij toegankelijk maken: om de machines van een boer te lenen, moet zijn boerderij berijdbaar zijn. Je moet met een voertuig tot bij de geparkeerde machines kunnen rijden en weer terug. Zorg er bij het plaatsen van boerderijen dus voor dat geen hekken, poorten, muren, bomen of andere objecten de in- en uitgang blokkeren.&#10;&#10;Een poort verwijderen: als een poort of deur de toegang blokkeert, kun je die rechtstreeks in Fields of Stories verwijderen. Ga dicht bij de poort staan of rijden (binnen ongeveer 20 m), open het menu met Shift+F3 op het tabblad Instellingen en klik op «Dichtstbijzijnde poort verwijderen». Het dichtstbijzijnde object waarvan de knooppuntnaam «gate» bevat, wordt permanent van de kaart verwijderd en blijft weg na herladen. De volgende afbeeldingen tonen hoe het verwijderen van de poort de toegang vrijmaakt zodat de machines kunnen worden geleend."/>
+            <text name="gui_help_voices_title" text="Stemmen en taal"/>
+            <text name="gui_help_voices_body" text="Gesprekken kunnen volledig worden ingesproken. De gesproken audio komt als een apart voicepack, zodat de mod zelf klein blijft.&#10;&#10;Een voicepack installeren: download het voicepack (zie de GitHub-pagina van de mod voor de exacte downloadlocatie: AirFoxTwo/FS25_FieldsOfStories) en pak het zo uit dat de map «conversations» in de modSettings-map van de mod staat (modSettings/FS25_FIELDS_OF_STORIES). Als het pack ontbreekt of verouderd is, verschijnt een waarschuwingsvenster met de knoppen «Opnieuw controleren» en «Negeren». Je kunt zonder blijven spelen; gesprekken tonen dan nog steeds ondertitels, alleen zonder gesproken audio.&#10;&#10;Talen: de mod is volledig vertaald in het Engels en Duits. De weergegeven tekst volgt automatisch de taal van je spel. Voicepacks komen in bijpassende Engelse en Duitse versies, en de mod speelt de audio die past bij het geïnstalleerde pack, anders bij de spel taal.&#10;&#10;Gespreksgeneratie (gevorderd): elk personage heeft eigen gespreksteksten met jou. In totaal komt dit neer op meer dan 10.000 geschreven en ingesproken gespreksdelen. Elk gesprek is handmatig gecontroleerd (ten minste op plausibiliteit). Woord- of grammaticafouten kunnen echter niet worden uitgesloten.&#10;&#10;Stemgeneratie (gevorderd): elk personage heeft een eigen stem, gegenereerd vanuit een text-to-speech stemontwerp. Deze stemmen worden vervolgens voor alle gespreksteksten opgenomen via stemklonen op een lokale NVIDIA RTX 5080. Het plan is om de kwaliteit te verbeteren door verdere optimalisatie of zelfs echte stemacteurs, wat echter aanzienlijke inspanning vergt."/>
+            <text name="gui_help_support_title" text="Ondersteuning en feedback"/>
+            <text name="gui_help_support_body" text="Een bug gevonden of een idee om de mod te verbeteren? Jouw feedback is zeer welkom.&#10;&#10;Feedback, bugmeldingen en functieverzoeken kun je het beste sturen via de GitHub-pagina van de mod: AirFoxTwo/FS25_FieldsOfStories&#10;&#10;Bij het melden van een probleem helpt het enorm om het volgende toe te voegen:&#10;- een korte beschrijving van wat er gebeurde en wat je verwachtte,&#10;- de stappen om het te reproduceren,&#10;- de kaart waarop je speelt,&#10;- je logbestand als je het kunt bijvoegen.&#10;&#10;Duidelijke, gedetailleerde meldingen versnellen oplossingen enorm. Bedankt dat je helpt Fields of Stories te verbeteren."/>
+            <text name="gui_mapinit_remove_mod_disclaimer" text="Let op: hierna moet het spel worden opgeslagen."/>
+            <text name="gui_mapinit_remove_mod" text="Mod-gegevens verwijderen"/>
+            <text name="gui_mapinit_open_construction_menu" text="Bouwmenu openen"/>
+            <text name="gui_mapinit_classic_init_mode" text="Klassieke init-modus"/>
+            <text name="gui_mapinit_place_size_label" text="Plaatsgrootte:"/>
+            <text name="gui_mapinit_place_size_character" text="Personage"/>
+            <text name="gui_mapinit_place_size_vehicle" text="Voertuig"/>
+            <text name="gui_mapinit_place_size_vehicle_attachment" text="Voertuig + werktuig"/>
+            <text name="gui_mapinit_place_size_oversize_vehicle" text="Extra groot voertuig"/>
+            <text name="gui_mapinit_place_size_large_area" text="Groot oppervlak"/>
+            <text name="gui_mapinit_place_size_silo" text="Silo"/>
+            <text name="gui_mapinit_place_type_label" text="Plaatstype:"/>
+            <text name="gui_mapinit_place_type_shop" text="Winkel"/>
+            <text name="gui_mapinit_place_type_gas_station" text="Tankstation"/>
+            <text name="gui_mapinit_place_type_character_homebase" text="Personage thuisbasis"/>
+            <text name="gui_mapinit_place_type_roadside" text="Wegkant"/>
+            <text name="gui_mapinit_place_type_dirt_road" text="Zandweg"/>
+            <text name="gui_mapinit_place_type_public_place" text="Openbare plaats"/>
+            <text name="gui_mapinit_place_type_player_farm" text="Spelersboerderij"/>
+            <text name="gui_mapinit_place_type_public_relax_place" text="Openbare ontspanningsplaats"/>
+            <text name="gui_mapinit_place_type_private_relax_place" text="Privé-ontspanningsplaats"/>
+            <text name="gui_mapinit_place_type_sell_point" text="Verkooppunt"/>
+            <text name="gui_mapinit_place_type_other" text="Overig"/>
+            <text name="gui_mapinit_place_type_church" text="Kerk"/>
+            <text name="gui_mapinit_place_type_public_infrastructure" text="Openbare infrastructuur"/>
+            <text name="gui_mapinit_place_type_roadside_trees" text="Bomen langs de weg"/>
+            <text name="gui_mapinit_place_type_industry" text="Industrie"/>
+            <text name="gui_mapinit_place_type_workshop" text="Werkplaats"/>
+            <text name="gui_mapinit_place_type_shed" text="Schuur"/>
+            <text name="gui_mapinit_place_type_fieldwork" text="Veldwerk"/>
+            <text name="fos_place_character_public_place" text="Plaats: Markering openbare plaats"/>
+            <text name="fos_place_character_public_place_desc" text="Fields of Stories - Een bruisend openbaar plein waar NPC's samenkomen, kletsen en hun vrije tijd doorbrengen"/>
+            <text name="fos_place_character_shop" text="Plaats: Winkelmarkering"/>
+            <text name="fos_place_character_shop_desc" text="Fields of Stories - Een winkelgebied waar NPC's goederen bekijken en kopen"/>
+            <text name="fos_place_character_gas_station" text="Plaats: Tankstationmarkering"/>
+            <text name="fos_place_character_gas_station_desc" text="Fields of Stories - Een tankstation waar NPC's hun voertuigen voltanken en anderen ontmoeten"/>
+            <text name="fos_place_character_roadside" text="Plaats: Wegkantmarkering"/>
+            <text name="fos_place_character_roadside_desc" text="Fields of Stories - Een plek langs de weg waar NPC's stoppen voor een praatje of een rij-pauze"/>
+            <text name="fos_place_character_dirt_road" text="Plaats: Zandwegmarkering"/>
+            <text name="fos_place_character_dirt_road_desc" text="Fields of Stories - Een rustige zandweg waar NPC's genieten van wandelingen en landelijke ontmoetingen"/>
+            <text name="fos_place_character_player_farm" text="Plaats: Spelersboerderijmarkering"/>
+            <text name="fos_place_character_player_farm_desc" text="Fields of Stories - Markeert de boerderij van de speler, het hart van je agrarische activiteiten"/>
+            <text name="fos_place_character_public_relax_place" text="Plaats: Ontspanningsplekmarkering"/>
+            <text name="fos_place_character_public_relax_place_desc" text="Fields of Stories - Een openbare ontspanningsplek waar NPC's tot rust komen en van hun vrije tijd genieten"/>
+            <text name="fos_place_character_private_relax_place" text="Plaats: Privé-ontspanningsplekmarkering"/>
+            <text name="fos_place_character_private_relax_place_desc" text="Fields of Stories - Een afgelegen toevluchtsoord waar NPC's privacy en rustige bezinning zoeken"/>
+            <text name="fos_place_character_sell_point" text="Plaats: Verkooppuntmarkering"/>
+            <text name="fos_place_character_sell_point_desc" text="Fields of Stories - Een handelspunt waar NPC's goederen afleveren en zaken doen"/>
+            <text name="fos_place_character_church" text="Plaats: Kerkmarkering"/>
+            <text name="fos_place_character_church_desc" text="Fields of Stories - Een gebedshuis waar NPC's diensten en gemeenschapsbijeenkomsten bijwonen"/>
+            <text name="fos_place_character_public_infrastructure" text="Plaats: Infrastructuurmarkering"/>
+            <text name="fos_place_character_public_infrastructure_desc" text="Fields of Stories - Een knooppunt van openbare voorzieningen en infrastructuur voor de lokale gemeenschap"/>
+            <text name="fos_place_character_industry" text="Plaats: Industriemarkering"/>
+            <text name="fos_place_character_industry_desc" text="Fields of Stories - Een industriezone waar NPC's werken en goederen produceren"/>
+            <text name="fos_place_character_workshop" text="Plaats: Werkplaatsmarkering"/>
+            <text name="fos_place_character_workshop_desc" text="Fields of Stories - Een reparatiewerkplaats waar NPC's hun materieel onderhouden en repareren"/>
+            <text name="fos_place_character_shed" text="Plaats: Schuurmarkering"/>
+            <text name="fos_place_character_shed_desc" text="Fields of Stories - Een opslagschuur waar NPC's hun gereedschap en materieel bewaren"/>
+            <text name="fos_place_character_remove" text="Gereedschap: Plaats verwijderen"/>
+            <text name="fos_place_character_remove_desc" text="Fields of Stories - Verwijdert de dichtstbijzijnde plaatsmarkering binnen 5 meter wanneer geplaatst"/>
+            <text name="gui_fos_place_created" text="Plaats gemaakt: %s (%s)"/>
+            <text name="gui_fos_bulk_remove_title" text="Plaatsen bulk verwijderen"/>
+            <text name="gui_fos_bulk_remove_confirm" text="%d plaats(en) van type «%s» verwijderen?"/>
+            <text name="gui_fos_bulk_remove_confirm_char" text="%d plaats(en) voor «%s» verwijderen?"/>
+            <text name="gui_fos_bulk_remove_btn_yes" text="Alles verwijderen"/>
+            <text name="gui_fos_bulk_remove_btn_no" text="Annuleren"/>
+            <text name="gui_fos_bulk_remove_none" text="Geen plaatsen van dit type om te verwijderen."/>
+            <text name="gui_fos_bulk_remove_done" text="%d plaats(en) verwijderd."/>
+            <text name="input_IAMapInitDialog" text="Fields of Stories-menu"/>
+            <text name="input_IAI3DReferencesDebug" text="Fields of Stories - Toon debugpunten op alle i3d-referentieknooppunten"/>
+            <text name="input_IADumpUserAttributes" text="Fields of Stories - Schrijf gebruikersattributen van kaartknooppunten naar het log"/>
+            <text name="input_IAPlaceSizeSelect" text="Plaatsgrootte selecteren (Fields of Stories)"/>
+            <text name="input_IAPlaceBulkRemove" text="Plaatsen bulk verwijderen (Fields of Stories)"/>
+            <text name="gui_fos_place_size_select" text="Plaatsgrootte"/>
+            <text name="gui_mapinit_add_nearest_homebase" text="Dichtstbijzijnde thuisbasis toevoegen"/>
+            <text name="gui_mapinit_add_nearest_homebase_info" text="De dichtstbijzijnde plaats is toegewezen aan personage %s."/>
+            <text name="gui_mapinit_notify_place_saved" text="Plaats opgeslagen: %s"/>
+            <text name="gui_mapinit_notify_remove_nearest_ok" text="Dichtstbijzijnde plaats verwijderd."/>
+            <text name="gui_mapinit_notify_remove_nearest_none" text="Geen plaats gevonden om te verwijderen."/>
+            <text name="gui_mapinit_notify_end_init" text="Init-fase beëindigd."/>
+            <text name="gui_mapinit_notify_remove_mod" text="De gegevens van de Fields of Stories-mod zijn gewist. Sla het spel op."/>
+            <text name="gui_mapinit_notify_reset_character" text="Personage %s is gereset."/>
+            <text name="gui_mapinit_notify_delete_character" text="%s is uit de mod verwijderd."/>
+            <text name="gui_mapinit_notify_remove_homeplaces" text="De woonplaatsen zijn verwijderd voor %s."/>
+            <text name="gui_mapinit_remove_nearest" text="Dichtstbijzijnde plaats verwijderen"/>
+            <text name="gui_mapinit_show_place_markers" text="Plaatsmarkeringen tonen"/>
+            <text name="gui_mapinit_hide_place_markers" text="Plaatsmarkeringen verbergen"/>
+            <text name="gui_mapinit_hide_nearest_gate" text="Dichtstbijzijnde poort verwijderen"/>
+            <text name="gui_mapinit_notify_hide_gate_ok" text="Dichtstbijzijnde poort verwijderd: %s"/>
+            <text name="gui_mapinit_notify_hide_gate_none" text="Geen poortobject in de buurt gevonden."/>
+            <text name="gui_mapinit_end_init" text="Init-fase beëindigen"/>
+            <text name="gui_mapinit_nudge_vehicle_left" text="Voertuig: 5 m naar rechts"/>
+            <text name="gui_mapinit_notify_nudge_vehicle_no_vehicle" text="Stap in een voertuig om dit te gebruiken."/>
+            <text name="gui_mapinit_notify_nudge_vehicle_ai" text="Stop de voertuig-AI voordat je verschuift."/>
+            <text name="gui_mapinit_notify_nudge_vehicle_failed" text="Kon het voertuig niet verplaatsen: %s"/>
+            <text name="gui_mapinit_reset_character" text="Personage resetten"/>
+            <text name="gui_mapinit_delete_character" text="Personage verwijderen"/>
+            <text name="gui_mapinit_remove_homeplaces" text="Woonplaatsen verwijderen"/>
+            <text name="gui_mapinit_detail_name" text="Naam"/>
+            <text name="gui_mapinit_detail_job" text="Baan"/>
+            <text name="gui_mapinit_detail_role" text="Rol"/>
+            <text name="gui_mapinit_detail_relationship" text="Relatie"/>
+            <text name="gui_mapinit_detail_relationship_fmt" text="%s (Niveau %d, %d / %d ptn)"/>
+            <text name="gui_mapinit_detail_vehicles" text="Voertuigen"/>
+            <text name="gui_mapinit_detail_current_situation" text="Huidige situatie"/>
+            <text name="gui_mapinit_detail_schedule" text="Gepland veldwerk voor vandaag"/>
+            <text name="gui_mapinit_detail_at_place_fmt" text="bij %s"/>
+            <text name="ingame_relationship_improved" text="Relatie verbeterd met %s (+%s punten)"/>
+            <text name="ingame_relationship_levelup" text="Relatieniveau verhoogd met %s (Niveau %s)"/>
+            <text name="ingame_relationship_decreased" text="Relatie verslechterd met %s (-%s punten)"/>
+            <text name="ingame_situation_at_player_farm" text="%s wacht op je boerderij."/>
+            <text name="ia_field_outcome_mission_title_for_neighbour" text="%s voor %s"/>
+            <text name="ia_field_outcome_mission_desc_short" text="Gebruik een %s om deze taak af te ronden."/>
+            <text name="ia_field_outcome_mission_desc_seed" text="Gebruik een %s om %s te zaaien."/>
+            <text name="ia_field_outcome_neighbour_generic" text="je buur"/>
+            <text name="ia_field_outcome_task_done" text="Klaar"/>
+            <text name="ia_field_outcome_task_open" text="Open"/>
+            <text name="ia_field_outcome_task_fieldwork" text="Veldwerk: %s"/>
+            <text name="ia_field_outcome_task_delivery" text="Aflevering"/>
+            <text name="ia_field_outcome_task_return" text="Materieel terugbrengen"/>
+            <text name="ia_field_outcome_task_delivery_progress" text="%s / %s afgeleverd"/>
+            <text name="ia_field_outcome_task_delivery_not_started" text="Niet gestart"/>
+            <text name="ia_field_outcome_task_return_after_fieldwork" text="Na het veldwerk"/>
+            <text name="ia_fieldwork_label_harvest_corn" text="Maïs oogsten"/>
+            <text name="ia_force_complete_button" text="Geforceerd voltooien"/>
+            <text name="ia_force_complete_no_mission" text="Geen actief Fields of Stories-contract geselecteerd."/>
+            <text name="ia_field_outcome_target_fertilizer" text="Doel: minerale kunstmest in fase %d op het veld."/>
+            <text name="ia_field_outcome_target_slurry" text="Doel: toepassing van drijfmest (vloeibare mest) of gistingsresten (digestaat) tot bemestingsfase %d."/>
+            <text name="ia_field_outcome_target_manure" text="Doel: vaste mest uitrijden tot bemestingsfase %d."/>
+            <text name="ia_field_outcome_target_lime" text="Doel: kalktoepassing (bemestingsfase %d)."/>
+            <text name="ia_field_outcome_target_lime_deliver" text="Doel: kalk gelijkmatig over het veld aanbrengen."/>
+            <text name="ia_field_outcome_target_stone_picking" text="Doel: alle stenen van het veld verwijderen."/>
+            <text name="ia_field_outcome_target_grass_mowing" text="Doel: het gras maaien en bij de boerderij afleveren."/>
+            <text name="ia_field_outcome_target_harvest_deliver_corn" text="Doel: de maïs oogsten en het graan bij de boerderij afleveren."/>
+            <text name="ia_field_outcome_target_herbicide" text="Doel: herbicide spuiten tot het onkruid de afgesproken toestand bereikt."/>
+            <text name="ia_field_outcome_target_seed" text="Doel: %s op het hele veld gevestigd."/>
+            <text name="ia_fieldwork_equip_cultivate" text="cultivator"/>
+            <text name="ia_fieldwork_equip_harrow" text="eg"/>
+            <text name="ia_fieldwork_equip_stubble_cultivation" text="schijveneg of stoppelcultivator"/>
+            <text name="ia_fieldwork_equip_harvest" text="maaier"/>
+            <text name="ia_fieldwork_equip_mineral_fertilizer" text="kunstmeststrooier"/>
+            <text name="ia_fieldwork_equip_slurry" text="drijfmesttank"/>
+            <text name="ia_fieldwork_equip_manure" text="meststrooier"/>
+            <text name="ia_fieldwork_equip_lime" text="kalkstrooier"/>
+            <text name="ia_fieldwork_equip_stone_picker" text="stenenraper"/>
+            <text name="ia_fieldwork_equip_grass_mower" text="maaier en opraapwagen of balenpers"/>
+            <text name="ia_fieldwork_equip_harvest_deliver_corn" text="maaier en graanwagen"/>
+            <text name="ia_fieldwork_equip_herbicide" text="veldspuit met herbicide"/>
+            <text name="ia_fieldwork_equip_seed" text="zaaimachine"/>
+            <text name="ia_fieldwork_equip_plow" text="ploeg"/>
+            <text name="ia_fieldwork_equip_generic" text="tractor en het juiste werktuig"/>
+            <text name="ia_fieldwork_label_cultivate" text="Cultiveren"/>
+            <text name="ia_fieldwork_label_harrow" text="Eggen"/>
+            <text name="ia_fieldwork_label_stubble_cultivation" text="Stoppelbewerking"/>
+            <text name="ia_fieldwork_label_harvest" text="Oogsten"/>
+            <text name="ia_fieldwork_label_fertilize_mineral" text="Minerale bemesting"/>
+            <text name="ia_fieldwork_label_slurry" text="Drijfmest uitrijden"/>
+            <text name="ia_fieldwork_label_manure" text="Mest uitrijden"/>
+            <text name="ia_fieldwork_label_lime" text="Bekalken"/>
+            <text name="ia_fieldwork_label_stone_picking" text="Stenen rapen"/>
+            <text name="ia_fieldwork_label_grass_mowing" text="Gras maaien en afleveren"/>
+            <text name="ia_fieldwork_label_grass_mowing_short" text="Gras maaien"/>
+            <text name="ia_fieldwork_label_harvest_deliver_corn" text="Maïs oogsten en afleveren"/>
+            <text name="ia_fieldwork_label_harvest_deliver_with_crop" text="%s oogsten en afleveren"/>
+            <text name="ia_fieldwork_label_spray" text="Spuiten"/>
+            <text name="ia_fieldwork_label_seed" text="Zaaien"/>
+            <text name="ia_fieldwork_label_seed_with_crop" text="%s zaaien"/>
+            <text name="ia_fieldwork_label_plow" text="Ploegen"/>
+            <text name="ia_fieldwork_label_condition" text="Veldtoestand"/>
+            <text name="ia_field_outcome_mission_finished" text="Fields of Stories-veldcontract voltooid."/>
+            <text name="ia_field_outcome_mission_failed" text="Het Fields of Stories-veldcontract is zonder succes beëindigd."/>
+            <text name="ia_field_outcome_deliver_wrong_location" text="Je moet de oogst bij de boerderij afleveren, niet ergens anders verkopen!"/>
+            <text name="ia_delivery_marker_label" text="Afleverpunt boerderij"/>
+            <text name="ia_field_outcome_mission_deliver_note" text="Lever de oogst af bij de boerderij (gemarkeerd op de kaart)."/>
+            <text name="ia_field_outcome_delivery_complete" text="Aflevering voltooid! De goederen zijn bij de boerderij aangekomen."/>
+            <text name="ia_mission_borrow_refill_at_farm" text="Het geleende materieel is leeg — vul het bij op de boerderij van %s."/>
+            <text name="ia_mission_borrow_return_to_farm" text="Het veldwerk is klaar — breng het geleende materieel terug naar de boerderij van %s (koppel het af op het erf)."/>
+            <text name="ia_mission_borrow_pickup_marker" text="Ophaalpunt geleend materieel"/>
+            <text name="ia_mission_borrow_yard_marker" text="Geleend materieel — ophalen en terugbrengen"/>
+            <text name="ia_settings_section_title" text="Fields of Stories"/>
+            <text name="ia_settings_contractCallsPerDay_title" text="Contractoproepen per dag"/>
+            <text name="ia_settings_contractCallsPerDay_info" text="Maximaal aantal contractoproepen per speldag over alle buren."/>
+            <text name="ia_settings_contractCallsPerDay_none" text="Geen"/>
+            <text name="ia_settings_contractCallsPerDay_1" text="1"/>
+            <text name="ia_settings_contractCallsPerDay_2" text="2"/>
+            <text name="ia_settings_contractCallsPerDay_3" text="3"/>
+            <text name="ia_settings_contractCallsPerDay_4" text="4"/>
+            <text name="ia_settings_contractCallsPerDay_unlimited" text="Onbeperkt"/>
+            <text name="ia_settings_missionOfferMode_title" text="Missieaanbod-modus"/>
+            <text name="ia_settings_missionOfferMode_info" text="Klassiek: vanilla-missies blijven op de kaart, geen contractoproepen. Realistisch: alleen contractoproepen van buren, vanilla-missies verwijderd."/>
+            <text name="ia_settings_missionOfferMode_classic" text="Klassiek"/>
+            <text name="ia_settings_missionOfferMode_realistic" text="Realistisch"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_title" text="Contractvelden per buur"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_info" text="Maximaal aantal velden/percelen dat een buur per dag als contract kan uitbesteden."/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_1" text="1"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_2" text="2"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_3" text="3"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_4" text="4"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_5" text="5"/>
+            <text name="ia_settings_contractMaxFieldsPerNeighbour_unlimited" text="Onbeperkt"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_title" text="Voltooiingsdrempel veldwerk"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_info" text="Percentage veldmeetpunten dat moet overeenkomen met de verwachte toestand voordat een veldwerkmissie als voltooid geldt."/>
+            <text name="ia_settings_fieldworkCompletionThreshold_60" text="60%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_65" text="65%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_70" text="70%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_75" text="75%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_80" text="80%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_85" text="85%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_90" text="90%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_95" text="95%"/>
+            <text name="ia_settings_fieldworkCompletionThreshold_100" text="100%"/>
+            <text name="ia_settings_voiceVolume_title" text="Stemvolume"/>
+            <text name="ia_settings_voiceVolume_info" text="Volume van de gesproken dialoogregels van buren."/>
+            <text name="ia_settings_voiceVolume_10" text="10%"/>
+            <text name="ia_settings_voiceVolume_20" text="20%"/>
+            <text name="ia_settings_voiceVolume_30" text="30%"/>
+            <text name="ia_settings_voiceVolume_40" text="40%"/>
+            <text name="ia_settings_voiceVolume_50" text="50%"/>
+            <text name="ia_settings_voiceVolume_60" text="60%"/>
+            <text name="ia_settings_voiceVolume_70" text="70%"/>
+            <text name="ia_settings_voiceVolume_80" text="80%"/>
+            <text name="ia_settings_voiceVolume_90" text="90%"/>
+            <text name="ia_settings_voiceVolume_100" text="100%"/>
+            <text name="ia_npc_unavailable" text=" (Niet beschikbaar)"/>
+            <text name="gui_language" text="nl"/>
+	</texts>
+</l10n>

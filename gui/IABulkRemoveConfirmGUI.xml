@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg"/>
+
+    <GuiElement profile="ia_bulkremove_dialogBg" id="dialogElement">
+        <ThreePartBitmap profile="fs25_dialogBgTopSmall" position="6px 0px"/>
+        <ThreePartBitmap profile="fs25_dialogBgMiddleSmall" position="6px 90px"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom" position="6px 0px"/>
+
+        <BoxLayout profile="ia_bulkremove_contentLayout" id="contentLayoutElement">
+            <Text profile="ia_bulkremove_title" text="$l10n_gui_fos_bulk_remove_title" id="titleElement" />
+            <Text profile="ia_bulkremove_message" text="" id="messageElement" />
+        </BoxLayout>
+
+        <BoxLayout profile="fs25_dialogButtonBox" position="6px 32px">
+            <Button profile="buttonOK" text="$l10n_gui_fos_bulk_remove_btn_yes" onClick="onClickConfirm" id="confirmButton" />
+            <Button profile="buttonCancel" text="$l10n_gui_fos_bulk_remove_btn_no" onClick="onClickCancel" id="cancelButton" />
+        </BoxLayout>
+    </GuiElement>
+
+    <GUIProfiles>
+        <Profile name="ia_bulkremove_dialogBg" extends="baseReference" with="pivotMiddleCenter">
+            <size value="520px 220px"/>
+        </Profile>
+
+        <Profile name="ia_bulkremove_contentLayout" extends="baseReference" with="pivotTopLeft">
+            <size value="520px 140px"/>
+            <position value="26px 26px"/>
+            <imageColor value="0 0 0 0"/>
+            <color value="0 0 0 0"/>
+            <flowDirection value="vertical"/>
+            <elementSpacing value="14px"/>
+            <alignmentX value="center"/>
+            <alignmentY value="center"/>
+        </Profile>
+
+        <Profile name="ia_bulkremove_title" extends="baseReference" with="anchorTopStretchingX">
+            <size value="100% 30px"/>
+            <textSize value="18px"/>
+            <textAlignment value="center"/>
+            <textVerticalAlignment value="middle"/>
+            <imageColor value="0 0 0 0"/>
+        </Profile>
+
+        <Profile name="ia_bulkremove_message" extends="baseReference" with="anchorTopStretchingX">
+            <size value="100% 90px"/>
+            <textSize value="16px"/>
+            <textAlignment value="center"/>
+            <textVerticalAlignment value="middle"/>
+            <textAutoHeight value="true"/>
+            <textMaxWidth value="460px"/>
+            <textMaxNumLines value="6"/>
+            <imageColor value="0 0 0 0"/>
+        </Profile>
+    </GUIProfiles>
+</GUI>

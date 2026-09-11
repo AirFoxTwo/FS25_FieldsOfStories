@@ -35,7 +35,6 @@ handleActiveSituation stays active and detects the day boundary crossing at 6:00
 		{ type = "snapshotState" },
 		{ type = "advanceGameTimeTo", hour = 6, minute = 1 },
 		{ type = "waitWallClock", seconds = 10 },
-		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 		{ type = "assertLogContains", category = "schedule", event = "rebuild_begin" },
 		{ type = "assertLogContains", category = "schedule", event = "rebuild_end" },
@@ -56,7 +55,6 @@ Check the structured log for task ordering in the rebuild_end event.
 	actions = {
 		{ type = "forceScheduleRebuild" },
 		{ type = "waitWallClock", seconds = 3 },
-		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 		{ type = "assertLogContains", category = "schedule", event = "rebuild_end" },
 		{ type = "assertNeighbourState", neighbourName = "Jacob Miller", field = "scheduleTasks", condition = "nonEmpty" },
@@ -77,7 +75,6 @@ non-harvest type from the candidate set, and harvest should never be outsourced.
 	actions = {
 		{ type = "forceScheduleRebuild" },
 		{ type = "waitWallClock", seconds = 3 },
-		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 	},
 })
@@ -95,7 +92,6 @@ after a schedule rebuild. These are set once per game day.
 	actions = {
 		{ type = "forceScheduleRebuild" },
 		{ type = "waitWallClock", seconds = 3 },
-		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 	},
 })
@@ -115,7 +111,6 @@ task rows for the same farmland when in a sowing window.
 	actions = {
 		{ type = "forceScheduleRebuild" },
 		{ type = "waitWallClock", seconds = 3 },
-		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 	},
 })
@@ -138,7 +133,9 @@ shows source="first_relax" and situationId="4".
 	},
 	actions = {
 		{ type = "waitForNeighbourSituation" },
-		{ type = "waitWallClock", seconds = 3 },
+		{ type = "waitWallClock", seconds = 5 },
+		{ type = "teleportPlayerToNeighbour" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 		{ type = "assertLogContains", category = "situation", event = "generated" },
@@ -159,6 +156,8 @@ source="fieldwork" for the generated situation.
 	actions = {
 		{ type = "waitForNeighbourSituation" },
 		{ type = "waitWallClock", seconds = 5 },
+		{ type = "teleportPlayerToNeighbour", neighbourName = "Jacob Miller" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 	},
@@ -178,6 +177,8 @@ has source="place_regular" or "place_random", not "fieldwork".
 	actions = {
 		{ type = "waitForNeighbourSituation" },
 		{ type = "waitWallClock", seconds = 5 },
+		{ type = "teleportPlayerToNeighbour" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 	},
@@ -199,11 +200,15 @@ verify that no fieldwork situation is generated for that neighbour until the cal
 	actions = {
 		{ type = "triggerIncomingPhoneRing" },
 		{ type = "waitWallClock", seconds = 2 },
+		{ type = "teleportPlayerToNeighbour" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "snapshotState" },
 		{ type = "takeScreenshot" },
 		{ type = "declinePhone" },
 		{ type = "waitWallClock", seconds = 2 },
 		{ type = "snapshotState" },
+		{ type = "teleportPlayerToNeighbour" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "takeScreenshot" },
 	},
 })
@@ -223,7 +228,6 @@ whose daytime matches the current game time.
 	actions = {
 		{ type = "waitForNeighbourSituation" },
 		{ type = "waitWallClock", seconds = 5 },
-		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 	},
 })
@@ -247,6 +251,8 @@ The AI vehicle should become active.
 	actions = {
 		{ type = "waitForNeighbourSituation" },
 		{ type = "waitWallClock", seconds = 10 },
+		{ type = "teleportPlayerToNeighbour", neighbourName = "Jacob Miller" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 	},
@@ -277,6 +283,8 @@ situation/complete log event via IATestRunner.onSituationComplete.
 		-- Wait for a farmer neighbour to get an active fieldwork situation.
 		{ type = "waitForNeighbourSituation" },
 		{ type = "waitWallClock", seconds = 10 },
+		{ type = "teleportPlayerToNeighbour", neighbourName = "Jacob Miller" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 
@@ -290,9 +298,68 @@ situation/complete log event via IATestRunner.onSituationComplete.
 		-- Wait for any neighbour's completed situation to be detected.
 		{ type = "waitForSituationComplete" },
 		{ type = "waitWallClock", seconds = 3 },
+		{ type = "teleportPlayerToNeighbour", neighbourName = "Jacob Miller" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 		{ type = "assertLogContains", category = "situation", event = "complete" },
+	},
+})
+
+IATestRunner.registerScenario({
+	name = "fieldwork_expires_before_realtime_guard_at_day_end",
+	description = [[
+Verifies that a fieldwork situation expires immediately at end-of-day (23:30+) even
+when the realtime 120-second guard has NOT elapsed, and that the fleet vehicles are
+moved back to homebase (not left sitting empty on the field).
+
+Flow: set time to 20:00 → force fieldwork → wait for AI to start → advance to
+23:35 (past the 23:30 end-of-day stop) → assert situation completes well under
+120s wall clock → assert IAHomebaseParking fires (vehicles returned to homebase).
+
+If the realtime guard still blocked fieldwork, the situation would linger past the
+day boundary and the test would time out waiting for completion.
+	]],
+	setup = {
+		setTime = { hour = 20, minute = 0, month = 4, dayInPeriod = 2 },
+		waitFrames = 30,
+		timeoutSeconds = 300,
+	},
+	actions = {
+		-- Ensure at least one field is in a plowable state so the schedule
+		-- has workable candidates regardless of savegame field states.
+		{ type = "prepareFieldForWork", neighbourName = "Brian Winter" },
+
+		-- Ensure the daily fieldwork schedule is built before forcing fieldwork.
+		{ type = "forceScheduleRebuild" },
+		{ type = "waitWallClock", seconds = 3 },
+
+		-- Verify at least one farmer neighbour has fieldwork tasks scheduled.
+		-- If none do, the savegame's field states don't match any fieldwork config
+		-- and the test cannot proceed.
+		{ type = "assertNeighbourState", neighbourName = "Brian Winter", field = "scheduleTasks", condition = "nonEmpty" },
+
+		-- Force a fieldwork situation for the farmer we verified has tasks.
+		{ type = "forceFieldwork", neighbourName = "Brian Winter" },
+		{ type = "waitWallClock", seconds = 8 },
+
+		-- Advance to end-of-day. At 23:30 managePositioning triggers
+		-- _fieldworkCompleteFieldworkAndGoToStep6 → loadStep=6→99 → loaded=true.
+		-- isExpired() should return true immediately (fieldwork skips realtime guard).
+		-- timeScale=499 stays below the 500 anti-sleep guard.
+		{ type = "advanceGameTimeTo", hour = 23, minute = 35, timeScale = 499 },
+		{ type = "waitWallClock", seconds = 10 },
+
+		-- Wait for the situation to complete and expire.
+		{ type = "waitForSituationComplete" },
+		{ type = "waitWallClock", seconds = 5 },
+
+		-- After expiration, fleet reconcile should move vehicles back to homebase
+		-- (not left sitting on the field). Verify the homebase parking event fired.
+		{ type = "snapshotState" },
+		{ type = "assertLogContains", category = "situation", event = "complete" },
+		{ type = "assertLogContains", category = "debug", event = "IAHomebaseParking:assignDesiredHomebaseForNeighbour()" },
+		{ type = "assertNoErrors" },
 	},
 })
 
@@ -314,11 +381,9 @@ generate new situations. After sleep ends (timeScale restored), generation resum
 		{ type = "setTimeScale", scale = 600 },
 		{ type = "waitWallClock", seconds = 3 },
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 		{ type = "setTimeScale", scale = 1 },
 		{ type = "waitWallClock", seconds = 5 },
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 	},
 })
 
@@ -367,7 +432,6 @@ event appears with reason=missed_timeout.
 		{ type = "triggerIncomingPhoneRing" },
 		{ type = "waitWallClock", seconds = 22 },
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 		{ type = "assertLogContains", category = "phone", event = "ring_end" },
 	},
 })
@@ -416,7 +480,6 @@ within the cooldown window fails.
 		{ type = "triggerIncomingPhoneRing", skipGlobalInboundWallClock = false },
 		{ type = "waitWallClock", seconds = 1 },
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 	},
 })
 
@@ -438,6 +501,8 @@ The refreshConversationActionEvents should switch from "phone" to "conv" state.
 	actions = {
 		{ type = "waitForNeighbourSituation" },
 		{ type = "waitWallClock", seconds = 5 },
+		{ type = "teleportPlayerToNeighbour" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "snapshotState" },
 		{ type = "takeScreenshot" },
 	},
@@ -486,7 +551,6 @@ The task list should be non-empty if there are eligible farmlands with work.
 	actions = {
 		{ type = "forceScheduleRebuild" },
 		{ type = "waitWallClock", seconds = 3 },
-		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 	},
 })
@@ -503,17 +567,16 @@ be no errors in the structured log. Neighbours should exist and be initialized.
 	]],
 	setup = {
 		ensureOutboundLoaded = true,
-		waitFrames = 60,
-	},
-	actions = {
-		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
-		{ type = "assertNoErrors" },
-	},
+			waitFrames = 60,
+		},
+		actions = {
+			{ type = "snapshotState" },
+			{ type = "assertNoErrors" },
+		},
 })
 
 IATestRunner.registerScenario({
-	name = "smoke_update_loop_runs",
+		name = "smoke_update_loop_runs",
 	description = [[
 The mod update loop should run without errors. After waiting several frames, the
 wallClockSec should be advancing and the outbound XML should be loaded.
@@ -524,7 +587,6 @@ wallClockSec should be advancing and the outbound XML should be loaded.
 	},
 	actions = {
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 		{ type = "assertNoErrors" },
 	},
 })
@@ -545,7 +607,6 @@ state. Useful as a baseline for AI evaluation of any other test.
 	},
 	actions = {
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 		{ type = "assertNoErrors" },
 	},
 })
@@ -567,11 +628,9 @@ the outbound file should be written. All debug output during save is captured.
 	},
 	actions = {
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 		{ type = "triggerGameSave" },
 		{ type = "waitWallClock", seconds = 3 },
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 		{ type = "assertLogContains", category = "game", event = "save_begin" },
 		{ type = "assertLogContains", category = "game", event = "save_end" },
 	},
@@ -626,6 +685,8 @@ open instead. Verify conversation/phone_opened event appears.
 	actions = {
 		{ type = "startConversation" },
 		{ type = "waitWallClock", seconds = 2 },
+		{ type = "teleportPlayerTo", x = 1024, y = 0, z = 1024 },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "snapshotState" },
 		{ type = "takeScreenshot" },
 	},
@@ -674,11 +735,9 @@ into the complete mod lifecycle from load to first situation.
 	},
 	actions = {
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 		{ type = "waitForNeighbourSituation" },
 		{ type = "waitWallClock", seconds = 10 },
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 		{ type = "assertNoErrors" },
 	},
 })
@@ -701,8 +760,7 @@ initiated and that standard vanilla missions remain on farmlands when a new game
 	actions = {
 		-- Snapshot initial state (classic mode already set in setup)
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
-		
+
 		-- Advance to next game day (6:00 AM) at high speed to trigger natural rebuild
 		{ type = "advanceGameTimeTo", hour = 6, minute = 0, timeScale = 499 },
 		
@@ -718,22 +776,20 @@ initiated and that standard vanilla missions remain on farmlands when a new game
 		-- Take snapshot - ring should have been BLOCKED (no payload)
 		{ type = "snapshotState" },
 		{ type = "assertLogContains", category = "phone", event = "ring_triggered" },
-		{ type = "takeScreenshot" },
-		
+
 		-- Assert the ring was blocked (ring_triggered with ok=false)
 		{ type = "assertNoErrors" },
 		
 		-- Advance to NEXT day (to trigger another rebuild cycle)
 		{ type = "advanceGameTimeTo", hour = 6, minute = 0, timeScale = 499 },
-		
+
 		-- Wait for rebuild
 		{ type = "waitForScheduleRebuild" },
-		
+
 		-- Final snapshot - should show farmlands with missions intact
 		{ type = "snapshotState" },
 		{ type = "assertNeighbourState", neighbourName = "Brian Winter", field = "farmlands", condition = "nonEmpty" },
-		{ type = "takeScreenshot" },
-		
+
 		-- Assert no errors throughout
 		{ type = "assertNoErrors" },
 	},
@@ -753,7 +809,6 @@ calls ARE initiated and that standard vanilla missions are removed from farmland
 	actions = {
 		-- Snapshot initial state (realistic mode already set)
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 
 		-- Advance to next game day (6:00 AM) at high speed to trigger natural rebuild
 		{ type = "advanceGameTimeTo", hour = 6, minute = 0, timeScale = 499 },
@@ -763,14 +818,12 @@ calls ARE initiated and that standard vanilla missions are removed from farmland
 
 		-- Snapshot after rebuild (missions should be removed from farmlands)
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 
 		-- Try to trigger a phone ring - should WORK in realistic mode
 		{ type = "triggerIncomingPhoneRing" },
 		
 		-- Take snapshot - ring should have payload
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 
 		-- Advance to NEXT day (to trigger another rebuild cycle)
 		{ type = "advanceGameTimeTo", hour = 6, minute = 0, timeScale = 499 },
@@ -780,7 +833,6 @@ calls ARE initiated and that standard vanilla missions are removed from farmland
 
 		-- Final snapshot
 		{ type = "snapshotState" },
-		{ type = "takeScreenshot" },
 
 		-- Assert no errors throughout
 		{ type = "assertNoErrors" },
@@ -817,6 +869,10 @@ The test:
 		waitFrames = 60,
 	},
 	actions = {
+		-- Force outsource type to a borrowable type before schedule rebuild,
+		-- so contract tasks are generated for a job type the neighbour can
+		-- actually provide equipment for (analogous to the harvest test).
+		{ type = "setSetting", key = "forceOutsourceType", value = "slurry_spreading" },
 		-- Rebuild schedule to generate contract-enabled tasks
 		{ type = "forceScheduleRebuild" },
 		{ type = "waitWallClock", seconds = 3 },
@@ -824,8 +880,9 @@ The test:
 		-- Snapshot before accepting
 		{ type = "snapshotState" },
 
-		-- Accept a mission with borrowed equipment
-		{ type = "acceptMissionWithBorrow" },
+		-- Accept a slurry spreading mission with borrowed equipment from
+		-- Brian Winter, who owns a Slurry Tank in his fleet.
+		{ type = "acceptMissionWithBorrow", fieldwork = "slurry_spreading", neighbourName = "Brian Winter" },
 		{ type = "waitWallClock", seconds = 3 },
 
 		-- Assert that borrow acceptance events occurred
@@ -835,6 +892,8 @@ The test:
 
 		-- Snapshot after borrow (vehicle should be borrowed now)
 		{ type = "snapshotState" },
+		{ type = "teleportPlayerToNeighbour", neighbourName = "Jacob Miller" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "takeScreenshot" },
 
 		-- Cancel the mission borrow session (simulates player cancelling the contract)
@@ -849,6 +908,8 @@ The test:
 
 		-- Snapshot after cancel (vehicle should be unborrowed, back at homebase)
 		{ type = "snapshotState" },
+		{ type = "teleportPlayerToNeighbour", neighbourName = "Jacob Miller" },
+		{ type = "waitWallClock", seconds = 2 },
 		{ type = "takeScreenshot" },
 
 		-- Assert no errors during the entire flow
@@ -924,11 +985,57 @@ which can be asserted against to confirm all characters are visibly spawned.
 		{ type = "forceAllNeighboursSituation", situationId = "4" },
 		{ type = "waitWallClock", seconds = 20 },
 		{ type = "assertAllNeighboursField", field = "npcIsActive", condition = "equals", expected = "true" },
+		{ type = "teleportPlayerToNeighbour" },
+		{ type = "waitWallClock", seconds = 2 },
+		{ type = "takeScreenshot" },
 		{ type = "snapshotState" },
 		{ type = "assertNoErrors" },
 	},
 })
 
+-- ============================================================================
+-- Homebase Parking
+-- ============================================================================
+
+IATestRunner.registerScenario({
+	name = "homebase_parking_correct",
+	description = [[
+Verifies that all non-situation vehicles are correctly parked at homebase
+during the relax/sleep situation (night). Validates:
+  - Headers are paired with their header trailers on the same parking spot
+  - Combines/harvesters are placed on oversize parking places
+  - Cars/tractors are placed on regular vehicle places
+  - All vehicles that should be parked have valid parking assignments
+  - No vehicles of the wrong type are placed on inappropriate spots
+
+The test forces all neighbours into relax (situation 4), waits for parking
+to complete, then asserts structural parking correctness per vehicle.
+	]],
+	setup = {
+		setTime = { hour = 0, minute = 0, month = 4, dayInPeriod = 1 },  -- midnight
+		waitFrames = 60,
+		timeoutSeconds = 300,
+	},
+	actions = {
+		{ type = "forceAllNeighboursSituation", situationId = "4" },
+		{ type = "waitWallClock", seconds = 15 },
+		{ type = "snapshotState" },
+		-- Structural assertion: validates all parking rules per vehicle
+		{ type = "assertHomebaseParking" },
+		-- Smoke check: parking summary was emitted
+		{ type = "assertLogContains", category = "debug", event = "IAHomebaseParking:assignDesiredHomebaseForNeighbour()" },
+		{ type = "assertNoErrors" },
+		-- Position camera behind the first found header+trailer pair for screenshot
+		{ type = "positionCameraForScreenshot", 
+		  targetExternalId = "53",      -- Marcus Brown's MF 8570 Header (farmer)
+		  offsetForward = -10,           -- 10 meters behind
+		  offsetRight = 4,               -- 4 meters to the right (side view)
+		  offsetUp = 3,                  -- 3 meters up
+		  lookAtForward = 1 },           -- look at center of header
+		{ type = "waitWallClock", seconds = 3 },
+		{ type = "takeScreenshot" },
+	},
+})
 IATestRunner.registerScenario({
 	name = "farmland_npcs_registered",
 	description = [[
@@ -951,5 +1058,270 @@ geprüft, da diese Base-Game-NPCs (GRANDPA, FARMER, HELPER) verwenden.
 		{ description = "NPC hat name und imageFilename gesetzt" },
 		{ description = "NPC-Name ist KEIN Base-Game-NPC (GRANDPA, FARMER, FORESTER, HELPER, ANIMAL_DEALER)" },
 		{ description = "Player-Farmlands und Farmlands ohne Felder werden nicht geprüft" },
+	},
+})
+
+-- ============================================================================
+-- Category: Mission Harvest Lifecycle
+-- ============================================================================
+
+IATestRunner.registerScenario({
+	name = "harvest_mission_accept_via_phone",
+	description = [[
+Prepares a field to wheat harvest-ready state, rebuilds the daily schedule,
+triggers an incoming phone call about a wheat harvest mission, answers the call,
+and accepts the harvest mission. Verifies the full
+chain: field state → schedule with harvest tasks → phone ring
+→ mission accept.
+	]],
+	setup = {
+		setTime = { hour = 6, minute = 0, month = 8, dayInPeriod = 1 },
+		setMissionOfferMode = 2,
+		ensureNoActiveConversation = true,
+		setGlobalCooldownExpired = true,
+		waitFrames = 60,
+	},
+	actions = {
+		-- 1. Force the outsource type to "harvest" before setTime triggers auto-rebuild
+		{ type = "setSetting", key = "forceOutsourceType", value = "harvest" },
+		-- 2. Prepare a field to wheat harvest-ready state (triggers harvest config, no month restriction)
+		{ type = "prepareFieldForHarvest", fruitType = "WHEAT" },
+		-- 3. Rebuild schedule to generate harvest contract tasks
+		{ type = "forceScheduleRebuild" },
+		{ type = "debugDumpNeighbourFleet" },
+		{ type = "waitWallClock", seconds = 3 },
+		-- 4. Snapshot before phone call
+		{ type = "snapshotState" },
+		-- 5. Trigger incoming phone ring for the harvest mission
+		{ type = "triggerIncomingPhoneRing" },
+		{ type = "waitWallClock", seconds = 2 },
+		-- 6. Answer the phone call
+		{ type = "answerPhone" },
+		{ type = "waitWallClock", seconds = 3 },
+		-- 7. Accept the harvest mission
+		{ type = "acceptMission" },
+		{ type = "waitWallClock", seconds = 2 },
+		-- Close the phone conversation dialog after accepting the mission
+		{ type = "closeDialog" },
+		{ type = "waitWallClock", seconds = 1 },
+		-- Teleport to the field to see the harvest-ready wheat
+		{ type = "teleportToField" },
+		{ type = "waitWallClock", seconds = 2 },
+		-- Teleport the player's harvester + cutter to the same field
+		{ type = "teleportPlayerHarvesterToField" },
+		{ type = "waitWallClock", seconds = 1 },
+		-- Take a screenshot of the wheat field with the harvester on it
+		{ type = "takeScreenshot" },
+		{ type = "waitWallClock", seconds = 1 },
+		-- 8. Snapshot after accept
+		{ type = "snapshotState" },
+		-- 9. Assertions
+		{ type = "assertLogContains", category = "mission", event = "accept_started" },
+		{ type = "assertLogContains", category = "mission", event = "accept_success" },
+		{ type = "assertNoErrors" },
+	},
+})
+
+IATestRunner.registerScenario({
+	name = "delivery_marker_created_for_grass_mowing",
+	description = [[
+		1. Set time to early morning (hour 6, minute 0)
+		2. Force a field to GRASS/harvestReady state
+		3. Spawn a silo at the first farmer neighbour's large_area farm place
+		4. Wait 5 seconds for the silo to finish spawning
+		5. Check logs confirm the silo was spawned
+		6. Teleport the player near the delivery point
+		7. Take a screenshot to visually verify the silo is present
+		8. Verify no errors occurred
+	]],
+	setup = {
+		setTime = { hour = 6, minute = 0, month = 4, dayInPeriod = 1 },
+		setMissionOfferMode = 2,  -- realistic mode
+		waitFrames = 60,
+	},
+	actions = {
+		{ type = "forceFieldState", fruitTypeIndex = "GRASS", growthState = "harvestReady" },
+		{ type = "forceDeliverySpawn", neighbourId = "1" },
+		{ type = "waitWallClock", seconds = 5 },
+		{ type = "assertLogContains", category = "delivery", event = "silo_spawned" },
+		{ type = "teleportToDeliveryPoint" },
+		{ type = "waitWallClock", seconds = 2 },
+		{ type = "takeScreenshot" },
+		{ type = "snapshotState" },
+		{ type = "assertNoErrors" },
+	},
+})
+
+-- ============================================================================
+-- Direct delivery placeable spawn test — exercises the standalone spawn function
+-- ============================================================================
+IATestRunner.registerScenario({
+	name = "delivery_silo_spawned_directly",
+	description = [[
+		Self-contained test that exercises placeable spawning at a character's
+		large_area right-back corner without depending on the mission pipeline:
+		
+		1. Finds a neighbour character with a large_area farm place
+		2. Calls IAFieldOutcomeDeliveryHelper.spawnSiloAtCharacterLargeArea()
+		3. Waits for the async spawn callback to fire
+		4. Teleports player to the spawn position
+		5. Takes a screenshot to visually verify the placeable is present
+		6. Cleans up the spawned placeable
+	]],
+	setup = {
+		waitFrames = 60,
+		timeoutSeconds = 120,
+	},
+	actions = {
+		{ type = "spawnSiloAtCharacterLargeArea" },
+		{ type = "waitWallClock", seconds = 3 },     -- wait for async spawn
+		{ type = "assertLogContains", category = "delivery", event = "silo_spawned" },
+		{ type = "teleportToDeliveryPoint" },
+		{ type = "waitWallClock", seconds = 1 },
+		{ type = "takeScreenshot" },
+		{ type = "cleanupDeliverySpawn" },
+		{ type = "assertNoErrors" },
+	},
+})
+
+IATestRunner.registerScenario({
+	name = "spawn_silo_at_character_large_area",
+		description = [[
+			Standalone test that spawns a silo at a character's large area farm place
+			without needing a mission pipeline:
+			
+			1. Finds a neighbour character with a large_area farm place
+			2. Spawns a farm silo at that position
+			3. Teleports the player nearby
+			4. Takes a screenshot for visual verification
+			5. Cleans up the spawned silo
+		]],
+		setup = {
+			waitFrames = 60,
+			timeoutSeconds = 120,
+		},
+		actions = {
+			{ type = "spawnSiloAtCharacterLargeArea" },
+			{ type = "waitWallClock", seconds = 3 },
+			{ type = "assertLogContains", category = "delivery", event = "silo_spawned" },
+			{ type = "teleportToDeliveryPoint" },
+			{ type = "waitWallClock", seconds = 1 },
+			{ type = "takeScreenshot" },
+			{ type = "cleanupDeliverySpawn" },
+			{ type = "assertNoErrors" },
+		},
+})
+
+IATestRunner.registerScenario({
+		name = "farmer_placeables_spawned",
+		description = [[
+			Verifies that all 4 farmer placeables (farma400modified silos) are spawned
+			after mod initialization. For each farmer (Marcus 18, Jacob 19, Emma 20, Brian 21):
+			- Checks FARMER_PLACEABLES has 4 entries
+			- Checks neighbour.placeables is non-empty
+			- Checks each placeable has uniqueId, positionX/Y/Z
+			- Takes individual screenshot of each silo from behind-right-above
+		]],
+		setup = {
+			ensureOutboundLoaded = true,
+			waitFrames = 120,
+			timeoutSeconds = 300,
+		},
+		actions = {
+			{ type = "assertFarmerPlaceablesDetailed" },
+			{ type = "snapshotState" },
+
+			-- Marcus Brown (18)
+			{ type = "teleportToPlaceable", neighbourId = "18", offsetForward = -12, offsetRight = 5, offsetUp = 4 },
+			{ type = "waitWallClock", seconds = 2 },
+			{ type = "takeScreenshot" },
+
+			-- Jacob Miller (19)
+			{ type = "teleportToPlaceable", neighbourId = "19", offsetForward = -12, offsetRight = 5, offsetUp = 4 },
+			{ type = "waitWallClock", seconds = 2 },
+			{ type = "takeScreenshot" },
+
+			-- Emma Kensington (20)
+			{ type = "teleportToPlaceable", neighbourId = "20", offsetForward = -12, offsetRight = 5, offsetUp = 4 },
+			{ type = "waitWallClock", seconds = 2 },
+			{ type = "takeScreenshot" },
+
+			-- Brian Winter (21)
+			{ type = "teleportToPlaceable", neighbourId = "21", offsetForward = -12, offsetRight = 5, offsetUp = 4 },
+			{ type = "waitWallClock", seconds = 2 },
+			{ type = "takeScreenshot" },
+
+			{ type = "assertNoErrors" },
+		},
+})
+
+IATestRunner.registerScenario({
+	name = "harvest_phone_conversation",
+	description = [[
+Full harvest mission flow via phone conversation:
+1. Prepare a field to harvest-ready wheat
+2. Force harvest outsource type, rebuild schedule → contract-enabled harvest tasks appear
+3. Trigger incoming phone call about harvest mission
+4. Take screenshot of ringing phone
+5. Answer the phone
+6. Wait for dialog playback, select option 1 ("Yes - I'll handle all of it.")
+7. Wait for Brian's response and conversation hang-up
+8. Verify conversation ended (activeConversationKind no longer "phone_ring")
+Expected result: full phone conversation completes with clean hang-up
+	]],
+	setup = {
+		setTime = { hour = 6, minute = 0, month = 8, dayInPeriod = 1 },
+		setMissionOfferMode = 2,
+		ensureNoActiveConversation = true,
+		setGlobalCooldownExpired = true,
+		waitFrames = 60,
+		timeoutSeconds = 300,
+	},
+	actions = {
+		-- 1. Prepare field to harvest-ready wheat
+		{ type = "prepareFieldForHarvest", fruitType = "WHEAT" },
+		{ type = "setSetting", key = "forceOutsourceType", value = "harvest" },
+		{ type = "waitWallClock", seconds = 1 },
+		{ type = "snapshotState" },
+
+		-- 2. Rebuild schedule so harvest contract tasks appear
+		{ type = "forceScheduleRebuild" },
+		{ type = "waitWallClock", seconds = 3 },
+		{ type = "snapshotState" },
+
+		-- 3. Trigger incoming phone call
+		{ type = "triggerIncomingPhoneRing" },
+		{ type = "waitWallClock", seconds = 2 },
+
+		-- 4. Screenshot of ringing phone
+		{ type = "takeScreenshot" },
+		{ type = "snapshotState" },
+
+		-- 5. Answer phone, then advance through voice lines to choice point
+		{ type = "answerPhone" },
+		{ type = "advanceConversationToChoice", timeoutMs = 60000 },
+
+		-- 6. Select the first dialog option ("Yes - I'll handle all of it.")
+		--    The selectOption handler polls per-frame for nextOptions with a
+		--    30s timeout, so it waits for the opening dialog to finish naturally.
+		{ type = "selectOption", optionIndex = 1, timeoutMs = 30000 },
+
+		-- 7. Take screenshot showing option was selected
+		{ type = "waitWallClock", seconds = 1 },
+		{ type = "takeScreenshot" },
+		{ type = "snapshotState" },
+		-- 8. Advance through conversation to end (player response + NPC closing lines)
+		{ type = "advanceConversationToEnd", timeoutMs = 60000 },
+		-- 9. Wait a moment then take final screenshot
+		{ type = "waitWallClock", seconds = 1 },
+		{ type = "takeScreenshot" },
+		{ type = "snapshotState" },
+
+		-- 10. Verify conversation ended and no Lua errors
+		{ type = "assertState", field = "_activeConversationKind", condition = "notEquals", value = "phone_ring" },
+		{ type = "assertNoErrors" },
+	},
+	cleanup = {
+		{ type = "closeDialog" },
 	},
 })

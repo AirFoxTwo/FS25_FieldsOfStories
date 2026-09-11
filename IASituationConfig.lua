@@ -39,6 +39,8 @@ function IASituationConfig.new(data)
 	self.triggerGrowthState = data.triggerGrowthState or {}
 	self.triggerWeedState = data.triggerWeedState or {}
 	self.triggerSprayLevel = data.triggerSprayLevel or {}
+	self.triggerStoneLevel = data.triggerStoneLevel or {}
+	self.triggerLimeLevel = data.triggerLimeLevel or {}
 	self.placetypes = data.placetypes or {}
 	-- Optional list of allowed place sizeType values for this situation.
 	-- - Empty/absent: any place size is accepted EXCEPT exclusive sizes (currently "large_area"), which are opt-in only.

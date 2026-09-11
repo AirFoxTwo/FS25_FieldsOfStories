@@ -21,8 +21,10 @@ local NEARBY_PUBLIC_PLACE_MAX_RADIUS_M = 300
 -- Place sizeTypes that are exclusive to area-based situations (opt-in via <placeSizes>) and must
 -- never be used to park idle / off-situation vehicles at homebase. Mirrors IAGameLoopHelper's
 -- IA_EXCLUSIVE_PLACE_SIZE_TYPES so a "large_area" homebase/shed slot is not turned into a parking bay.
+-- Silo places are storage buildings, not parking bays, and must never host parked vehicles/attachments.
 local PARKING_EXCLUDED_PLACE_SIZE_TYPES = {
 	["large_area"] = true,
+	["silo"] = true,
 }
 
 --- True when the place's sizeType is reserved for situations and must not host parked vehicles.
@@ -284,12 +286,63 @@ end
 
 local function isHeaderAttachment(ia)
 	local cat = iaCategoryLower(ia)
-	return (string.find(cat, "header") ~= nil) or (string.find(cat, "cutter") ~= nil)
+	if string.find(cat, "trailer") ~= nil then return false end
+	-- Check for "cutter"/"header" BEFORE the broad "beet"/"potato" exclusions,
+	-- so categories like "beetHarvesterCutters" are correctly recognized as headers.
+	if string.find(cat, "cutter") ~= nil then return true end
+	if string.find(cat, "header") ~= nil then return true end
+	if string.find(cat, "beet") ~= nil then return false end
+	if string.find(cat, "potato") ~= nil then return false end
+	return false
+end
+
+local function findHeaderTrailerVehicle(neighbour, headerExternalId, freeForAttachmentPlaces)
+	if neighbour == nil or headerExternalId == nil then return nil end
+	-- Primary lookup: neighbour.vehicles (keyed by uniqueId, may be incomplete for fresh spawns)
+	if neighbour.vehicles ~= nil then
+		for _, vehicle in pairs(neighbour.vehicles) do
+			if tostring(vehicle.externalId) == tostring(headerExternalId) then
+				return vehicle
+			end
+		end
+	end
+	-- Fallback: search freeForAttachmentPlaces (the sorted list used by the pairing loop).
+	-- On a fresh scenario load, vehicles may not yet have a uniqueId assigned when
+	-- addVehicle() is called, so neighbour.vehicles[nil] silently fails in Lua 5.1
+	-- and the trailer is absent from that table even though the IANeighbourVehicle
+	-- wrapper exists in the attachment list.
+	if freeForAttachmentPlaces ~= nil then
+		for _, vehicle in ipairs(freeForAttachmentPlaces) do
+			if tostring(vehicle.externalId) == tostring(headerExternalId) then
+				return vehicle
+			end
+		end
+	end
+	return nil
 end
 
 local function isWeightAttachment(ia)
 	local cat = iaCategoryLower(ia)
 	return string.find(cat, "weight") ~= nil
+end
+
+--- Vehicles that must never be spawned for homebase parking (physics issues,
+--- too large for homebase slots). They are only visible during situations.
+local NEVER_PARK_AT_HOMEBASE_XML_PATTERNS = {
+	"fd250",
+	"hdht52",
+}
+local function isNeverParkedAtHomebaseVehicle(ia)
+	if ia == nil or ia.xmlFilename == nil then
+		return false
+	end
+	local fn = string.lower(tostring(ia.xmlFilename))
+	for _, pattern in ipairs(NEVER_PARK_AT_HOMEBASE_XML_PATTERNS) do
+		if string.find(fn, pattern, 1, true) ~= nil then
+			return true
+		end
+	end
+	return false
 end
 
 local function normalizeRotation(r)
@@ -305,14 +358,43 @@ end
 -- into neighbouring slots. Weights are modeled facing the tractor's hitch, so
 -- when parked unattached they end up backwards versus the place orientation;
 -- a 180° flip makes them face out of the bay like other attachments.
+-- Beet harvester cutter TRAILERS (e.g. ROPA RR-XL) share the same category as
+-- their cutter ("beetHarvesterCutters") but need the opposite rotation (+90° CCW)
+-- because their model is oriented differently from the cutter head.
 local function getHomebaseRotationForVehicle(place, ia_vehicle)
 	local rot = place.rotation or 0
+	IAprintDebug("IAHomebaseParking:getHomebaseRotationForVehicle", string.format("vehicle=%s category=%s baseRot=%.3f isHeader=%s", tostring(ia_vehicle.externalId or ia_vehicle.uniqueId or "?"), tostring(ia_vehicle.category or "?"), rot, tostring(isHeaderAttachment(ia_vehicle))), nil, ia_vehicle, nil)
 	if isHeaderAttachment(ia_vehicle) then
-		rot = normalizeRotation(rot + math.pi * -0.5)
+		local cat = iaCategoryLower(ia_vehicle)
+		local fn = ia_vehicle.xmlFilename ~= nil and string.lower(tostring(ia_vehicle.xmlFilename)) or ""
+		-- Beet harvester cutter trailers share the "beetHarvesterCutters" category
+		-- with the cutter head but need opposite rotation. Detect them by filename.
+		if string.find(cat, "beet") ~= nil and string.find(fn, "trailer") ~= nil then
+			rot = normalizeRotation(rot + math.pi * 0)  -- +0° CCW
+		else
+			rot = normalizeRotation(rot + math.pi * -0.5)  -- -90° (normal header/cutter)
+		end
 	elseif isWeightAttachment(ia_vehicle) then
 		rot = normalizeRotation(rot + math.pi)
 	end
 	return rot
+end
+
+local function getHeaderOnTrailerHeightOffset(trailerIA)
+	-- Place the header on top of its paired trailer.
+	-- When the trailer's physics size height is reliable (> 0.1 m), use it as the
+	-- base offset so the header sits just above the trailer top (with 1.5 m clearance
+	-- to prevent visual clipping / physics overlap). Otherwise fall back to a fixed
+	-- offset (~2.0 m above ground).
+	local MIN_TRAILER_HEIGHT = 2
+	local FALLBACK_OFFSET = 1.5
+	if trailerIA and trailerIA.vehicle and trailerIA.vehicle.size then
+		local h = trailerIA.vehicle.size.height
+		if type(h) == "number" and h > MIN_TRAILER_HEIGHT then
+			return h + 0.5
+		end
+	end
+	return FALLBACK_OFFSET
 end
 
 --- Build a homebase parking pose for a fleet vehicle at a place (used when borrow ends / XML reload).
@@ -381,6 +463,7 @@ function IAHomebaseParking:getAssignedHomebasePlacesForNeighbour(neighbour)
 end
 
 local LOG = "IAHomebaseParking:assignDesiredHomebaseForNeighbour()"
+local LOG_PAIR = "IAHomebaseParking:pairHeaderTrailer()"
 
 --- Unique ids for vehicles that belong to the active situation (convoy); excluded from homebase slot assignment.
 -- Uses scenario refs plus activeSituationId on fleet wrappers (set in IASituation:initialize before parking runs).
@@ -445,22 +528,29 @@ function IAHomebaseParking:assignDesiredHomebaseForNeighbour(neighbour, scenario
 	local freeForVehiclePlaces = {}
 	local freeForOversizePlaces = {}
 	local freeForAttachmentPlaces = {}
+	local freeNeverParked = {}
 	for _, ia_vehicle in pairs(neighbour.vehicles) do
 		local uid = ia_vehicle ~= nil and ia_vehicle.uniqueId ~= nil and tostring(ia_vehicle.uniqueId) or nil
 		if ia_vehicle ~= nil and (uid == nil or not inSituationIds[uid]) then
-			local gv = ia_vehicle.vehicle
-			if gv ~= nil and type(gv.getIsAIActive) == "function" and gv:getIsAIActive() then
-				if type(ia_vehicle.stopAIJob) == "function" then
-					pcall(function() ia_vehicle:stopAIJob() end)
-				end
-			end
-			local vtype = (ia_vehicle.type ~= nil) and string.lower(tostring(ia_vehicle.type)) or ""
-			if isOversizeVehicleType(ia_vehicle) then
-				table.insert(freeForOversizePlaces, ia_vehicle)
-			elseif vtype == "car" or vtype == "tractor" or vtype == "tractor large" then
-				table.insert(freeForVehiclePlaces, ia_vehicle)
+			-- Vehicles that are too large / cause physics issues are never parked
+			-- at homebase; they only appear when part of an active situation.
+			if isNeverParkedAtHomebaseVehicle(ia_vehicle) then
+				table.insert(freeNeverParked, ia_vehicle)
 			else
-				table.insert(freeForAttachmentPlaces, ia_vehicle)
+				local gv = ia_vehicle.vehicle
+				if gv ~= nil and type(gv.getIsAIActive) == "function" and gv:getIsAIActive() then
+					if type(ia_vehicle.stopAIJob) == "function" then
+						pcall(function() ia_vehicle:stopAIJob() end)
+					end
+				end
+				local vtype = (ia_vehicle.type ~= nil) and string.lower(tostring(ia_vehicle.type)) or ""
+				if isOversizeVehicleType(ia_vehicle) then
+					table.insert(freeForOversizePlaces, ia_vehicle)
+				elseif vtype == "car" or vtype == "tractor" or vtype == "tractor large" then
+					table.insert(freeForVehiclePlaces, ia_vehicle)
+				else
+					table.insert(freeForAttachmentPlaces, ia_vehicle)
+				end
 			end
 		end
 	end
@@ -494,6 +584,14 @@ function IAHomebaseParking:assignDesiredHomebaseForNeighbour(neighbour, scenario
 		end
 		reservedHomebasePlaceId[key] = uniqueId
 		return true
+	end
+	-- Reserve the situation's character place so homebase parking
+	-- (header+trailer pairing, attachment pass, etc.) cannot steal it.
+	-- Without this, when iaForceSituation triggers the first-ever homebase
+	-- parking pass, both the situation placement and the vehicle parking
+	-- can independently select the same place in a single tick.
+	if scenario.place ~= nil and scenario.place.id ~= nil then
+		reservedHomebasePlaceId[tostring(scenario.place.id)] = "__situation__"
 	end
 	-- Re-claim a previously saved homebase slot before any new assignment so a
 	-- vehicle keeps the spot it was parked at last save / borrow return.
@@ -574,6 +672,219 @@ function IAHomebaseParking:assignDesiredHomebaseForNeighbour(neighbour, scenario
 	runStickyPass(attachmentPlaces, freeForAttachmentPlaces, true, placeStickyAttachment)
 	runStickyPass(oversizePlaces, freeForOversizePlaces, true, placeStickyAttachment)
 
+	-- Pairing pre-pass: place header attachments on top of their designated header trailers.
+	-- Headers marked with headerTrailerExternalId are paired on top of the resolved trailer
+	-- at the same XZ position, using the trailer's height for the Y offset.
+	local pairedTrailerUids = {}
+	for _, headerIA in ipairs(freeForAttachmentPlaces) do
+		IAprintDebug(LOG, string.format("PAIR_DEBUG: iterating freeForAttachmentPlaces vehicle category=%s externalId=%s uniqueId=%s isHeader=%s headerTrailerExternalId=%s", 
+			tostring(headerIA.category or "?"), tostring(headerIA.externalId or "?"), tostring(headerIA.uniqueId or "?"), 
+			tostring(isHeaderAttachment(headerIA)), tostring(headerIA.headerTrailerExternalId or "nil")))
+		local headerUid = headerIA ~= nil and headerIA.uniqueId ~= nil and tostring(headerIA.uniqueId) or nil
+			-- REDUNDANT FALLBACK: directly read headerTrailerExternalId from neighbour.vehicles
+			-- headerIA comes from neighbour.iaVehicles which may not have headerTrailerExternalId set,
+			-- but neighbour.vehicles (keyed by externalId or hash) should have it.
+			if headerIA.headerTrailerExternalId == nil and headerIA.externalId ~= nil then
+				local extIdStr = tostring(headerIA.externalId)
+				IAprintDebug(LOG, string.format("PAIR_DEBUG_REDUNDANT: checking neighbour.vehicles for externalId=%s", extIdStr))
+				if neighbour.vehicles ~= nil then
+					for _, v in pairs(neighbour.vehicles) do
+						if tostring(v.externalId) == extIdStr then
+							if v.headerTrailerExternalId ~= nil then
+								headerIA.headerTrailerExternalId = v.headerTrailerExternalId
+								IAprintDebug(LOG, string.format("PAIR_DEBUG_REDUNDANT: COPIED headerTrailerExternalId=%s from neighbour.vehicles to iaVehicle externalId=%s", 
+									tostring(v.headerTrailerExternalId), extIdStr))
+							else
+								IAprintDebug(LOG, string.format("PAIR_DEBUG_REDUNDANT: vehicle found in neighbour.vehicles but headerTrailerExternalId is nil, category=%s", 
+									tostring(v.category or "?")))
+							end
+							break
+						end
+					end
+				else
+					IAprintDebug(LOG, "PAIR_DEBUG_REDUNDANT: neighbour.vehicles is nil")
+				end
+			end
+
+		if headerUid ~= nil
+			and isHeaderAttachment(headerIA)
+			and headerIA.headerTrailerExternalId ~= nil then
+			IAprintDebug(LOG, string.format("PAIR_DEBUG: ENTERED pairing gate for vehicle externalId=%s, headerTrailerExternalId=%s, headerUid=%s", tostring(headerIA.externalId or "?"), tostring(headerIA.headerTrailerExternalId or "?"), tostring(headerUid or "?")))
+			local trailerIA = findHeaderTrailerVehicle(neighbour, headerIA.headerTrailerExternalId, freeForAttachmentPlaces)
+			if trailerIA ~= nil then
+				IAprintDebug(LOG, string.format("PAIR_DEBUG: TRAILER FOUND trailerUid=%s", tostring(trailerIA.uniqueId or "?")))
+				local trailerUid = trailerIA.uniqueId ~= nil and tostring(trailerIA.uniqueId) or nil
+				
+				-- Handle cases where header and/or trailer were parked separately
+				-- by tryTrustSavedHomebaseSlot (Phase 1) and need re-pairing:
+				
+				if trailerUid ~= nil then
+					IAprintDebug(LOG, string.format("PAIR_DEBUG: headerUid=%s parkingDone=%s, trailerUid=%s parkingDone=%s, headerPlaceId=%s, trailerPlaceId=%s", 
+						tostring(headerUid), tostring(parkingDone[headerUid]), tostring(trailerUid), tostring(parkingDone[trailerUid]),
+						tostring(headerIA.parkingPlaceId or "?"), tostring(trailerIA.parkingPlaceId or "?")))
+				end
+				
+				-- Case A: Header parked, trailer NOT parked (trailer couldn't claim shared spot)
+				if parkingDone[headerUid] and trailerUid ~= nil and not parkingDone[trailerUid]
+					and not inSituationIds[trailerUid]
+					and not (trailerIA.isBorrowedByPlayer == true) then
+					if headerIA.parkingPlaceId ~= nil then
+						reservedHomebasePlaceId[tostring(headerIA.parkingPlaceId)] = nil
+						placeStickyAttachment[headerIA.parkingPlaceId] = nil
+					end
+					headerIA.parkingPlaceId = nil
+					headerIA.parkingPlaceSemantic = nil
+					parkingDone[headerUid] = false
+					IAprintDebug(LOG, "PAIR_DEBUG: CASE A FIRED - unparking header")
+				end
+				
+				-- Case B: Trailer parked, header NOT parked (trailer claimed shared spot first)
+				if not parkingDone[headerUid] and trailerUid ~= nil and parkingDone[trailerUid]
+					and not inSituationIds[trailerUid]
+					and not (trailerIA.isBorrowedByPlayer == true) then
+					if trailerIA.parkingPlaceId ~= nil then
+						reservedHomebasePlaceId[tostring(trailerIA.parkingPlaceId)] = nil
+						placeStickyAttachment[tostring(trailerIA.parkingPlaceId)] = nil
+					end
+					trailerIA.parkingPlaceId = nil
+					trailerIA.parkingPlaceSemantic = nil
+					parkingDone[trailerUid] = false
+					IAprintDebug(LOG, "PAIR_DEBUG: CASE B FIRED - unparking trailer")
+				end
+				
+				-- Case C: Both parked but on DIFFERENT spots (separate saved slots)
+				if parkingDone[headerUid] and trailerUid ~= nil and parkingDone[trailerUid]
+					and headerIA.parkingPlaceId ~= trailerIA.parkingPlaceId
+					and not inSituationIds[trailerUid]
+					and not (trailerIA.isBorrowedByPlayer == true) then
+					-- Unpark header
+					if headerIA.parkingPlaceId ~= nil then
+						reservedHomebasePlaceId[tostring(headerIA.parkingPlaceId)] = nil
+						placeStickyAttachment[headerIA.parkingPlaceId] = nil
+					end
+					headerIA.parkingPlaceId = nil
+					headerIA.parkingPlaceSemantic = nil
+					parkingDone[headerUid] = false
+					-- Unpark trailer
+					if trailerIA.parkingPlaceId ~= nil then
+						reservedHomebasePlaceId[tostring(trailerIA.parkingPlaceId)] = nil
+						placeStickyAttachment[tostring(trailerIA.parkingPlaceId)] = nil
+					end
+					trailerIA.parkingPlaceId = nil
+					trailerIA.parkingPlaceSemantic = nil
+					parkingDone[trailerUid] = false
+					IAprintDebug(LOG, "PAIR_DEBUG: CASE C FIRED - unparking BOTH")
+				end
+				IAprintDebug(LOG, string.format("PAIR_DEBUG: After cases - parkingDone[headerUid]=%s, parkingDone[trailerUid]=%s, headerUid exists=%s", 
+					tostring(parkingDone[headerUid]), tostring(trailerUid ~= nil and tostring(parkingDone[trailerUid]) or "N/A"),
+					tostring(headerUid ~= nil)))
+				-- Original pairing logic (headerUid may have been unparked above)
+				if not parkingDone[headerUid] then
+					-- Trailer must be free, not in a situation, and not borrowed
+					if trailerUid ~= nil
+						and not inSituationIds[trailerUid]
+						and trailerIA.isBorrowedByPlayer ~= true
+						and not parkingDone[trailerUid] then
+						-- Try the trailer's saved homebase slot first, then any free attachment place
+						local place = nil
+						IAprintDebug(LOG, "PAIR_DEBUG: ATTEMPTING to find shared place for header+trailer")
+						if trailerIA.parkingPlaceSemantic == "homebase" and trailerIA.parkingPlaceId ~= nil then
+							local candidate = findPlaceByIdInNeighbours(inn, trailerIA.parkingPlaceId)
+							if candidate ~= nil
+								and isHomebaseParkingStructurallyValid(neighbour, candidate, trailerIA, true)
+								and not placeStickyAttachment[candidate.id]
+								and not reservedHomebasePlaceId[tostring(candidate.id)]
+								and reserveHomebasePlace(candidate.id, trailerUid) then
+								place = candidate
+							end
+						end
+						-- Fallback: find any free attachment place
+						if place == nil then
+							for _, p in ipairs(attachmentPlaces) do
+								if p.id ~= nil
+									and not placeStickyAttachment[p.id]
+									and not reservedHomebasePlaceId[tostring(p.id)]
+									and reserveHomebasePlace(p.id, trailerUid) then
+									place = p
+									break
+								end
+							end
+						end
+						if place == nil then
+							IAprintDebug(LOG, "PAIR_DEBUG: NO PLACE FOUND for header+trailer pairing")
+						else
+							IAprintDebug(LOG, string.format("PAIR_DEBUG: PLACE FOUND id=%s for header+trailer", tostring(place.id or "?")))
+						end
+						if place ~= nil then
+							-- Build trailer pose with normal rotation (no header rotation correction)
+							local trailerPose = self:buildPoseForVehicleAtPlace(place, trailerIA)
+							if trailerPose == nil then
+								local trailerRot = place.rotation or 0
+								local twx, twz = computeHomebaseBackOffsetWorldXZ(place, inn, trailerIA, trailerRot)
+								local tgroundY = (g_terrainNode ~= nil) and (getTerrainHeightAtWorldPos(g_terrainNode, twx, 0, twz) + 0.2) or (place.y or 0)
+								trailerPose = { x = twx, y = tgroundY, z = twz, rotation = trailerRot }
+							end
+							-- Header pose: same XZ as trailer, Y on top of trailer height, header-specific rotation.
+							-- Shift the header laterally and longitudinally relative to the trailer's
+							-- forward direction so it sits correctly on the trailer bed.
+							local HEADER_LATERAL_OFFSET = 0      -- meters right (positive = right)
+							local HEADER_LONGITUDINAL_OFFSET = 0  -- meters forward (positive = forward)
+							if headerIA.xmlFilename ~= nil and string.find(string.lower(headerIA.xmlFilename), "mf8570header") ~= nil then
+								HEADER_LATERAL_OFFSET = -0.2
+								HEADER_LONGITUDINAL_OFFSET = -1.5
+							end
+							if headerIA.xmlFilename ~= nil and string.find(string.lower(headerIA.xmlFilename), "cr980_1830") ~= nil then
+								HEADER_LATERAL_OFFSET = 0.5
+								HEADER_LONGITUDINAL_OFFSET = -3
+							end
+							if headerIA.xmlFilename ~= nil and string.find(string.lower(headerIA.xmlFilename), "fd250") ~= nil then
+								HEADER_LATERAL_OFFSET = -1
+								HEADER_LONGITUDINAL_OFFSET = -1
+							end
+							local trailerRot = trailerPose.rotation or 0
+							local forwardX = math.sin(trailerRot)
+							local forwardZ = math.cos(trailerRot)
+							local rightX = math.cos(trailerRot)
+							local rightZ = -math.sin(trailerRot)
+							local headerRot = getHomebaseRotationForVehicle(place, headerIA)
+							local headerY = trailerPose.y + getHeaderOnTrailerHeightOffset(trailerIA)
+							local headerX = trailerPose.x + rightX * HEADER_LATERAL_OFFSET + forwardX * HEADER_LONGITUDINAL_OFFSET
+							local headerZ = trailerPose.z + rightZ * HEADER_LATERAL_OFFSET + forwardZ * HEADER_LONGITUDINAL_OFFSET
+							local headerPose = { x = headerX, y = headerY, z = headerZ, rotation = headerRot }
+
+							-- Set desired homebase for both
+							if IAEquipmentPresence ~= nil then
+								IAEquipmentPresence.State.setDesiredHomebase(trailerIA, trailerPose, place.id)
+								IAEquipmentPresence.State.setDesiredHomebase(headerIA, headerPose, place.id)
+							end
+
+							-- Update position tracking
+							trailerIA.positionX = trailerPose.x
+							trailerIA.positionY = trailerPose.y
+							trailerIA.positionZ = trailerPose.z
+							trailerIA.rotation = trailerPose.rotation
+							headerIA.positionX = headerPose.x
+							headerIA.positionY = headerPose.y
+							headerIA.positionZ = headerPose.z
+							headerIA.rotation = headerPose.rotation
+
+							-- Mark both as parked
+							parkingDone[trailerUid] = true
+							parkingDone[headerUid] = true
+							pairedTrailerUids[trailerUid] = true
+							placeStickyAttachment[place.id] = true
+							IAprintDebug(LOG_PAIR, string.format("header_paired: header=%s trailer=%s onPlaceId=%s", tostring(headerIA.externalId or headerIA.uniqueId), tostring(trailerIA.externalId or trailerIA.uniqueId), tostring(place.id)), neighbour, headerIA, nil)
+							IAprintDebug(LOG, string.format("PAIR_DEBUG: PAIRING COMPLETE headerPlaceId=%s trailerPlaceId=%s", 
+								tostring(headerIA.parkingPlaceId or "?"), tostring(trailerIA.parkingPlaceId or "?")))
+						end
+					end
+				end
+			else
+				IAprintDebug(LOG, string.format("PAIR_DEBUG: TRAILER NOT FOUND for header externalId=%s, headerTrailerExternalId=%s", tostring(headerIA.externalId or "?"), tostring(headerIA.headerTrailerExternalId or "?")))
+			end
+		end
+end
+
 	-- Shared: reserve slot; write desired homebase presence (Layer 1); reconcile applies mechanics.
 	local function tryAssignOneHomebasePlace(place, ia_vehicle, wantAttachmentSlot, afterMoveOk)
 		if ia_vehicle == nil or place.x == nil or place.z == nil then
@@ -640,6 +951,7 @@ function IAHomebaseParking:assignDesiredHomebaseForNeighbour(neighbour, scenario
 					end
 				end) then
 					vi = vi + 1
+					IAprintDebug(LOG, string.format("vehicle_assigned: type=%s placeId=%s kind=%s", tostring(ia_vehicle.typeName or "unknown"), tostring(place.id), tostring(place.sizeType or "standard")), neighbour, ia_vehicle, nil)
 				end
 			end
 		end
@@ -661,6 +973,7 @@ function IAHomebaseParking:assignDesiredHomebaseForNeighbour(neighbour, scenario
 					end
 				end) then
 					oi = oi + 1
+					IAprintDebug(LOG, string.format("vehicle_assigned: type=%s placeId=%s kind=%s", tostring(ia_vehicle.typeName or "unknown"), tostring(place.id), tostring(place.sizeType or "standard")), neighbour, ia_vehicle, nil)
 				end
 			end
 		end
@@ -668,7 +981,7 @@ function IAHomebaseParking:assignDesiredHomebaseForNeighbour(neighbour, scenario
 
 	for _, place in ipairs(attachmentPlaces) do
 		if place.id == nil or not placeStickyAttachment[place.id] then
-			while ai <= #freeForAttachmentPlaces and (skipPublicPlaceVehicle(freeForAttachmentPlaces[ai]) or (freeForAttachmentPlaces[ai].uniqueId ~= nil and parkingDone[freeForAttachmentPlaces[ai].uniqueId])) do
+			while ai <= #freeForAttachmentPlaces and (skipPublicPlaceVehicle(freeForAttachmentPlaces[ai]) or (freeForAttachmentPlaces[ai].uniqueId ~= nil and (parkingDone[freeForAttachmentPlaces[ai].uniqueId] or pairedTrailerUids[freeForAttachmentPlaces[ai].uniqueId]))) do
 				ai = ai + 1
 			end
 			local ia_vehicle = freeForAttachmentPlaces[ai]
@@ -684,6 +997,7 @@ function IAHomebaseParking:assignDesiredHomebaseForNeighbour(neighbour, scenario
 					end
 				end) then
 					ai = ai + 1
+					IAprintDebug(LOG, string.format("vehicle_assigned: type=%s placeId=%s kind=%s", tostring(ia_vehicle.typeName or "unknown"), tostring(place.id), tostring(place.sizeType or "standard")), neighbour, ia_vehicle, nil)
 				end
 			end
 		end
@@ -741,6 +1055,7 @@ function IAHomebaseParking:assignDesiredHomebaseForNeighbour(neighbour, scenario
 		end
 		if IAEquipmentPresence ~= nil then
 			IAEquipmentPresence.State.setDesiredHidden(ia)
+			IAprintDebug(LOG, string.format("vehicle_hidden: type=%s reason=no_place", tostring(ia.typeName or "unknown")), neighbour, ia, nil)
 		end
 	end
 
@@ -751,7 +1066,61 @@ function IAHomebaseParking:assignDesiredHomebaseForNeighbour(neighbour, scenario
 		hideIfUnparked(ia)
 	end
 	for _, ia in ipairs(freeForAttachmentPlaces) do
-		hideIfUnparked(ia)
+		local uid = ia ~= nil and ia.uniqueId ~= nil and tostring(ia.uniqueId) or nil
+		if uid == nil or not pairedTrailerUids[uid] then
+			hideIfUnparked(ia)
+		end
+	end
+	for _, ia in ipairs(freeNeverParked) do
+		-- Force-hide: strip any stale homebase parking state from a previous
+		-- session, then set desired hidden AND immediately hide the vehicle.
+		-- Bypasses hideIfUnparked guards (isAlreadyParkedAndValid /
+		-- presenceState) which could skip these vehicles if they were saved
+		-- as homebase-visible before the exclusion.
+		local uid = ia ~= nil and ia.uniqueId ~= nil and tostring(ia.uniqueId) or nil
+		if uid ~= nil and not inSituationIds[uid] then
+			ia.parkingPlaceId = nil
+			ia.parkingPlaceSemantic = nil
+			if IAEquipmentPresence ~= nil then
+				IAEquipmentPresence.State.setDesiredHidden(ia)
+			end
+			-- Hide immediately: setting desiredHidden alone defers the actual
+			-- removeFromPhysics to reconciliation, which runs too late — the
+			-- DynamicMountAttacher:onUpdateTick fires first and crashes.
+			if ia.vehicle ~= nil and ia.vehicleIsVisible then
+				pcall(function() ia:mech_hide() end)
+			end
+			IAprintDebug(LOG, string.format("vehicle_hidden: type=%s reason=never_parked_at_homebase", tostring(ia.typeName or "unknown")), neighbour, ia, nil)
+		end
+	end
+
+	-- Force-hide header trailers whose headers are in the active situation.
+	-- Headers in the convoy leave their paired trailer behind; the trailer must
+	-- not be independently parked on a different homebase slot. Without this,
+	-- the normal attachment loop can assign the trailer a free slot since the
+	-- header is no longer in freeForAttachmentPlaces to trigger pairing.
+	if neighbour.vehicles ~= nil then
+		for _, headerIA in pairs(neighbour.vehicles) do
+			local headerUid = headerIA ~= nil and headerIA.uniqueId ~= nil and tostring(headerIA.uniqueId) or nil
+			if headerUid ~= nil
+				and inSituationIds[headerUid]
+				and headerIA.headerTrailerExternalId ~= nil then
+				local trailerIA = findHeaderTrailerVehicle(neighbour, headerIA.headerTrailerExternalId, freeForAttachmentPlaces)
+				if trailerIA ~= nil then
+					local trailerUid = trailerIA.uniqueId ~= nil and tostring(trailerIA.uniqueId) or nil
+					if trailerUid ~= nil and not inSituationIds[trailerUid] then
+						-- Strip parking fields so tryTrustSavedHomebaseSlot won't
+						-- reclaim the old paired slot on the next parking pass.
+						trailerIA.parkingPlaceId = nil
+						trailerIA.parkingPlaceSemantic = nil
+						if IAEquipmentPresence ~= nil then
+							IAEquipmentPresence.State.setDesiredHidden(trailerIA)
+						end
+						IAprintDebug(LOG, string.format("vehicle_hidden: type=%s reason=header_in_situation", tostring(trailerIA.typeName or "unknown")), neighbour, trailerIA, nil)
+					end
+				end
+			end
+		end
 	end
 
 	local function countParked(list)

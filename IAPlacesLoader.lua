@@ -78,7 +78,7 @@ function IAPlacesLoader:addPlaceFromMapInitEntry(entry)
 		id = self:getNextFreeNumericPlaceId()
 	end
 	local name = entry.name or ("Place " .. tostring(id))
-	local place = IAMapPlace.new(id, name, entry.type, entry.x, entry.y or 0, entry.z, entry.rotation or 0, entry.withVehicle ~= false, entry.withAttachment == true, entry.sizeType, nil)
+	local place = IAMapPlace.new(id, name, entry.type, entry.x, entry.y or 0, entry.z, entry.rotation or 0, entry.withVehicle ~= false, entry.withAttachment == true, entry.sizeType, entry.characterNumber)
 	if entry.ignoreCollision == true then
 		place.ignoreCollision = true
 	end
@@ -92,6 +92,12 @@ function IAPlacesLoader:addPlaceFromMapInitEntry(entry)
 		place.resolvedMapNodeId = entry.resolvedMapNodeId
 	end
 	table.insert(self.ianeighbours.places, place)
+	-- Silo hook: auto-spawn the farma400modified game placeable when a silo place is created manually
+	if place.sizeType == "silo"
+		and self.ianeighbours.xmlHelper ~= nil
+		and self.ianeighbours.xmlHelper.ensureSiloPlaceableForPlace ~= nil then
+		self.ianeighbours.xmlHelper:ensureSiloPlaceableForPlace(place, entry.characterNumber)
+	end
 	if self.ianeighbours.debug then
 		print("--- IAPlacesLoader:addPlaceFromMapInitEntry() - Added place: " .. tostring(place.name) .. " (Type: " .. tostring(place.type) .. ", ID: " .. tostring(place.id) .. ")")
 	end
@@ -1151,7 +1157,7 @@ function IAPlacesLoader:savePlaceAtFocusedMapNode(placeType, characterNumber, wi
 	else
 		name = ptype .. " at " .. tostring(nodeName)
 	end
-	local place = IAMapPlace.new(nextId, name, ptype, 0, 0, 0, 0, withVehicle, withAttachment, sizeType, nil, nil, offsetX, offsetY, offsetZ, relRotation)
+	local place = IAMapPlace.new(nextId, name, ptype, 0, 0, 0, 0, withVehicle, withAttachment, sizeType, characterNumber, nil, offsetX, offsetY, offsetZ, relRotation)
 	place.nodeName = nodeName
 	if focused.referenceId ~= nil then place.referenceId = focused.referenceId end
 	if focused.referenceFilename and focused.referenceFilename ~= "" then place.referenceFilename = focused.referenceFilename end
@@ -1299,7 +1305,6 @@ function IAPlacesLoader:hasPlaceNear(x, z, threshold)
 				return true
 			end
 		end
-		return
 	end
 	return false
 end

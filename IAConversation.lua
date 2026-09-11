@@ -35,6 +35,10 @@ IAConversation.DYNAMIC_PLAYER_FOLDER = "player"
 IAConversation.situationVariantIds = {}
 --- conversation folder name (neighbour.id) → character `index` from conversations-structure.xml (for path lookup).
 IAConversation.structureCharacterIndexByFolderId = {}
+--- [dynamicCharIndex][topicId] = { variantFolderId, ... } — filled by IAXMLHelper:loadConversationsStructureRegistry from <dynamicConversationsData>.
+IAConversation.dynamicSituationVariantIds = {}
+--- dynamic conversation folder name (neighbour.id) → character `index` from conversations-structure.xml <dynamicConversationsData>.
+IAConversation.structureDynamicCharacterIndexByFolderId = {}
 
 function IAConversation.new()
 	local self = setmetatable({}, IAConversation._mt)
@@ -390,10 +394,11 @@ local IA_CONVERSATION_SANITIZE_RULES = {
 	{ "\226\128\153", "'",  "U+2019 RIGHT SINGLE QUOTATION MARK" },
 	{ "\226\128\156", "\"", "U+201C LEFT DOUBLE QUOTATION MARK" },
 	{ "\226\128\157", "\"", "U+201D RIGHT DOUBLE QUOTATION MARK" },
-	{ "\226\128\148", "--", "U+2014 EM DASH" },
+	{ "\226\128\148", "-",  "U+2014 EM DASH" },
 	{ "\226\128\147", "-",  "U+2013 EN DASH" },
 	{ "\226\128\166", "...","U+2026 HORIZONTAL ELLIPSIS" },
 	{ "\226\128\145", "-",  "U+2011 NON-BREAKING HYPHEN" },
+	{ "\226\128\162", "-",  "U+2022 BULLET" },
 }
 
 --- Replace Unicode typographic characters with ASCII equivalents for font compatibility.
@@ -558,10 +563,11 @@ end
 
 --- Mod-relative per-topic folder for dynamic named/static clips spoken by the player.
 -- Derived from the resolved character topic dir by replacing the `<characterId>` segment with
--- `<DYNAMIC_PLAYER_FOLDER>` and dropping any trailing variant subdir, so the same player audio
--- is reused across every neighbour (and every variant) of the same topic.
+-- `<DYNAMIC_PLAYER_FOLDER>` while preserving any trailing variant subdir, so each variant can
+-- have its own player audio recordings. The same player audio is still reused across every
+-- neighbour for the same topic+variant combination.
 --   conversations/dynamic/18/field_mission_offer            -> conversations/dynamic/player/field_mission_offer
---   conversations/dynamic/18/field_mission_offer/2          -> conversations/dynamic/player/field_mission_offer
+--   conversations/dynamic/18/field_mission_offer/2          -> conversations/dynamic/player/field_mission_offer/2
 -- The generator helper writes the corresponding `<lang>_male_0_<suffix>.ogg` files here too;
 -- see helper/generate_dynamic_conversation_voices.ps1.
 -- @param string|nil resolvedRelDir mod-relative path to the topic folder (or variant subdir)
@@ -570,15 +576,12 @@ function IAConversation.getDynamicPlayerTopicDirFromResolvedDir(resolvedRelDir)
 	if resolvedRelDir == nil or resolvedRelDir == "" then
 		return nil
 	end
-	-- Expected layout: conversations/dynamic/<charId>/<topic>[/<variant>]. Capture the topic
-	-- segment (first path component after `dynamic/<charId>/`).
-	local topic = string.match(resolvedRelDir, "/dynamic/[^/\\]+/([^/\\]+)")
-	if topic == nil or topic == "" then
-		return nil
-	end
-	return IAConversation.MOD_CONVERSATIONS_ROOT
-		.. "/dynamic/" .. IAConversation.DYNAMIC_PLAYER_FOLDER
-		.. "/" .. topic
+	-- Expected layout: conversations/dynamic/<charId>/<topic>[/<variant>]. Replace the
+	-- <charId> segment with DYNAMIC_PLAYER_FOLDER, preserving any variant subdir that follows.
+	--   conversations/dynamic/18/field_mission_offer       -> conversations/dynamic/player/field_mission_offer
+	--   conversations/dynamic/18/field_mission_offer/2     -> conversations/dynamic/player/field_mission_offer/2
+	local replaced = string.gsub(resolvedRelDir, "^(.-/dynamic/)[^/\\]+", "%1" .. IAConversation.DYNAMIC_PLAYER_FOLDER)
+	return replaced
 end
 
 --- Mod-relative path for one voice segment clip (same pattern as _getVoicePath but custom suffix stem).
@@ -1199,11 +1202,7 @@ function IAConversation:_updateOptionButtons(state)
 			local entryId = entry.id
 			local textEl = clone:getDescendantByName("text")
 			if textEl and textEl.setText then
-				local optionText = entry.text or ""
-				if #optionText > 70 then
-					optionText = optionText:sub(1, 70) .. "..."
-				end
-				textEl:setText(optionText)
+				textEl:setText(entry.text or "")
 			end
 			local rowBg = clone.elements and clone.elements[1]
 			local guiButton = rowBg and rowBg.elements and rowBg.elements[1]
@@ -1218,6 +1217,17 @@ function IAConversation:_updateOptionButtons(state)
 						self.situation:selectConversationOption(id)
 					elseif id then
 						self:selectOption(id)
+					end
+				end
+				-- Grow the green row background and item box to the button's wrapped text height.
+				local btnH = guiButton.size and guiButton.size[2]
+				if btnH and btnH > 0 then
+					local pad = 10 / (g_referenceScreenHeight or 1080)
+					if rowBg and rowBg.setSize then
+						rowBg:setSize(rowBg.size[1], btnH + pad)
+					end
+					if clone and clone.setSize then
+						clone:setSize(clone.size[1], btnH + 2 * pad)
 					end
 				end
 			end
@@ -1267,8 +1277,37 @@ function IAConversation.resolveRandomSituationVariantDirectory(situationBaseDir)
 	return nil
 end
 
---- Pick a random variant under conversations/dynamic/<character>/<topic>/ when subfolders 1..N each contain conversation.xml.
--- If conversation.xml exists directly under baseRelDir, returns baseRelDir.
+--- Resolve a random variant using the <dynamicConversationsData> structure registry.
+-- Parses "conversations/dynamic/<charId>/<topic>" from baseRelDir, looks up
+-- IAConversation.dynamicSituationVariantIds[charIndex][topicId] for registered variant ids,
+-- and returns baseRelDir .. "/" .. <pickedVariantId>.
+-- Returns nil when no structure entry exists for this char/topic.
+-- @param string baseRelDir mod-relative e.g. conversations/dynamic/18/field_mission_offer
+-- @return string|nil
+function IAConversation.resolveDynamicConversationVariantDirectoryFromStructure(baseRelDir)
+	if baseRelDir == nil or baseRelDir == "" then
+		return nil
+	end
+	-- Parse path: conversations/dynamic/<charId>/<topic>
+	local norm = string.gsub(baseRelDir, "\\", "/")
+	local folderCharId, topicId = string.match(norm, "^conversations/dynamic/([^/]+)/([^/]+)$")
+	if folderCharId == nil or topicId == nil then
+		return nil
+	end
+	local structIndex = IAConversation.structureDynamicCharacterIndexByFolderId[folderCharId]
+	local byChar = structIndex ~= nil and IAConversation.dynamicSituationVariantIds[structIndex] or nil
+	local variantList = byChar ~= nil and byChar[topicId] or nil
+	if variantList ~= nil and #variantList > 0 then
+		local pick = variantList[math.random(1, #variantList)]
+		return baseRelDir .. "/" .. tostring(pick)
+	end
+	return nil
+end
+
+--- Pick a random variant under conversations/dynamic/<character>/<topic>/ using:
+-- 1) the <dynamicConversationsData> structure registry first (zip-safe), then
+-- 2) scanning subfolders 1..N each containing conversation.xml (legacy fallback).
+-- If conversation.xml exists directly under baseRelDir, returns baseRelDir (flat legacy mode).
 -- @param string baseRelDir mod-relative e.g. conversations/dynamic/1/field_mission_offer
 -- @return string|nil
 function IAConversation.resolveDynamicConversationVariantDirectory(baseRelDir)
@@ -1276,10 +1315,17 @@ function IAConversation.resolveDynamicConversationVariantDirectory(baseRelDir)
 	if baseDir == nil or baseRelDir == nil or baseRelDir == "" then
 		return nil
 	end
+	-- Try flat legacy mode first: conversation.xml directly at baseRelDir
 	local legacyPath = Utils.getFilename(baseRelDir .. "/conversation.xml", baseDir)
 	if fileExists(legacyPath) then
 		return baseRelDir
 	end
+	-- Try structure registry (zip-safe, like normal conversations)
+	local structResult = IAConversation.resolveDynamicConversationVariantDirectoryFromStructure(baseRelDir)
+	if structResult ~= nil then
+		return structResult
+	end
+	-- Fallback: scan subfolders 1..40 for conversation.xml (legacy filesystem scan)
 	local variants = {}
 	for i = 1, 40 do
 		local sub = baseRelDir .. "/" .. tostring(i)
@@ -1930,6 +1976,8 @@ function IAConversation:update(dt)
 		local wasIntermediateSegment = justFinished ~= nil and justFinished.isLastSegment == false
 		if not wasIntermediateSegment then
 			self.advanceDelay = math.max(IAConversation.VOICE_LINE_GAP_MILLISECONDS, self.advanceDelay)
+		else
+			self.advanceDelay = 150 -- Shorter gap between segments of the same line, if any (e.g. for dynamic conversations with multiple voice clips per subtitle). Adjust as needed or make it a constant.
 		end
 	end
 	if self.advanceDelay > 0 then

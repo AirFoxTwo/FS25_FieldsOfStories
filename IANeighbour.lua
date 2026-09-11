@@ -221,6 +221,7 @@ function IANeighbour.new(id, name, enabled, positionX, positionY, positionZ, rot
 	self.initialized = false
 
 	self.vehicles = {}
+	self.placeables = {}
 	
 	-- Real position tracking (updated from vehicle)
 	self.realPositionX = nil
@@ -266,6 +267,10 @@ function IANeighbour.new(id, name, enabled, positionX, positionY, positionZ, rot
 	-- Actual last ring time, used so missed-call retries wait a real in-game hour even if the planned slot was already late.
 	self.contractCallLastRingScheduleKey = nil
 	self.contractCallLastRingTotalMinutes = nil
+	-- In-memory marker for "full contract rebuild already ran today" (see evaluateScheduledFieldworkRefresh).
+	self._iaScheduleRebuiltForDayKey = nil
+	-- Last chosen outsource job type for today (preserved across additive rebuilds in rebuildDailyFieldworkSchedule).
+	self._iaLastOutsourcedJobType = nil
 
 	-- Homebase place ids (assignment stored on neighbour, not on places)
 	self.assignedHomebasePlaceIds = {}
@@ -342,10 +347,17 @@ function IANeighbour:onContractCallTimeTriggered()
 	local totalHaRounded = helper:sumRoundedHectaresForFarmlandIds(farmlandIdsOrdered)
 	-- Dynamic conversation variables: see IANeighbourDynamicConversationData header for the
 	-- contract. jobType and vehicleNameWithArticle share the IAFieldwork.JobType enum value as
-	-- catalog key; extraRefillNote is "needed" only for implements that consume refillable
-	-- material (seed/spray/fertilizer); the rest are raw strings displayed verbatim.
+	-- catalog key; extraRefillNote is "needed" for implements that consume refillable
+	-- material, "delivery" for harvest/grass-mowing jobs that require delivery to silo
 	local jobTypeEnum = IAFieldwork.normalizeFieldworkJobType(jobConfig.fieldwork) or "other"
 	local usesRefillable = IAFieldwork.fieldworkImplementUsesRefillableConsumable(jobConfig.fieldwork)
+	local isDeliveryJob = IAFieldwork.isDeliveryRequiredJobType(jobTypeEnum)
+	local extraRefillNoteKey = nil
+	if usesRefillable then
+		extraRefillNoteKey = "needed"
+	elseif isDeliveryJob then
+		extraRefillNoteKey = "delivery"
+	end
 	local mission = {
 		config = jobConfig,
 		farmlandIds = farmlandIdsOrdered,
@@ -354,7 +366,7 @@ function IANeighbour:onContractCallTimeTriggered()
 		variableMap = {
 			jobType                = jobTypeEnum,
 			vehicleNameWithArticle = jobTypeEnum,
-			extraRefillNote        = usesRefillable and "needed" or nil,
+			extraRefillNote        = extraRefillNoteKey,
 			fieldNumber            = tostring(farmlandIdsOrdered[1]),
 			fieldNumbers           = table.concat(farmlandIdsOrdered, ", "),
 			totalHectares          = tostring(totalHaRounded),
@@ -369,6 +381,15 @@ function IANeighbour:onContractCallTimeTriggered()
 	local n = self
 	local callbacksByAction = {
 		accept = function()
+			-- TEMP DIAGNOSTIC
+			local diagFarmId = (g_localPlayer ~= nil and g_localPlayer.farmId) or (g_currentMission ~= nil and g_currentMission.getFarmId ~= nil and g_currentMission:getFarmId()) or nil
+			local diagOpenCnt = mission.contractOpenFieldworkList and #mission.contractOpenFieldworkList or 0
+			--print(string.format("--- ACCEPT CALLBACK: g_server=%s g_missionManager=%s g_currentMission=%s farmId=%s openList#=%s h=%s h.createFieldMission=%s",
+--				tostring(g_server), tostring(g_missionManager),
+--				tostring(g_currentMission), tostring(diagFarmId),
+--				tostring(diagOpenCnt),
+--				tostring(n.ianeighbours and n.ianeighbours.gameLoopHelper),
+--				tostring(n.ianeighbours and n.ianeighbours.gameLoopHelper and type(n.ianeighbours.gameLoopHelper.createAndRegisterFieldMissionsForOpenFieldworkList))))
 			local h = n.ianeighbours and n.ianeighbours.gameLoopHelper
 			if h ~= nil and type(h.markAllContractRowsAsAcceptedByPlayer) == "function" then
 				h:markAllContractRowsAsAcceptedByPlayer(n)
@@ -1249,6 +1270,9 @@ function IANeighbour:update(dt,gameSeconds,game5Seconds)
 			if type(ih.gameLoopHelper.evaluateContractPlayerCallTrigger) == "function" then
 				ih.gameLoopHelper:evaluateContractPlayerCallTrigger(self)
 			end
+			if type(ih.gameLoopHelper.evaluateScheduledFieldworkRefresh) == "function" then
+				ih.gameLoopHelper:evaluateScheduledFieldworkRefresh(self)
+			end
 			if type(ih.gameLoopHelper.evaluateContractFallbackToAiAt1500) == "function" then
 				ih.gameLoopHelper:evaluateContractFallbackToAiAt1500(self)
 			end
@@ -2121,6 +2145,161 @@ function IANeighbour:addVehicle(ia_vehicle)
 	self.vehicles[ia_vehicle.uniqueId] = ia_vehicle
 end
 
+--- Placeable accessors (mirrors the vehicle pattern for outbound XML persistence).
+function IANeighbour:getPlaceable(uniqueId)
+	for _, ia_placeable in pairs(self.placeables) do
+		if ia_placeable.uniqueId == uniqueId then
+			return ia_placeable
+		end
+	end
+	return nil
+end
+
+function IANeighbour:getPlaceableByExternalId(externalId)
+	if externalId == nil then
+		return nil
+	end
+	for _, ia_placeable in pairs(self.placeables) do
+		if ia_placeable.externalId == externalId then
+			return ia_placeable
+		end
+	end
+	return nil
+end
+
+function IANeighbour:addPlaceable(ia_placeable)
+	if ia_placeable.uniqueId ~= nil then
+		self.placeables[ia_placeable.uniqueId] = ia_placeable
+	end
+end
+
+--- Get all assigned homebase places from IANeighbours.places.
+--- @return table array of IAMapPlace
+function IANeighbour:getHomebasePlaces()
+	local out = {}
+	if IANeighbours == nil or IANeighbours.places == nil or self.assignedHomebasePlaceIds == nil then
+		return out
+	end
+	for _, hbId in ipairs(self.assignedHomebasePlaceIds) do
+		for _, p in ipairs(IANeighbours.places) do
+			if p ~= nil and p.id ~= nil and tostring(p.id) == tostring(hbId) then
+				out[#out + 1] = p
+				break
+			end
+		end
+	end
+	return out
+end
+
+--- Get this neighbour's large_area homebase place, or nil if none.
+--- @return IAMapPlace|nil
+function IANeighbour:getLargeAreaPlace()
+	for _, p in ipairs(self:getHomebasePlaces()) do
+		if p.sizeType == "large_area" then
+			return p
+		end
+	end
+	return nil
+end
+
+--- Count this neighbour's assigned homebase places grouped by sizeType.
+--- @return table { character, vehicle, vehicle_attachment, oversize_vehicle, large_area, silo, total }
+function IANeighbour:getActualHomebasePlaces()
+	local counts = {
+		character = 0,
+		vehicle = 0,
+		vehicle_attachment = 0,
+		oversize_vehicle = 0,
+		large_area = 0,
+		silo = 0,
+		total = 0,
+	}
+	for _, p in ipairs(self:getHomebasePlaces()) do
+		if p ~= nil and p.sizeType ~= nil then
+			local st = tostring(p.sizeType)
+			if counts[st] ~= nil then
+				counts[st] = counts[st] + 1
+			end
+		end
+	end
+	for _, v in pairs(counts) do
+		counts.total = counts.total + v
+	end
+	return counts
+end
+
+--- Compute the required number of homebase places per sizeType for this neighbour,
+--- based on their vehicle fleet and job.
+---
+--- character        = 1 (always)
+--- vehicle          = count of cars + trucks + tractors + tractor large
+--- vehicle_attachment = count of attachments
+--- oversize_vehicle = count of combines, harvesters, beet loaders (isOversizeVehicleType)
+--- large_area       = 1 for Neighbour Farmers / Agricultural Contractor, 0 otherwise
+--- silo             = 1 for Neighbour Farmers / Agricultural Contractor, 0 otherwise
+---
+--- @return table { character, vehicle, vehicle_attachment, oversize_vehicle, large_area, silo, total }
+function IANeighbour:getRequiredHomebasePlaces()
+	local counts = {
+		character = 1,
+		vehicle = 0,
+		vehicle_attachment = 0,
+		oversize_vehicle = 0,
+		large_area = 0,
+		silo = 0,
+		total = 0,
+	}
+
+	local function isOversize(vtype)
+		if vtype == nil then return false end
+		local t = string.lower(tostring(vtype))
+		return t == "combine"
+			or t == "greenbeanharvesters"
+			or t == "peaharvesters"
+			or t == "spinachharvesters"
+			or t == "beetloading"
+			or t == "beetharvesters"
+			or t == "forageharvesters"
+	end
+
+	for _, ia in pairs(self.vehicles or {}) do
+		if ia ~= nil and ia.type ~= nil then
+			local vtype = string.lower(tostring(ia.type))
+			if vtype == "car" or vtype == "tractor" or vtype == "tractor large" or vtype == "truck" then
+				counts.vehicle = counts.vehicle + 1
+			elseif vtype == "attachment" then
+				counts.vehicle_attachment = counts.vehicle_attachment + 1
+			elseif isOversize(vtype) then
+				counts.oversize_vehicle = counts.oversize_vehicle + 1
+			end
+		end
+	end
+
+	local job = self.job
+	local role = self.role
+	if (job == "Farmer" and role == "Neighbour") or job == "Agricultural Contractor" then
+		counts.large_area = 1
+		counts.silo = 1
+	end
+
+	counts.total = counts.character + counts.vehicle + counts.vehicle_attachment
+		+ counts.oversize_vehicle + counts.large_area + counts.silo
+	return counts
+end
+
+--- Get the first spawned placeable (game object) for this neighbour.
+--- Used by the mission system to find the farmer's silo for delivery/consumable.
+--- @return table|nil placeable game placeable object
+function IANeighbour:getFirstPlaceable()
+	if self.placeables == nil then return nil end
+	for _, iaPl in pairs(self.placeables) do
+		if iaPl ~= nil and iaPl.placeable ~= nil then
+			return iaPl.placeable
+		end
+	end
+	return nil
+end
+
 function IANeighbour:updateFromXML(enabled, positionX, positionY, positionZ, rotation, action, farmId, activeSituationId, hathair, glasses, glassesColorIndex, facegear, facegearColorIndex, onepiece, onepieceColorIndex, bottom, bottomColorIndex, face, faceColorIndex, top, topColorIndex, gloves, glovesColorIndex, headgear, headgearColorIndex, footwear, footwearColorIndex, hairStyle, hairStyleColorIndex, beard, beardColorIndex, characterVisibility)
 	IAprintDebug("updateFromXML", "onepiece=" .. tostring(onepiece) .. " top=" .. tostring(top) .. " bottom=" .. tostring(bottom) .. " footwear=" .. tostring(footwear) .. " initialized=" .. tostring(self.initialized), self)
 	return self:_updateFromXMLImpl(enabled, positionX, positionY, positionZ, rotation, action, farmId, activeSituationId, hathair, glasses, glassesColorIndex, facegear, facegearColorIndex, onepiece, onepieceColorIndex, bottom, bottomColorIndex, face, faceColorIndex, top, topColorIndex, gloves, glovesColorIndex, headgear, headgearColorIndex, footwear, footwearColorIndex, hairStyle, hairStyleColorIndex, beard, beardColorIndex, characterVisibility)
@@ -2283,6 +2462,17 @@ function IANeighbour:delete()
 		end
 	end
 	self.vehicles = {}
+
+	-- Delete all spawned placeables
+	if self.placeables ~= nil then
+		for key, iaPl in pairs(self.placeables) do
+			if iaPl ~= nil and iaPl.delete then
+				pcall(function() iaPl:delete() end)
+			end
+			self.placeables[key] = nil
+		end
+	end
+	self.placeables = {}
 
 	if self.removeNPCSpot then
 		pcall(function() self:removeNPCSpot() end)

@@ -14,6 +14,7 @@
             <text name="gui_voice_pack_warn_message" text="Hraješ Fields of Stories bez hlasového balíčku (volitelné). Vyžadovaná verze: %s"/>
             <text name="gui_voice_pack_warn_recheck" text="Zkontrolovat znovu"/>
             <text name="gui_voice_pack_warn_ok_notification" text="Hlasový balíček je v pořádku: Verze odpovídá verzi Fields of Stories."/>
+            <text name="ia_homebase_setup_warning" text="Fields of Stories: Domovské základny nejsou kompletní. Umístěte požadované plochy domovské základny pro dokončení nastavení."/>
             <text name="gui_dialog_button_ignore" text="Ignorovat"/>
             <text name="gui_mapplaces_gen_title" text="Fields of Stories – Generování míst na mapě"/>
 			<text name="gui_mapplaces_gen_message" text="Experimentální: Pro tuto mapu nebyla nalezena žádná uložená konfigurace. Pokud budeš pokračovat, &quot;Fields of Stories&quot; automaticky vygeneruje stovky až tisíce míst na mapě. Hra může během tohoto procesu vypadat jako zamrzlá, dokud se generování nedokončí."/>
@@ -35,6 +36,37 @@ Další informace najdeš v herní nápovědě v tématech věnovaných Fields o
 to všechno je možné, ale vyžaduje to čas a tvou podporu."/>
 			<text name="gui_phone_title" text="%s"/>
             <text name="gui_phone_title_default" text="Telefon"/>
+            <text name="construction_foS_category" text="Fields of Stories"/>
+            <text name="construction_foS_tab_placeables" text="Obecná místa"/>
+            <text name="construction_foS_tab_character_homebase" text="Domov postavy"/>
+            <text name="fos_char_homebase_name" text="Domov: %s"/>
+            <text name="fos_char_homebase_desc" text="Umístění domova pro postavu #%s."/>
+            <text name="fos_char_homebase_name_1" text="Mary Carter (Rodinný příslušník, Zemědělec)"/>
+            <text name="fos_char_homebase_desc_1" text="Domov pro Mary Carter."/>
+            <text name="fos_char_homebase_name_2" text="John Carter (Rodinný příslušník, Zemědělec)"/>
+            <text name="fos_char_homebase_desc_2" text="Domov pro John Carter."/>
+            <text name="fos_char_homebase_name_10" text="Sharon Whitaker (Úředník)"/>
+            <text name="fos_char_homebase_desc_10" text="Domov pro Sharon Whitaker."/>
+            <text name="fos_char_homebase_name_11" text="Kyle Bennett (Civilista)"/>
+            <text name="fos_char_homebase_desc_11" text="Domov pro Kyle Bennett."/>
+            <text name="fos_char_homebase_name_13" text="Lukas Brenner (Soused, Lesník)"/>
+            <text name="fos_char_homebase_desc_13" text="Domov pro Lukas Brenner."/>
+            <text name="fos_char_homebase_name_14" text="Martin Walker (Úředník, Starosta)"/>
+            <text name="fos_char_homebase_desc_14" text="Domov pro Martin Walker."/>
+            <text name="fos_char_homebase_name_15" text="Susan Keller (Obchodní partner, Obchodník s obilím)"/>
+            <text name="fos_char_homebase_desc_15" text="Domov pro Susan Keller."/>
+            <text name="fos_char_homebase_name_16" text="Andy Hoffman (Obchodní partner, Prodejce zem. strojů)"/>
+            <text name="fos_char_homebase_desc_16" text="Domov pro Andy Hoffman."/>
+            <text name="fos_char_homebase_name_17" text="Paul Meyer (Obchodní partner, Zemědělský podnikatel)"/>
+            <text name="fos_char_homebase_desc_17" text="Domov pro Paul Meyer."/>
+            <text name="fos_char_homebase_name_18" text="Marcus Brown (Soused, Zemědělec)"/>
+            <text name="fos_char_homebase_desc_18" text="Domov pro Marcus Brown."/>
+            <text name="fos_char_homebase_name_19" text="Jacob Miller (Soused, Zemědělec)"/>
+            <text name="fos_char_homebase_desc_19" text="Domov pro Jacob Miller."/>
+            <text name="fos_char_homebase_name_20" text="Emma Kensington (Soused, Zemědělec)"/>
+            <text name="fos_char_homebase_desc_20" text="Domov pro Emma Kensington."/>
+            <text name="fos_char_homebase_name_21" text="Brian Winter (Soused, Zemědělec)"/>
+            <text name="fos_char_homebase_desc_21" text="Domov pro Brian Winter."/>
             <text name="gui_phone_message" text="Příchozí hovor"/>
             <text name="gui_phone_answer" text="Přijmout"/>
             <text name="gui_phone_decline" text="Odmítnout"/>
@@ -282,7 +314,7 @@ Odměna a reputace: Dokončená zakázka ti vyplatí odměnu a zlepší tvůj vz
 Půjčení techniky znamená o něco nižší finanční odměnu než s použitím vlastní techniky. Důležité: Zakázka s půjčeným nářadím zůstane stát na 99 procentech, dokud neodvezeš každý půjčený stroj zpět na sousedův statek a tam ho neodpojíš. Teprve poté se zakázka považuje za dokončenou.
 
 Pokud si stroje půjčíš, najdeš na mapě značku, kde si je můžeš vyzvednout. Tam můžeš také doplňovat spotřební materiál (např. kejdu, osivo nebo herbicid) a po skončení zakázky tam stroje zase zaparkovat."/>
-            <text name="gui_help_contracts_body3" text=""/>
+            <text name="gui_help_contracts_body3" text="Sklizňové a doručovací zakázky&#10;&#10;Některé polní zakázky také vyžadují doručení úrody:&#10;&#10;Doručení sklizně: skliď plodinu (např. kukuřici, pšenici, řepku) a doruč zrno do sila zemědělce. Hra sleduje, co tvůj kombajn nasbírá, a porovnává to s tím, co doručíš. Musíš doručit alespoň 99 % sklizeného množství.&#10;&#10;Doručení posekané trávy: posekej trávu a doruč ji (balíky nebo volně loženou) do sila zemědělce.&#10;&#10;Pokud více doručovacích zakázek sdílí stejné silo a stejný druh plodiny, doručení se mezi ně poměrně rozdělí.&#10;&#10;Ukazatel průběhu:&#10;0-80 % pokrývá polní práci, 80-99 % znamená polní práce hotovy, ale doručení stále čeká. Při 100 % je vše dokončeno — vyzvedni zakázku z menu misí a získej odměnu.&#10;&#10;Extra bonus za doručení:&#10;Zemědělec očekává celou úrodu — nic si nenechávej pro sebe. Můžeš pokračovat v doručování i poté, co zakázka dosáhne 100 %. Při vyzvednutí každé přebytečné množství nad rámec stavu v sile při dokončení přináší bonus +50 bodů vztahu."/>
             <text name="gui_help_contract_cap_call_info" text="Když zemědělec potřebuje pomoc, uslyšíš vyzvánění a uvidíš upozornění na příchozí hovor (zhruba mezi 08:00 a 15:00)."/>
 			<text name="gui_help_contract_cap_call" text="Otevři mobil a stiskni Přijmout, abys si poslechl nabídku, nebo Odmítnout / Esc pro zrušení hovoru.
 
@@ -380,6 +412,7 @@ Jasná a podrobná hlášení nesmírně urychlují opravy. Děkujeme, že pomá
 			<text name="gui_mapinit_place_size_vehicle_attachment" text="Vozidlo + přípojné zařízení"/>
             <text name="gui_mapinit_place_size_oversize_vehicle" text="Nadměrné vozidlo"/>
             <text name="gui_mapinit_place_size_large_area" text="Velká plocha"/>
+            <text name="gui_mapinit_place_size_silo" text="Silo"/>
             <text name="gui_mapinit_place_type_label" text="Typ místa:"/>
             <text name="gui_mapinit_place_type_shop" text="Obchod"/>
             <text name="gui_mapinit_place_type_gas_station" text="Čerpací stanice"/>
@@ -431,6 +464,17 @@ Jasná a podrobná hlášení nesmírně urychlují opravy. Děkujeme, že pomá
             <text name="ia_field_outcome_mission_desc_short" text="Použij %s k dokončení úkolu."/>
             <text name="ia_field_outcome_mission_desc_seed" text="Použij %s k zasetí plodiny %s."/>
             <text name="ia_field_outcome_neighbour_generic" text="tvého souseda"/>
+            <text name="ia_field_outcome_task_done" text="Hotovo"/>
+            <text name="ia_field_outcome_task_open" text="Zbývá"/>
+            <text name="ia_field_outcome_task_fieldwork" text="Polní práce: %s"/>
+            <text name="ia_field_outcome_task_delivery" text="Odvoz"/>
+            <text name="ia_field_outcome_task_return" text="Vrátit nářadí"/>
+            <text name="ia_field_outcome_task_delivery_progress" text="%s / %s doručeno"/>
+            <text name="ia_field_outcome_task_delivery_not_started" text="Ještě nezačato"/>
+            <text name="ia_field_outcome_task_return_after_fieldwork" text="Po polní práci"/>
+            <text name="ia_fieldwork_label_harvest_corn" text="Sklidit kukuřici"/>
+            <text name="ia_force_complete_button" text="Vynutit dokončení"/>
+            <text name="ia_force_complete_no_mission" text="Není vybrána žádná aktivní zakázka Fields of Stories."/>
             <text name="ia_field_outcome_target_fertilizer" text="Cíl: Minerální hnojení na úroveň %d na poli."/>
             <text name="ia_field_outcome_target_slurry" text="Cíl: Aplikovat kejdu (tekutý hnůj) nebo digestát na úroveň hnojení %d."/>
             <text name="ia_field_outcome_target_manure" text="Cíl: Aplikovat pevný hnůj na úroveň hnojení %d."/>
@@ -500,6 +544,18 @@ Jasná a podrobná hlášení nesmírně urychlují opravy. Děkujeme, že pomá
             <text name="ia_settings_fieldworkCompletionThreshold_90" text="90 %"/>
             <text name="ia_settings_fieldworkCompletionThreshold_95" text="95 %"/>
             <text name="ia_settings_fieldworkCompletionThreshold_100" text="100 %"/>
+            <text name="ia_settings_voiceVolume_title" text="Hlasitost hlasů"/>
+            <text name="ia_settings_voiceVolume_info" text="Hlasitost mluvených dialogů sousedů."/>
+            <text name="ia_settings_voiceVolume_10" text="10 %"/>
+            <text name="ia_settings_voiceVolume_20" text="20 %"/>
+            <text name="ia_settings_voiceVolume_30" text="30 %"/>
+            <text name="ia_settings_voiceVolume_40" text="40 %"/>
+            <text name="ia_settings_voiceVolume_50" text="50 %"/>
+            <text name="ia_settings_voiceVolume_60" text="60 %"/>
+            <text name="ia_settings_voiceVolume_70" text="70 %"/>
+            <text name="ia_settings_voiceVolume_80" text="80 %"/>
+            <text name="ia_settings_voiceVolume_90" text="90 %"/>
+            <text name="ia_settings_voiceVolume_100" text="100 %"/>
             <text name="ia_npc_unavailable" text=" (Nedostupný)"/>
             <text name="gui_mapinit_reset_character" text="Resetovat postavu"/>
             <text name="gui_mapinit_delete_character" text="Smazat postavu"/>
@@ -514,5 +570,66 @@ Jasná a podrobná hlášení nesmírně urychlují opravy. Děkujeme, že pomá
             <text name="gui_mapinit_detail_schedule" text="Plánované polní práce na dnešek"/>
             <text name="gui_mapinit_detail_at_place_fmt" text="na %s"/>
             <text name="gui_language" text="cs"/>
-	</texts>
+            <text name="fos_place_character_church" text="Značka: Kostel"/>
+            <text name="fos_place_character_church_desc" text="Fields of Stories - Místo bohoslužeb, kde NPC navštěvují obřady a komunitní setkání"/>
+            <text name="fos_place_character_dirt_road" text="Značka: Polní cesta"/>
+            <text name="fos_place_character_dirt_road_desc" text="Fields of Stories - Klidná polní cesta, kde se NPC procházejí a zažívají venkovská setkání"/>
+            <text name="fos_place_character_gas_station" text="Značka: Čerpací stanice"/>
+            <text name="fos_place_character_gas_station_desc" text="Fields of Stories - Čerpací stanice, kde NPC tankují svá vozidla a setkávají se"/>
+            <text name="fos_place_character_industry" text="Značka: Průmysl"/>
+            <text name="fos_place_character_industry_desc" text="Fields of Stories - Průmyslová zóna, kde NPC pracují a vyrábějí zboží"/>
+            <text name="fos_place_character_player_farm" text="Značka: Hráčův statek"/>
+            <text name="fos_place_character_player_farm_desc" text="Fields of Stories - Označuje hráčův statek, srdce tvých zemědělských aktivit"/>
+            <text name="fos_place_character_private_relax_place" text="Značka: Soukromé místo k odpočinku"/>
+            <text name="fos_place_character_private_relax_place_desc" text="Fields of Stories - Odlehlé útočiště, kam NPC chodí za soukromím a klidem"/>
+            <text name="fos_place_character_public_infrastructure" text="Značka: Infrastruktura"/>
+            <text name="fos_place_character_public_infrastructure_desc" text="Fields of Stories - Veřejné služby a infrastrukturní centrum pro místní komunitu"/>
+            <text name="fos_place_character_public_place" text="Značka: Veřejné místo"/>
+            <text name="fos_place_character_public_place_desc" text="Fields of Stories - Rušné veřejné náměstí, kde se NPC scházejí, povídají si a tráví volný čas"/>
+            <text name="fos_place_character_public_relax_place" text="Značka: Místo k odpočinku"/>
+            <text name="fos_place_character_public_relax_place_desc" text="Fields of Stories - Veřejná odpočinková zóna, kde NPC relaxují a užívají si volný čas"/>
+            <text name="fos_place_character_remove" text="Nástroj: Odstranit místo"/>
+            <text name="fos_place_character_remove_desc" text="Fields of Stories - Odstraní nejbližší značku místa do 5 metrů"/>
+            <text name="fos_place_character_roadside" text="Značka: Krajnice"/>
+            <text name="fos_place_character_roadside_desc" text="Fields of Stories - Místo u krajnice, kde se NPC zastavují na krátký rozhovor nebo přestávku"/>
+            <text name="fos_place_character_sell_point" text="Značka: Prodejní místo"/>
+            <text name="fos_place_character_sell_point_desc" text="Fields of Stories - Obchodní místo, kde NPC dodávají zboží a obchodují"/>
+            <text name="fos_place_character_shop" text="Značka: Obchod"/>
+            <text name="fos_place_character_shop_desc" text="Fields of Stories - Nákupní oblast, kam NPC chodí prohlížet a nakupovat zboží"/>
+            <text name="fos_place_character_workshop" text="Značka: Dílna"/>
+            <text name="fos_place_character_workshop_desc" text="Fields of Stories - Opravářská dílna, kde NPC udržují a opravují své vybavení"/>
+            <text name="fos_place_character_shed" text="Značka: Hala"/>
+            <text name="fos_place_character_shed_desc" text="Fields of Stories - Skladovací hala, kde NPC uchovávají své nářadí a vybavení"/>
+            <text name="gui_fos_place_created" text="Místo vytvořeno: %s (%s)"/>
+            <text name="gui_fos_place_size_select" text="Velikost místa"/>
+            <text name="gui_fos_bulk_remove_title" text="Hromadné odstranění míst"/>
+            <text name="gui_fos_bulk_remove_confirm" text="Odstranit %d míst(o)/míst(a) typu '%s'?"/>
+            <text name="gui_fos_bulk_remove_confirm_char" text="Odstranit %d míst(o)/míst(a) pro '%s'?"/>
+            <text name="gui_fos_bulk_remove_btn_yes" text="Odstranit vše"/>
+            <text name="gui_fos_bulk_remove_btn_no" text="Zrušit"/>
+            <text name="gui_fos_bulk_remove_none" text="Žádná místa tohoto typu k odstranění."/>
+            <text name="gui_fos_bulk_remove_done" text="Odstraněno %d míst(o)/míst(a)."/>
+            <text name="gui_mapinit_classic_init_mode" text="Klasický init režim"/>
+            <text name="gui_mapinit_dialog_first_message" text="Otevři stavební menu pro vytváření míst po celé mapě. Nebo zapni Klasický režim z verze 1.0, který vyžaduje projetí mapy pro ukládání míst."/>
+            <text name="gui_mapinit_dialog_first_title" text="Konfigurace míst"/>
+            <text name="gui_mapinit_open_construction_menu" text="Otevřít stavební menu"/>
+            <text name="ia_delivery_marker_label" text="Místo doručení na statek"/>
+            <text name="ia_field_outcome_deliver_wrong_location" text="Úrodu musíš doručit na statek, ne ji prodat jinde!"/>
+            <text name="ia_field_outcome_delivery_complete" text="Doručení dokončeno! Zboží dorazilo na statek."/>
+            <text name="ia_field_outcome_mission_deliver_note" text="Doruč úrodu na statek (vyznačeno na mapě)."/>
+            <text name="ia_field_outcome_target_grass_mowing" text="Cíl: posekat trávu a doručit ji na statek."/>
+            <text name="ia_field_outcome_target_harvest_deliver_corn" text="Cíl: sklidit kukuřici a doručit zrno na statek."/>
+            <text name="ia_field_outcome_target_lime_deliver" text="Cíl: rovnoměrně aplikovat vápno na celé pole."/>
+            <text name="ia_field_outcome_target_stone_picking" text="Cíl: odstranit všechny kameny z pole."/>
+            <text name="ia_fieldwork_equip_grass_mower" text="sekačka a sběrací vůz nebo lis"/>
+            <text name="ia_fieldwork_equip_harvest_deliver_corn" text="kombajn a obilný přívěs"/>
+            <text name="ia_fieldwork_equip_stone_picker" text="sběrač kamenů"/>
+            <text name="ia_fieldwork_label_grass_mowing" text="Posekat trávu a doručit"/>
+            <text name="ia_fieldwork_label_grass_mowing_short" text="Posekat trávu"/>
+            <text name="ia_fieldwork_label_harvest_deliver_corn" text="Sklidit kukuřici a doručit"/>
+            <text name="ia_fieldwork_label_harvest_deliver_with_crop" text="Sklidit %s a doručit"/>
+            <text name="ia_fieldwork_label_stone_picking" text="Sběr kamenů"/>
+            <text name="input_IAPlaceSizeSelect" text="Výběr velikosti místa (Fields of Stories)"/>
+            <text name="input_IAPlaceBulkRemove" text="Hromadné odstranění míst (Fields of Stories)"/>
+</texts>
 </l10n>

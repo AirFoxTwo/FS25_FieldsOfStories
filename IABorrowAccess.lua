@@ -135,6 +135,23 @@ function IABorrowAccess.shouldAllowCrossFarmAttach(attachable, farmId, attacherV
 	return false
 end
 
+--- AccessHandler hook: also grant temporary access to farmer silos during active field missions.
+IABorrowAccess._missionAccessiblePlaceableIds = IABorrowAccess._missionAccessiblePlaceableIds or {}
+
+--- Mark a placeable (silo) as temporarily accessible to the player during an active mission.
+--- @param uniqueId string Placeable uniqueId
+function IABorrowAccess.markMissionSilo(uniqueId)
+	if uniqueId == nil then return end
+	IABorrowAccess._missionAccessiblePlaceableIds[tostring(uniqueId)] = true
+end
+
+--- Remove temporary access when the mission ends.
+--- @param uniqueId string Placeable uniqueId
+function IABorrowAccess.unmarkMissionSilo(uniqueId)
+	if uniqueId == nil then return end
+	IABorrowAccess._missionAccessiblePlaceableIds[tostring(uniqueId)] = nil
+end
+
 --- AttacherJoints.updateActionEvents uses accessHandler:canFarmAccess for attach HUD (showAttachNotAllowedText), not isAttachAllowed.
 function IABorrowAccess.shouldAllowFarmAccessForBorrowed(farmId, object)
 	if not IABorrowAccess.isBorrowSystemActive() or object == nil then
@@ -146,6 +163,12 @@ function IABorrowAccess.shouldAllowFarmAccessForBorrowed(farmId, object)
 	end
 	if Vehicle ~= nil and object.isa ~= nil and object:isa(Vehicle) then
 		return IABorrowAccess.hasPlayerBorrowAccess(object)
+	end
+	-- Also grant access to farmer silos that are part of active field missions
+	if Placeable ~= nil and object.isa ~= nil and object:isa(Placeable) then
+		if object.uniqueId ~= nil and IABorrowAccess._missionAccessiblePlaceableIds[tostring(object.uniqueId)] then
+			return true
+		end
 	end
 	return false
 end
@@ -261,9 +284,18 @@ function IABorrowAccess.forEachAttachedFleetIA(parentIa, callback)
 end
 
 --- World X/Z for borrow pickup, return, and refill (homebase slot or saved pickup pose).
+-- Result is cached on ia._cachedReturnPose because the return pose is derived from a
+-- static map place and the vehicle's immutable category — it never changes during a
+-- borrow session. The cache is cleared when borrow state changes (setBorrowedForGameVehicle,
+-- endBorrowed). This avoids per-frame buildPoseForVehicleAtPlace / getHomebaseRotationForVehicle
+-- calls in IAMissionBorrow.updateSession.
 function IABorrowAccess.getReturnWorldPose(ia)
 	if ia == nil then
 		return nil, nil, nil
+	end
+	if ia._cachedReturnPose ~= nil then
+		local c = ia._cachedReturnPose
+		return c.x, c.z, c.pose
 	end
 	local rx, rz = ia.borrowPickupPositionX, ia.borrowPickupPositionZ
 	if IAEquipmentPresence ~= nil and IAEquipmentPresence.State ~= nil and IAEquipmentPresence.State.getReservedParkingPlaceId ~= nil then
@@ -281,10 +313,13 @@ function IABorrowAccess.getReturnWorldPose(ia)
 						end
 					end
 					if pose ~= nil and pose.x ~= nil and pose.z ~= nil then
+						ia._cachedReturnPose = { x = pose.x, z = pose.z, pose = pose }
 						return pose.x, pose.z, pose
 					end
 					if place.x ~= nil and place.z ~= nil then
-						return place.x, place.z, { x = place.x, y = place.y, z = place.z, rotation = place.rotation }
+						local p = { x = place.x, y = place.y, z = place.z, rotation = place.rotation }
+						ia._cachedReturnPose = { x = place.x, z = place.z, pose = p }
+						return place.x, place.z, p
 					end
 					break
 				end
@@ -292,6 +327,7 @@ function IABorrowAccess.getReturnWorldPose(ia)
 		end
 	end
 	if rx ~= nil and rz ~= nil then
+		ia._cachedReturnPose = { x = rx, z = rz, pose = nil }
 		return rx, rz, nil
 	end
 	return nil, nil, nil
@@ -876,6 +912,10 @@ function IABorrowAccess.setBorrowedForGameVehicle(vehicle, borrowed)
 		tostring(ia.vehicleHotspotApplied),
 		tostring(ia.borrowReturnParkingPlaceId)
 	), neighbour, ia, nil)
+	-- Clear cached return pose whenever borrow state transitions; the return slot
+	-- may differ after a borrow end + re-borrow cycle (different sibling swap target).
+	ia._cachedReturnPose = nil
+
 	if ia.isBorrowedByPlayer == borrowed then
 		IAprintDebug("IABorrowAccess.setBorrowedForGameVehicle()", string.format(
 			"[BORROW-CANCEL] flag already %s -> only syncBorrowYardMarkers (engine vehicle hotspot WILL NOT be touched)",
@@ -1205,6 +1245,112 @@ function IABorrowAccess.installAnimatedObjectAccessHook()
 	--Logging.info("[%s] Borrow access AnimatedObjectActivatable access guard installed", IABorrowAccess.MOD_NAME)
 end
 
+--- Hook UnloadingStation:getIsFillAllowedFromFarm and LoadingStation:getIsFillAllowedToFarm —
+-- these are the actual silo access gates (NOT AccessHandler, which silos don't use).
+-- When an active field mission has marked a silo via markMissionSilo(), the owningPlaceable's
+-- uniqueId is in _missionAccessiblePlaceableIds — grant access regardless of ownerFarmId.
+function IABorrowAccess.installSiloStationAccessHook()
+	if IABorrowAccess._siloStationAccessHookInstalled == true then
+		return
+	end
+	if UnloadingStation == nil or LoadingStation == nil then
+		return
+	end
+
+	-- Unloading INTO silo (harvest delivery missions)
+	if UnloadingStation.getIsFillAllowedFromFarm ~= nil then
+		--local _origGetIsFillAllowedFromFarm = UnloadingStation.getIsFillAllowedFromFarm
+
+		UnloadingStation.getIsFillAllowedFromFarm = Utils.overwrittenFunction(
+			UnloadingStation.getIsFillAllowedFromFarm,
+			function(station, superFunc, farmId, ...)
+				local extra = {...}
+				--print(string.format("WRAPPER station=%s farmId=%s extraArgs=%d",
+				--	tostring(station ~= nil), tostring(farmId), #extra))
+
+				-- In getIsFillAllowedFromFarm hook:
+				if station.owningPlaceable ~= nil 
+					and station.owningPlaceable.uniqueId ~= nil 
+					and IABorrowAccess._missionAccessiblePlaceableIds[tostring(station.owningPlaceable.uniqueId)] then
+					return true  -- ← mission silo bypass
+				end
+
+				-- Call original directly (bypassing superFunc)
+				--local direct = _origGetIsFillAllowedFromFarm(station, farmId, ...)
+				-- Call through superFunc
+				local viaSuper = superFunc(station, farmId, ...)
+
+				--print(string.format("VGL direct=%s viaSuper=%s MATCH=%s",
+				--	tostring(direct), tostring(viaSuper), tostring(direct == viaSuper)))
+
+				return viaSuper
+			end
+		)
+		
+	end
+
+	-- Loading FROM silo (seed/fertilizer/lime consumable missions)
+	if LoadingStation.getIsFillAllowedToFarm ~= nil then
+		LoadingStation.getIsFillAllowedToFarm = Utils.overwrittenFunction(
+			LoadingStation.getIsFillAllowedToFarm,
+			function(station, superFunc, farmId, ...)
+				if station.owningPlaceable ~= nil
+					and station.owningPlaceable.uniqueId ~= nil
+					and IABorrowAccess._missionAccessiblePlaceableIds[tostring(station.owningPlaceable.uniqueId)] then
+					return true
+				end
+				return superFunc(station, farmId, ...)
+			end
+		)
+	end
+
+	 -- Secondary gate: hasFarmAccessToStorage (called internally by some fill operations)
+    if UnloadingStation.hasFarmAccessToStorage ~= nil then
+        --local _origHasFarmAccessToStorage = UnloadingStation.hasFarmAccessToStorage
+
+        UnloadingStation.hasFarmAccessToStorage = Utils.overwrittenFunction(
+            UnloadingStation.hasFarmAccessToStorage,
+            function(station, superFunc, storage, a, b)
+                --local extra = {...}
+               -- print(string.format("STORAGE WRAPPER station=%s storage=%s a=%s b=%s",
+               --     tostring(station ~= nil), tostring(storage ~= nil), tostring(a), tostring(b))) --#extra))
+
+				if station.owningPlaceable ~= nil and station.owningPlaceable.uniqueId ~= nil then
+					if IABorrowAccess._missionAccessiblePlaceableIds[tostring(station.owningPlaceable.uniqueId)] then
+						return true
+					end
+				end
+
+
+                --local direct = _origHasFarmAccessToStorage(station, storage, a, b)
+                local viaSuper = superFunc(station, storage, a, b)
+
+                --print(string.format("STORAGE VGL direct=%s viaSuper=%s MATCH=%s",
+                --    tostring(direct), tostring(viaSuper), tostring(direct == viaSuper)))
+
+                return viaSuper
+            end
+        )
+    end
+
+	if LoadingStation.hasFarmAccessToStorage ~= nil then
+		LoadingStation.hasFarmAccessToStorage = Utils.overwrittenFunction(
+			LoadingStation.hasFarmAccessToStorage,
+			function(station, superFunc, storage, a, b)
+				if station.owningPlaceable ~= nil and station.owningPlaceable.uniqueId ~= nil then
+					if IABorrowAccess._missionAccessiblePlaceableIds[tostring(station.owningPlaceable.uniqueId)] then
+						return true
+					end
+				end
+				return superFunc(station, storage, a, b)
+			end
+		)
+	end
+
+	IABorrowAccess._siloStationAccessHookInstalled = true
+	--Logging.info("[%s] Silo station access hooks installed (UnloadingStation.getIsFillAllowedFromFarm, LoadingStation.getIsFillAllowedToFarm, hasFarmAccessToStorage)", IABorrowAccess.MOD_NAME)
+end
+
 function IABorrowAccess.installValidateTypesHook()
 	if IABorrowAccess._validateTypesHookInstalled == true then
 		return
@@ -1230,6 +1376,7 @@ function IABorrowAccess.installValidateTypesHook()
 	IABorrowAccess.installAccessHandlerHook()
 	IABorrowAccess.installAccessHandlerOtherIdHook()
 	IABorrowAccess.installAnimatedObjectAccessHook()
+	IABorrowAccess.installSiloStationAccessHook()
 	--Logging.info("[%s] Borrow access validateTypes hook installed", IABorrowAccess.MOD_NAME)
 end
 
@@ -1269,6 +1416,7 @@ end
 
 -- File loaded by addSpecialization: install hooks when class is ready.
 IABorrowAccess.installValidateTypesHook()
-IABorrowAccess.installAccessHandlerHook()
-IABorrowAccess.installAccessHandlerOtherIdHook()
-IABorrowAccess.installAnimatedObjectAccessHook()
+--IABorrowAccess.installAccessHandlerHook()
+--IABorrowAccess.installAccessHandlerOtherIdHook()
+--IABorrowAccess.installAnimatedObjectAccessHook()
+--IABorrowAccess.installSiloStationAccessHook()

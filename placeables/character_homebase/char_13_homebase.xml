@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<placeable type="placeableFOSTool" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
+    <storeData>
+        <name>$l10n_fos_char_homebase_name_13</name>
+        <functions>
+            <function>$l10n_fos_char_homebase_desc_13</function>
+        </functions>
+        <image>placeables/character_homebase/store_char_13_homebase.dds</image>
+        <price>0</price>
+        <dailyUpkeep>0</dailyUpkeep>
+        <lifetime>1000</lifetime>
+        <rotation>0</rotation>
+        <brand>NONE</brand>
+        <species>PLACEABLE</species>
+        <category>decoration</category>
+        <brush>
+            <type>placeable</type>
+            <category>decoration</category>
+            <tab>decoration</tab>
+        </brush>
+        <canBeSold>true</canBeSold>
+        <showInStore>true</showInStore>
+        <vertexBufferMemoryUsage>13568</vertexBufferMemoryUsage>
+        <indexBufferMemoryUsage>5632</indexBufferMemoryUsage>
+        <textureMemoryUsage>327680</textureMemoryUsage>
+        <instanceVertexBufferMemoryUsage>0</instanceVertexBufferMemoryUsage>
+        <instanceIndexBufferMemoryUsage>0</instanceIndexBufferMemoryUsage>
+        <audioMemoryUsage>0</audioMemoryUsage>
+    </storeData>
+
+    <base>
+        <filename>placeables/place_character/place_character_public_place.i3d</filename>
+    </base>
+
+    <placement useRandomYRotation="false" useManualYRotation="true" >
+        <testAreas>
+            <testArea startNode="testAreaStart01" endNode="testAreaEnd01" />
+        </testAreas>
+        <sounds>
+            <place template="smallImp" pitchScale="1.6"/>
+        </sounds>
+    </placement>
+
+    <clearAreas>
+        <clearArea startNode="clearAreaStart01" widthNode="clearAreaWidth01" heightNode="clearAreaHeight01"/>
+    </clearAreas>
+
+    <leveling>
+        <levelAreas>
+            <levelArea startNode="levelAreaStart01" widthNode="levelAreaWidth01" heightNode="levelAreaHeight01"/>
+        </levelAreas>
+    </leveling>
+
+    <indoorAreas/>
+
+    <tipOcclusionUpdateAreas>
+        <tipOcclusionUpdateArea startNode="tipOcclusionUpdateAreaStart01" endNode="tipOcclusionUpdateAreaEnd01" />
+    </tipOcclusionUpdateAreas>
+
+    <ai>
+        <updateAreas>
+            <updateArea startNode="tipOcclusionUpdateAreaStart01" endNode="tipOcclusionUpdateAreaEnd01" />
+        </updateAreas>
+    </ai>
+	
+    <i3dMappings>
+        <i3dMapping id="testAreaStart01" node="0>0|0|0" />
+        <i3dMapping id="testAreaEnd01" node="0>0|0|0|0" />
+        <i3dMapping id="tipOcclusionUpdateAreaStart01" node="0>0|1|0" />
+        <i3dMapping id="tipOcclusionUpdateAreaEnd01" node="0>0|1|0|0" />
+        <i3dMapping id="clearAreaStart01" node="0>0|4|0" />
+        <i3dMapping id="clearAreaWidth01" node="0>0|4|0|0" />
+        <i3dMapping id="clearAreaHeight01" node="0>0|4|0|1" />
+        <i3dMapping id="levelAreaStart01" node="0>0|5|0" />
+        <i3dMapping id="levelAreaWidth01" node="0>0|5|0|0" />
+        <i3dMapping id="levelAreaHeight01" node="0>0|5|0|1" />
+    </i3dMappings>
+</placeable>

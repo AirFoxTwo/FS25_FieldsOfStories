@@ -83,6 +83,7 @@ function IANeighbourVehicle.new(uniqueId, farmId, neighbour)
 	-- Initialize all fields to nil/default values
 	self.xmlFilename = nil
 	self.externalId = nil
+	self.headerTrailerExternalId = nil
 	self.type = nil
 	self.category = nil
 	self.colorIndex = nil
@@ -424,7 +425,7 @@ end
 -- engine's Suspensions specialization has cached, producing the recurring
 -- "Failed to update suspension node X. Node does not exist anymore!" error as soon as the player gets
 -- within suspension update range. Instead we go through the Enterable spec's setVehicleCharacter(),
--- which swaps the driver cleanly (the same pattern FS25_PlayerWorkers uses without triggering the error).
+-- which swaps the driver cleanly (the same pattern the base game uses for player workers without triggering the error).
 function IANeighbourVehicle:applyVehicleCharacterStyle()
 	if self.vehicle == nil then
 		return
@@ -573,7 +574,7 @@ function IANeighbourVehicle:startAIJob(jobType, targetX, targetZ, farmlandId)
 			self:applyVehicleCharacterStyle()
 			IAprintDebug("IANeighbourVehicle:startAIJob()", "Started AI job", self.neighbour, self, nil)
 		end
-	elseif jobType == "FIELDWORK" or jobType == IAFieldwork.JobType.CULTIVATE or jobType == IAFieldwork.JobType.HARROW or jobType == IAFieldwork.JobType.SEED or jobType == IAFieldwork.JobType.HARVEST or IAFieldwork.isFertilizeJobType(jobType) or jobType == IAFieldwork.JobType.SPRAY or jobType == IAFieldwork.JobType.PLOW then
+	elseif jobType == "FIELDWORK" or jobType == IAFieldwork.JobType.CULTIVATE or jobType == IAFieldwork.JobType.HARROW or jobType == IAFieldwork.JobType.SEED or jobType == IAFieldwork.JobType.HARVEST or IAFieldwork.isFertilizeJobType(jobType) or jobType == IAFieldwork.JobType.SPRAY or jobType == IAFieldwork.JobType.PLOW or jobType == IAFieldwork.JobType.LIME or jobType == IAFieldwork.JobType.STONE_PICKING or jobType == IAFieldwork.JobType.GRASS_MOWING or jobType == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
 		-- Create a fieldwork job
 		local job = g_currentMission.aiJobTypeManager:createJob(AIJobType.FIELDWORK)
 		if job == nil then
@@ -941,9 +942,19 @@ function IANeighbourVehicle:mech_teleportToPose(pose)
 	self.rotation = rot
 	self.vehicle:removeFromPhysics()
 	local realX = MathUtil.round(self.realPositionX or 0, 0)
+	local realY = MathUtil.round(self.realPositionY or 0, 0)
 	local realZ = MathUtil.round(self.realPositionZ or 0, 0)
-	if realX ~= targetX or realZ ~= targetZ then
-		if self.vehicle.setWorldPosition ~= nil then
+	-- Compare X, Y, and Z so the teleport fires even when only the height differs
+	-- (e.g. header placed on top of a trailer at the same XZ but different Y).
+	if realX ~= targetX or realY ~= groundY or realZ ~= targetZ then
+		-- Determine whether the target Y is near terrain level or above it.
+		-- setRelativePosition(..., true) treats Y as a terrain-relative offset
+		-- (placeOnGround), so passing an absolute world Y would place the vehicle
+		-- at terrain + groundY — way up in the sky. Only use it when groundY is
+		-- close to the terrain surface.
+		local terrainY = (g_terrainNode ~= nil) and getTerrainHeightAtWorldPos(g_terrainNode, targetX, 0, targetZ) or groundY
+		local isNearTerrain = (math.abs(groundY - terrainY) <= 1.0)
+		if isNearTerrain and self.vehicle.setWorldPosition ~= nil then
 			self.vehicle:setRelativePosition(targetX, 0.5, targetZ, rot, true)
 		else
 			setTranslation(self.vehicle.rootNode, targetX, groundY, targetZ)
@@ -1729,7 +1740,23 @@ function IANeighbourVehicle:spawn(callbackFunction)
 	-- Create vehicle loading data
 	local data = VehicleLoadingData.new()
 	data:setFilename(self.xmlFilename)
-	data:setPosition(0,0,0)--self.positionX, spawnY, self.positionZ)
+	-- Offset each spawned vehicle by a deterministic hash of its filename so
+	-- no two different vehicle types overlap at origin.  Prevents
+	-- DynamicMountAttacher from finding overlapping header-trailer pairs
+	-- (e.g. fd250 + hdht52) and crashing because physics isn't ready.
+	local spawnHash = 0
+	if self.xmlFilename ~= nil then
+		for i = 1, #self.xmlFilename do
+			spawnHash = (spawnHash * 31 + string.byte(self.xmlFilename, i)) % 65521
+		end
+	end
+	local spawnX = (spawnHash % 997) - 498
+	local spawnZ = ((spawnHash // 256) % 997) - 498
+	local spawnY = 0
+	if g_terrainNode ~= nil and getTerrainHeightAtWorldPos ~= nil then
+		spawnY = getTerrainHeightAtWorldPos(g_terrainNode, spawnX, 0, spawnZ) + 150
+	end
+	data:setPosition(spawnX, spawnY, spawnZ)
 	data:setRotation(0, 0, 0)--self.rotation, 0)
 	--data:setPropertyState(VehiclePropertyState.OWNED)
 	if self.colorIndex ~= nil and self.colorIndex > 0 then

@@ -31,7 +31,8 @@ function IAFieldOutcomeMissionProbeEvaluator.fertilizeSprayTypeKeyMatches(fieldw
 	return false
 end
 
---- Spray contracts: expected and actual weedState both count as sprayed (FS25 uses 8; legacy missions may expect 7).
+--- Spray contracts: any post-herbicide "withered" weedState (7/8/9, incl. PF target 9) counts as sprayed.
+--- weedState 0 also passes: tramlines / Precision Farming spots with no crop have no weeds to spray either.
 function IAFieldOutcomeMissionProbeEvaluator.sprayWeedStateKeyMatches(fieldworkJobRaw, expectedIdx, actualIdx)
 	if IAFieldwork == nil or type(IAFieldwork.normalizeFieldworkJobType) ~= "function" then
 		return false
@@ -41,6 +42,11 @@ function IAFieldOutcomeMissionProbeEvaluator.sprayWeedStateKeyMatches(fieldworkJ
 	end
 	local e, a = tonumber(expectedIdx), tonumber(actualIdx)
 	if e ~= nil and a ~= nil and e == a then
+		return true
+	end
+	-- Precision Farming / tramlines: a bare spot with no crop also has no weeds (weedState 0).
+	-- It is already "clean", so treat it as sprayed instead of failing the probe.
+	if a ~= nil and a == 0 then
 		return true
 	end
 	if type(IAFieldwork.isPostHerbicideWeedState) == "function" then
@@ -125,6 +131,28 @@ local function keyMatchesExpected(fieldworkJobRaw, k, expected, actual)
 	return actual ~= nil and actual == expected
 end
 
+--- True when the raw fieldwork string normalizes to a job where a bare tramline spot (no seed,
+-- so no crop) has nothing left to do: harvest (nothing to harvest) or harrow (no stubble to work).
+function IAFieldOutcomeMissionProbeEvaluator.isTramlineJob(fieldworkJobRaw)
+	if IAFieldwork == nil or IAFieldwork.JobType == nil or type(IAFieldwork.normalizeFieldworkJobType) ~= "function" then
+		return false
+	end
+	local jt = IAFieldwork.normalizeFieldworkJobType(tostring(fieldworkJobRaw or ""))
+	return jt == IAFieldwork.JobType.HARVEST or jt == IAFieldwork.JobType.HARROW
+end
+
+--- True when a sampled FieldState has no fruit at all (fruitTypeIndex UNKNOWN and growthState 0),
+-- e.g. a tramline where the seeder skipped the row so there is no crop to harvest or cultivate.
+function IAFieldOutcomeMissionProbeEvaluator.probeHasNoFruit(probe)
+	if probe == nil then
+		return false
+	end
+	local unknown = (FruitType ~= nil and FruitType.UNKNOWN ~= nil) and tonumber(FruitType.UNKNOWN) or 0
+	local fti = tonumber(probe.fruitTypeIndex)
+	local gs = tonumber(probe.growthState)
+	return (fti == nil or fti == 0 or fti == unknown) and (gs == nil or gs == 0)
+end
+
 --- True when every key in `expected` is satisfied by `probe` (same FieldState key names).
 -- @param table|nil expected contract subset (numeric FieldState keys)
 -- @param string|nil fieldworkJobRaw for fertilize-only sprayType equivalence
@@ -141,6 +169,12 @@ function IAFieldOutcomeMissionProbeEvaluator.probeSatisfiesExpected(expected, fi
 	end
 	if not hasAny then
 		return false
+	end
+	-- Tramline / Precision Farming: a spot with no crop has nothing to harvest or work, so it
+	-- already satisfies the outcome instead of failing the fruitTypeIndex/growthState/groundType keys.
+	if IAFieldOutcomeMissionProbeEvaluator.isTramlineJob(fieldworkJobRaw)
+		and IAFieldOutcomeMissionProbeEvaluator.probeHasNoFruit(probe) then
+		return true
 	end
 	for k, exp in pairs(expected) do
 		if not keyMatchesExpected(fieldworkJobRaw, k, exp, probe[k]) then

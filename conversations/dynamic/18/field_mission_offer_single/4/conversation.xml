@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<conversation>
+	<entry id="1" previousId="0" speaker="npc"
+		text_en="Hey neighbor, could you help me out? {jobType} still needs doing and it's about {totalHectares} hectares all together."
+		text_de="Hey Nachbar, kannst du mir aushelfen? {jobType} muss noch gemacht werden und es sind insgesamt etwa {totalHectares} Hektar."
+		callbackOnPlaybackEnd="">
+		<voiceSegments>
+			<segment type="named" id="dm4_1_1"/>
+			<segment type="variable" name="jobType"/>
+			<segment type="named" id="dm4_1_2"/>
+			<segment type="variable" name="totalHectares"/>
+			<segment type="named" id="dm4_1_3"/>
+		</voiceSegments>
+	</entry>
+	<entry id="2" previousId="1" speaker="player"
+		text_en="Sure, I'll get on it."
+		text_de="Klar, ich kümmere mich drum."
+		callbackOnSelectImmediate="accept">
+		<voiceSegments>
+			<segment type="named" id="dm4_2_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="3" previousId="1" speaker="player"
+		text_en="Happy to help if i can take {vehicleNameWithArticle}."
+		text_de="Gerne, wenn ich {vehicleNameWithArticle} abholen kann."
+		callbackOnSelectImmediate="accept_with_equipment">
+		<voiceSegments>
+			<segment type="named" id="dm4_3_1"/>
+			<segment type="variable" name="vehicleNameWithArticle"/>
+			<segment type="named" id="dm4_3_2"/>
+		</voiceSegments>
+	</entry>
+	<entry id="6" previousId="1" speaker="player"
+		text_en="Sorry, I can't squeeze it in right now."
+		text_de="Tut mir leid, ich bekomme das gerade nicht unter."
+		callbackOnSelectImmediate="decline">
+		<voiceSegments>
+			<segment type="named" id="dm4_6_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="7" previousId="2" speaker="npc"
+		text_en="Appreciate it. I'll mark the fields for you. {extraRefillNote}"
+		text_de="Weiß ich zu schätzen. Ich markiere die Felder für dich. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm4_7_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="8" previousId="3" speaker="npc"
+		text_en="That's perfectly fine. Take whatever you need from the shed. {extraRefillNote}"
+		text_de="Das ist völlig in Ordnung. Nimm dir, was du aus dem Schuppen brauchst. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm4_8_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="9" previousId="6" speaker="npc"
+		text_en="No problem at all. Maybe next time."
+		text_de="Ganz und gar kein Problem. Vielleicht beim nächsten Mal."
+		callbackOnPlaybackEnd="after_decline">
+		<voiceSegments>
+			<segment type="named" id="dm4_9_1"/>
+		</voiceSegments>
+	</entry>
+</conversation>

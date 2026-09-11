@@ -1,10 +1,10 @@
 ﻿--
 -- FS25 - InteractiveNeighbours
 --
--- @Interface: 1.0.0.1
+-- @Interface: 1.0.0.5
 -- @Author: AirFoxTwo
--- @Date: 27.06.2026
--- @Version: 1.0.0.1
+-- @Date: 19.07.2026
+-- @Version: 1.0.0.5
 
 IANeighbours = {}
 IANeighbours.dir = g_currentModDirectory
@@ -36,6 +36,7 @@ IANeighbours.canStartConversation = false
 --- Previous frame g_inGameMenu.isOpen; used to run conversation GUI cleanup when the menu closes.
 IANeighbours._prevInGameMenuOpen = false
 IANeighbours.vehicleIdMapping = {} -- Maps externalId -> uniqueId
+IANeighbours.placeableIdMapping = {} -- Maps externalId -> uniqueId for placeables
 IANeighbours.debugPoints = {}
 IANeighbours.savegameEventsBound = false
 IANeighbours.outboundXMLLoaded = false  -- Flag to track if outbound XML has been loaded once
@@ -51,7 +52,7 @@ IANeighbours.pendingMapPlacesBootstrap = false  -- No map config: wait for user 
 IANeighbours.mapPlacesBootstrapDialogShown = false  -- true after showDialog queued successfully (retry if show failed)
 IANeighbours.firstLoadTutorialDialogShown = false -- true after showDialog queued successfully
 -- Voice pack: expected version in modSettings/.../conversations/voice_pack_version.xml (see loadData check in IAXMLHelper)
-IANeighbours.requiredVoicePackVersion = "1.1.0"
+IANeighbours.requiredVoicePackVersion = "1.2.0"
 IANeighbours.pendingVoicePackWarning = false
 IANeighbours.voicePackWarningNotificationShown = false
 --- True after voice_pack_version.xml matches requiredVoicePackVersion; false until check runs or on mismatch/missing. IAConversation skips audio when false.
@@ -66,13 +67,15 @@ IANeighbours.debugVehiclePresencePositions = false
 IANeighbours.debugFieldworkBorderGeometry = false
 --- When true, draw FoS phone field-outcome mission probe markers (V/I samples). Toggle: `iaToggleFieldMissionProbeDebug`.
 IANeighbours.debugFieldMissionProbes = false
+--- When true, draw 0.5m-grid grass foliage fill level debug points for active GRASS_MOWING missions. Toggle: `iaToggleGrassFoliageDebug`.
+IANeighbours.debugGrassFoliageFill = false
 --- Per-frame profiling: when IANeighbours:update wall-clock time exceeds this many ms, the elapsed time is printed.
 --- Set to nil to always print, or to a large value to effectively disable.
 IANeighbours.frameTimeLogThresholdMs = 2
 -- Map-init debug: wireframe sphere radius (visual only; overlapSphere for blocking still uses PLACE_COLLISION_CHECK_RADIUS).
 IANeighbours.collisionProbeSpheres = {}
 IANeighbours.DebugAiFarmId = nil
--- On-foot situation: public_place parking slots reserved this frame (see isPlaceBlocked forPublicPlaceParkingSelection + reserveRoadsideParkingSlot) to avoid multiple NPCs at same map place
+-- On-foot situation: public_place parking slots reserved this frame (see isPlaceBlocked forPublicPlaceParkingSelection + reserveRoadsideParkingSliot) to avoid multiple NPCs at same map place
 IANeighbours.roadsideParkingReservedKeys = {}
 
 -- Cached PlayerStyle configs for HumanModel neighbours (copyConfigurationFrom per spawn; cleared on remove-mod).
@@ -127,6 +130,11 @@ IANeighbours._wallClockSec = 0
 IANeighbours.GLOBAL_INBOUND_PHONE_COOLDOWN_SEC = 180
 --- Inbound phone may open again once `_wallClockSec` reaches this value (any character).
 IANeighbours._globalInboundPhoneCooldownUntilWallClockSec = IANeighbours.GLOBAL_INBOUND_PHONE_COOLDOWN_SEC
+--- Recurring real-time warning cooldown (seconds) while any homebase setup is incomplete.
+--- Starts at 60 s for the first warning, then raised to 600 s after the first warning is shown.
+IANeighbours._homebaseSetupWarningCooldownSec = 60
+--- Real-time accumulator (seconds) driving the homebase setup warning (reset on each fire).
+IANeighbours._homebaseSetupWarningAccumSec = 0
 
 IANeighbours.mapInitJob = nil
 IANeighbours.mapInitDialogKeybind = nil
@@ -157,10 +165,17 @@ IANeighbours.PLACE_DEBUG_BOX_LENGTH_ATTACH = 15  -- box length when withAttachme
 IANeighbours.PLACE_DEBUG_BOX_LENGTH_OVERSIZE = 10  -- box length when sizeType == "oversize_vehicle" (bigger than vehicle+attachment)
 IANeighbours.PLACE_DEBUG_BOX_LENGTH_LARGE_AREA = 22.5  -- box length when sizeType == "large_area" (vehicle+attachment length + 50%)
 IANeighbours.PLACE_DEBUG_SIDE_LARGE_AREA = 4.5    -- box half-width when sizeType == "large_area" (3x PLACE_DEBUG_SIDE_M)
+IANeighbours.PLACE_DEBUG_BOX_LENGTH_SILO = 4     -- box length when sizeType == "silo" (farmer silo building)
+IANeighbours.PLACE_DEBUG_SIDE_SILO = 2.0          -- box half-width when sizeType == "silo"
 --- For vehicle+attachment places: two extra collision probes along local −Z (rear of debug box), at this fraction of the back segment length (center→rear edge). Matches IAHelper_computePlaceDebugBoxCorners back = boxLength − PLACE_DEBUG_FRONT_M.
 IANeighbours.PLACE_ATTACH_BACK_PROBE_FRACTIONS = { 1 / 4, 2 / 4, 3 / 4 }
 IANeighbours.mapInitPlaceDebugParents = {}  -- legacy: { parentNode } per place (corner boxes now drawn as lines, not scene nodes)
 IANeighbours.mapInitPlaceDebugBoxes = {}    -- { corners = {{x,y,z} x4}, centerX, centerY, centerZ } drawn per-frame as connected lines (borrow-return box style)
+
+--- Placeable tool size index: cycled via the "Fields of Stories: Place Size Selection" keybind.
+-- 1=character, 2=vehicle, 3=vehicle_attachment, 4=oversize_vehicle, 5=large_area, 6=silo
+IANeighbours.placeableToolSizeIndex = 1
+IANeighbours.PLACEABLE_TOOL_MAX_SIZE = 6
 
 --- Default radius (m) for place collision check - small sphere at place position.
 IANeighbours.PLACE_COLLISION_CHECK_RADIUS = 0.5
@@ -193,11 +208,14 @@ source(IANeighbours.dir .. "gui/IAMapInitDialogGUI.lua")
 source(IANeighbours.dir .. "gui/IAMapPlacesGenDialogGUI.lua")
 source(IANeighbours.dir .. "gui/IAMapFirstLoadTutorialDialogGUI.lua")
 source(IANeighbours.dir .. "gui/IAPhoneDialogGUI.lua")
+source(IANeighbours.dir .. "gui/ConstructionFoSGUI.lua")
+source(IANeighbours.dir .. "gui/IABulkRemoveConfirmGUI.lua")
 source(IANeighbours.dir .. "IAConversation.lua")
 source(IANeighbours.dir .. "IANeighbourDynamicConversationData.lua")
 source(IANeighbours.dir .. "XMLHelper.lua")
 source(IANeighbours.dir .. "IANeighbour.lua")
 source(IANeighbours.dir .. "IANeighbourVehicle.lua")
+source(IANeighbours.dir .. "IANeighbourPlaceable.lua")
 source(IANeighbours.dir .. "IAEquipmentPresence.lua")
 source(IANeighbours.dir .. "IAAIJob.lua")
 source(IANeighbours.dir .. "IAFieldwork.lua")
@@ -210,7 +228,30 @@ source(IANeighbours.dir .. "IAMapInitJob.lua")
 source(IANeighbours.dir .. "IAHomebaseParking.lua")
 source(IANeighbours.dir .. "IAGameLoopHelper.lua")
 source(IANeighbours.dir .. "IAFieldOutcomeMission.lua")
+source(IANeighbours.dir .. "IATargetMapHotspot.lua")
+source(IANeighbours.dir .. "IAHud.lua")
+local ok_placeable, err_placeable = pcall(function()
+	source(IANeighbours.dir .. "IAPlaceableHelper.lua")
+end)
+if not ok_placeable then
+	print("[IANeighbours] ERROR sourcing IAPlaceableHelper.lua: " .. tostring(err_placeable))
+end
+
+local ok_detector, err_detector = pcall(function()
+	source(IANeighbours.dir .. "IAPlaceablePlacementDetector.lua")
+end)
+if not ok_detector then
+	print("[IANeighbours] ERROR sourcing IAPlaceablePlacementDetector.lua: " .. tostring(err_detector))
+end
+
+local ok_delivery_helper, err_delivery_helper = pcall(function()
+	source(IANeighbours.dir .. "IAFieldOutcomeDeliveryHelper.lua")
+end)
+if not ok_delivery_helper then
+	print("[IANeighbours] ERROR sourcing IAFieldOutcomeDeliveryHelper.lua: " .. tostring(err_delivery_helper))
+end
 source(IANeighbours.dir .. "IAMissionBorrow.lua")
+source(IANeighbours.dir .. "IAForceCompleteContract.lua")
 source(IANeighbours.dir .. "IASettings.lua")
 if IANeighbours.debug then
 	source(IANeighbours.dir .. "lib/testFramework/IATestRunner.lua")
@@ -258,11 +299,24 @@ function IANeighbours:loadMap()
 	-- Initialize IAPlacesLoader (loads all places into IANeighbours.places from XML + init + placeables)
 	IANeighbours.placesLoader = IAPlacesLoader.new(IANeighbours)
 	
+	-- Seed the placeable placement detector with existing placeables (so savegame reloads don't re-process)
+	if IAPlaceablePlacementDetector ~= nil then
+		IAPlaceablePlacementDetector:seedFromExistingPlaceables()
+	end
+
 	-- Initialize IAGameLoopHelper
 	IANeighbours.gameLoopHelper = IAGameLoopHelper.new(IANeighbours)
 
+	-- Pre-register farmer NPC keys in g_npcManager.nameToNPC before the engine loads
+	-- savegame npc.xml, which happens after loadMap() returns and before update().
+	IANeighbours:preRegisterFarmerNpcNames()
+
 	if IAFieldOutcomeMission ~= nil and type(IAFieldOutcomeMission.registerWithMissionManager) == "function" then
 		IAFieldOutcomeMission.registerWithMissionManager()
+	end
+
+	if IAForceCompleteContract ~= nil and type(IAForceCompleteContract.install) == "function" then
+		IAForceCompleteContract.install()
 	end
 
 	-- Lift active mission cap (vanilla uses hasFarmReachedMissionLimit and MAX_MISSIONS for generation/UI).
@@ -279,17 +333,36 @@ function IANeighbours:loadMap()
 
 	-- Map init job (used for map init spawn and for update-driven debug, e.g. map nodes debug)
 	IANeighbours.mapInitJob = IAMapInitJob.new(self)
+
+	-- Map init job (used for map init spawn and for update-driven debug, e.g. map nodes debug)
+	IANeighbours.mapInitJob = IAMapInitJob.new(self)
 	IAMapInitJob.getMapReferenceData() --initialize the map reference data by triggering the map async data loading
 	
 	--g_currentMission.aiSystem:consoleCommandAIEnableDebug()
 
 	if addConsoleCommand ~= nil then
 		addConsoleCommand("iaForceFieldwork", "Fields of Stories: force a neighbour into a fieldwork situation", "consoleCommandIaForceFieldwork", IANeighbours, "[index|id|name]")
+		addConsoleCommand("iaRebuildSchedule", "Fields of Stories: rebuild a neighbour's daily fieldwork schedule (regenerates contract offers)", "consoleCommandIaRebuildSchedule", IANeighbours, "[index|id|name]")
 		addConsoleCommand("iaForceSituation", "Fields of Stories: force a neighbour into a specific situation (if eligible)", "consoleCommandIaForceSituation", IANeighbours, "[index|id|name]; [situationId]")
+		addConsoleCommand("iaTriggerNextCall", "Fields of Stories: trigger the next incoming phone call now (bypasses cooldowns)", "consoleCommandIaTriggerNextCall", IANeighbours, "[neighbour index|id|name]")
 		addConsoleCommand("iaToggleVehiclePresenceDebug", "Fields of Stories: toggle map-wide vehicle/attachment presence debug markers", "consoleCommandIaToggleVehiclePresenceDebug", IANeighbours)
 		addConsoleCommand("iaToggleFieldworkBorderDebug", "Fields of Stories: toggle fieldwork border/alignment debug markers (all active fieldworks)", "consoleCommandIaToggleFieldworkBorderDebug", IANeighbours)
 		addConsoleCommand("iaToggleFieldMissionProbeDebug", "Fields of Stories: toggle field-outcome mission probe debug markers (active phone contracts)", "consoleCommandIaToggleFieldMissionProbeDebug", IANeighbours)
+		addConsoleCommand("iaToggleGrassFoliageDebug", "Fields of Stories: toggle 0.5m-grid grass foliage fill level debug markers (GRASS_MOWING missions)", "consoleCommandIaToggleGrassFoliageDebug", IANeighbours)
+		addConsoleCommand("iaShowFieldProbes", "Fields of Stories: show ring+grid probe debug markers for a field by farmland ID", "consoleCommandIaShowFieldProbes", IANeighbours, "[farmlandId]")
 		addConsoleCommand("iaDumpGrowthStates", "Fields of Stories: dump all growth state names via getFruitTypeGrowthStateName (optional fruit name filter)", "consoleCommandIaDumpGrowthStates", IANeighbours, "[fruitName]")
+		addConsoleCommand("iaDumpSeedCalendar", "Fields of Stories: dump current month/period + planting calendar for all fruit types", "consoleCommandIaDumpSeedCalendar", IANeighbours, "[fruitNameFilter]")
+		addConsoleCommand("iaSpawnPlaceable", "Fields of Stories: spawn a placeable at the player position (optional: xmlFilename)", "consoleCommandIaSpawnPlaceable", IANeighbours, "[xmlFilename]")
+		addConsoleCommand("iaSiloAccessTest", "Fields of Stories (TEMP): test silo access — dump silo data for current mission's farmer", "consoleCommandIaSiloAccessTest", IANeighbours)
+		addConsoleCommand("iaSiloSetForeign", "Fields of Stories (TEMP): set foreignSilo=true on all farmer silos", "consoleCommandIaSiloSetForeign", IANeighbours)
+		addConsoleCommand("iaSiloSetFarm1", "Fields of Stories (TEMP): set ownerFarmId=1 on all farmer silos (revert with iaSiloSetFarm99)", "consoleCommandIaSiloSetFarm1", IANeighbours)
+		addConsoleCommand("iaSiloSetFarm99", "Fields of Stories (TEMP): restore ownerFarmId=99 on all farmer silos", "consoleCommandIaSiloSetFarm99", IANeighbours)
+		addConsoleCommand("iaSiloStationFarm1", "Fields of Stories (TEMP): set unloadingStation+loadingStation.ownerFarmId=1 on all silos", "consoleCommandIaSiloStationFarm1", IANeighbours)
+		addConsoleCommand("iaSiloStationRestore", "Fields of Stories (TEMP): restore unloadingStation+loadingStation.ownerFarmId on all silos", "consoleCommandIaSiloStationRestore", IANeighbours)
+		addConsoleCommand("iaSiloDumpFuncs", "Fields of Stories (TEMP): dump all functions on unloadingStation, loadingStation, storageSystem to find access gate", "consoleCommandIaSiloDumpFuncs", IANeighbours)
+		addConsoleCommand("iaSiloHookTest", "Fields of Stories (TEMP): test silo access hooks — show status, mark/unmark a silo, verify getIsFillAllowedFromFarm", "consoleCommandIaSiloHookTest", IANeighbours)
+		addConsoleCommand("iaCyclePlaceSize", "Fields of Stories: cycle placeable tool size (1-5) for construction preview", "consoleCommandIaCyclePlaceSize", IANeighbours)
+		addConsoleCommand("iaHarvestTrack", "Fields of Stories (TEMP): show harvest tracking state for all active FoS missions", "consoleCommandIaHarvestTrack", IANeighbours)
 		-- Performance debugging console commands
 		addConsoleCommand("iaPerfToggleNeighbours", "Fields of Stories: toggle skipNeighbourUpdate (disable all neighbour per-frame updates)", "consoleCommandIaPerfToggleNeighbours", IANeighbours)
 		addConsoleCommand("iaPerfToggleDebugDrawing", "Fields of Stories: toggle skipDebugDrawing (disable all per-frame debug visual overlays)", "consoleCommandIaPerfToggleDebugDrawing", IANeighbours)
@@ -301,6 +374,12 @@ function IANeighbours:loadMap()
 		addConsoleCommand("iaCombinePipeInfo", "Fields of Stories (TEMP): print nearest combine pipe (auger) state fields", "consoleCommandIaCombinePipeInfo", IANeighbours)
 		addConsoleCommand("iaFoldCombinePipe", "Fields of Stories (TEMP): fold the nearest combine's auger pipe in", "consoleCommandIaFoldCombinePipe", IANeighbours)
 		addConsoleCommand("iaUnfoldCombinePipe", "Fields of Stories (TEMP): unfold the nearest combine's auger pipe out", "consoleCommandIaUnfoldCombinePipe", IANeighbours)
+
+		addConsoleCommand("iaOpenConstruction", "Open the construction menu", "consoleCommandIaOpenConstruction", IANeighbours)
+
+		addConsoleCommand("iaHudForceShow", "Fields of Stories: force the construction-place HUD overlay to stay visible (toggle)", "consoleCommandIaHudForceShow", IANeighbours)
+		addConsoleCommand("iaHudDebugDraw", "Fields of Stories: toggle per-frame debug logging from the HUD draw hook", "consoleCommandIaHudDebugDraw", IANeighbours)
+
 	end
 
 	-- Mod settings: load persisted values and register the in-game settings page UI
@@ -315,7 +394,7 @@ function IANeighbours:loadMap()
 		IABorrowAccess.registerConsoleCommands()
 	end
 
-	if IANeighbours.debug then
+	if IANeighbours.debug and IATestRunner ~= nil then
 		IATestRunner.registerConsoleCommands()
 	end
 
@@ -328,6 +407,14 @@ function IANeighbours:loadMap()
 		if texPath ~= nil and texPath ~= "" and fileExists(texPath) then
 			g_overlayManager:addTextureConfigFile(texPath, "iaPhone")
 			IANeighbours._phoneGuiTextureRegistered = true
+		end
+	end
+
+	-- Register construction-menu category icon atlas (textures/iaConstructionFoS.xml)
+	if g_overlayManager ~= nil and g_overlayManager.addTextureConfigFile ~= nil then
+		local conFoSAtlas = Utils.getFilename("textures/iaConstructionFoS.xml", IANeighbours.dir)
+		if conFoSAtlas ~= nil and conFoSAtlas ~= "" and fileExists(conFoSAtlas) then
+			g_overlayManager:addTextureConfigFile(conFoSAtlas, "iaConstructionFoS")
 		end
 	end
 
@@ -433,6 +520,22 @@ function IANeighbours:loadMap()
 			g_inputBinding:setActionEventTextVisibility(IANeighbours.mapNodeFocusNextI3dKeybind, false)
 			g_inputBinding:setActionEventActive(IANeighbours.mapNodeFocusNextI3dKeybind, true)
 		end
+
+		-- Placeable tool size selection keybind: cycles IANeighbours.placeableToolSizeIndex (1-5).
+		-- Visible only when the construction screen is open and a Fields of Stories tool placeable is selected.
+		-- triggerAlways=true is required because the construction screen sets its own input context.
+		if InputAction ~= nil and InputAction.IAPlaceSizeSelect ~= nil then
+			_, IANeighbours.placeSizeKeybind = g_inputBinding:registerActionEvent(InputAction.IAPlaceSizeSelect, selfx, function ()
+				
+				IAprintDebug("placeSizeKeybind", "triggered", nil, nil, nil)
+				IANeighbours:cyclePlaceableToolSize()
+			end, false, true, true, true)
+			g_inputBinding:setActionEventTextPriority(IANeighbours.placeSizeKeybind, GS_PRIO_VERY_HIGH)
+			g_inputBinding:setActionEventTextVisibility(IANeighbours.placeSizeKeybind, true)
+			g_inputBinding:setActionEventActive(IANeighbours.placeSizeKeybind, false)  -- only active when construction screen open
+		else
+			print("[IANeighbours] WARNING: InputAction.IAPlaceSizeSelect not found — place size keybind not registered")
+		end
 	end
 	PlayerInputComponent.registerGlobalPlayerActionEvents = Utils.overwrittenFunction(
 		PlayerInputComponent.registerGlobalPlayerActionEvents, addPlayerActionEvents)
@@ -465,6 +568,16 @@ function IANeighbours:loadMap()
 	end
 
 	IANeighbours.initPlayerStyleTemplates()
+
+	-- Install construction-menu hooks for Fields of Stories category (placeables)
+	if ConstructionFoSGUI ~= nil and ConstructionFoSGUI.installHooks ~= nil then
+		ConstructionFoSGUI.installHooks()
+	end
+
+	-- Install in-game HUD overlay (shown when FoS tool placeable selected in construction menu)
+	if IAHud ~= nil and IAHud.installHooks ~= nil then
+		IAHud.installHooks()
+	end
 
 	--IANeighbours:loadInitialNpcs()
 
@@ -540,6 +653,84 @@ function IANeighbours.initPlayerStyleTemplates()
 	IANeighbours.femaleStyleTemplate = f
 end
 
+--- Read the scenario XML and create real NPC engine objects for every farmer neighbour,
+--- registering them in g_npcManager BEFORE the engine loads savegame npc.xml.
+--- The NPCs are stored in self._preRegisteredNpcs[id] so registerFarmerNPCs() can
+--- reassign them to the neighbour objects once those are loaded.
+function IANeighbours:preRegisterFarmerNpcNames()
+	if g_npcManager == nil or g_npcManager.nameToNPC == nil then
+		return
+	end
+	if self._preRegisteredNpcs ~= nil then
+		return  -- already done
+	end
+	local scenarioPath = Utils.getFilename("default_scenarios/fields_of_stories_scenario.xml", self.dir)
+	if scenarioPath == nil or scenarioPath == "" or not fileExists(scenarioPath) then
+		if IANeighbours.debug then
+			print("--- IANeighbours:preRegisterFarmerNpcNames() - scenario file not found: " .. tostring(scenarioPath))
+		end
+		return
+	end
+	local xmlFile = loadXMLFile("IANeighboursScenarioPreReg", scenarioPath)
+	if xmlFile == nil then
+		return
+	end
+
+	-- Find next NPC index (same logic as registerFarmerNPCs)
+	local nextIndex = 0
+	if g_npcManager.npcs ~= nil then
+		for i = 1, #g_npcManager.npcs do
+			if g_npcManager.npcs[i] ~= nil then
+				nextIndex = i
+			end
+		end
+		nextIndex = nextIndex + 1
+	else
+		nextIndex = 1
+	end
+
+	self._preRegisteredNpcs = {}
+	local rootKey = "scenario.neighbours"
+	local i = 0
+	local count = 0
+	while true do
+		local neighbourKey = rootKey .. ".neighbour(" .. i .. ")"
+		local nid = getXMLInt(xmlFile, neighbourKey .. "#id", nil)
+		if nid == nil then
+			break
+		end
+		local job = getXMLString(xmlFile, neighbourKey .. "#job", nil)
+		local role = getXMLString(xmlFile, neighbourKey .. "#role", nil)
+		if job == "Farmer" and role == "Neighbour" then
+			local npcKey = "FARMER_NPC_" .. tostring(nid)
+			local npcName = getXMLString(xmlFile, neighbourKey .. "#name", nil) or ("Farmer " .. tostring(nid))
+			local npcIndex = nextIndex + count
+			local imagePath = Utils.getFilename("images/" .. tostring(nid) .. ".dds", self.dir)
+
+			local ok, npc = pcall(function()
+				local npcObj = NPC.new()
+				npcObj:load("dataS2/npc/farmer/farmer.xml", npcKey, npcName)
+				npcObj.index = npcIndex
+				npcObj.name = npcKey
+				npcObj.title = npcName
+				npcObj.imageFilename = imagePath
+				return npcObj
+			end)
+			if ok and npc ~= nil then
+				IAHelper_registerNpcInManager(npc, npcIndex)
+				g_npcManager.nameToNPC[npcKey] = npc
+				self._preRegisteredNpcs[nid] = npc
+				count = count + 1
+			end
+		end
+		i = i + 1
+	end
+	delete(xmlFile)
+	if IANeighbours.debug then
+		print("--- IANeighbours:preRegisterFarmerNpcNames() - pre-registered " .. count .. " farmer NPCs")
+	end
+end
+
 function IANeighbours:registerFarmerNPCs()
 	-- Find existing max NPC index in g_npcManager
 	local nextIndex = 0
@@ -575,41 +766,44 @@ function IANeighbours:registerFarmerNPCs()
 		local npcImage = neighbour:_characterPortraitImagePathForMap()
 		
 		IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: npcIndex=" .. npcIndex .. " npcKey=" .. npcKey .. " npcName=" .. npcName, nil, nil, nil)
-		
-		-- Ensure existing registered NPC also has its index set (from a previous registration, e.g. save reload)
-		if neighbour.registeredNpc ~= nil then
-			neighbour.registeredNpc.index = npcIndex
-			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: NPC fuer " .. neighbour.name .. " existiert bereits, update Index auf " .. npcIndex, nil, nil, nil)
-			IAHelper_registerNpcInManager(neighbour.registeredNpc, npcIndex)
-		end
-		
-		IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: Erstelle NPC " .. npcIndex .. " fuer " .. neighbour.name .. " (key=" .. npcKey .. ")", nil, nil, nil)
-		
-		-- Create and load a REAL engine NPC object
-		local success, npc = pcall(function()
-			local npcObj = NPC.new()
-			npcObj:load("dataS2/npc/farmer/farmer.xml", npcKey, npcName)
-			npcObj.index = npcIndex  -- Important for farmland.npcIndex assignment in updateFarmlands()
-			npcObj.title = npcName
-			npcObj.imageFilename = npcImage
-			return npcObj
-		end)
-		
-		if success and npc ~= nil then
-			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: NPC geladen fuer " .. neighbour.name .. " mit Index " .. npcIndex, nil, nil, nil)
-			
-			-- Register in g_npcManager via helper (encapsulates direct g_npcManager access)
-			IAHelper_registerNpcInManager(npc, npcIndex)
-			if g_npcManager ~= nil and g_npcManager.nameToNPC ~= nil then
-				g_npcManager.nameToNPC[npcKey] = npc
-			end
-			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: NPC-Index " .. npcIndex .. " = " .. tostring(npc) .. " registriert in g_npcManager fuer " .. neighbour.name, nil, nil, nil)
-			
-			-- Store reference on the neighbour object
-			neighbour.registeredNpc = npc
+
+		-- Reuse NPC already created by preRegisterFarmerNpcNames() during loadMap()
+		local preNpc = self._preRegisteredNpcs ~= nil and self._preRegisteredNpcs[neighbour.id] or nil
+		if preNpc ~= nil then
+			neighbour.registeredNpc = preNpc
+			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: reused pre-registered NPC for " .. neighbour.name, nil, nil, nil)
 		else
-			local errMsg = tostring(npc)
-			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: FEHLGESCHLAGEN fuer " .. npcName .. ": " .. errMsg, nil, nil, nil)
+			-- Ensure existing registered NPC also has its index set (from a previous registration, e.g. save reload)
+			if neighbour.registeredNpc ~= nil then
+				neighbour.registeredNpc.index = npcIndex
+				IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: NPC fuer " .. neighbour.name .. " existiert bereits, update Index auf " .. npcIndex, nil, nil, nil)
+				IAHelper_registerNpcInManager(neighbour.registeredNpc, npcIndex)
+			end
+
+			IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: Erstelle NPC " .. npcIndex .. " fuer " .. neighbour.name .. " (key=" .. npcKey .. ")", nil, nil, nil)
+
+			-- Create and load a REAL engine NPC object
+			local success, npc = pcall(function()
+				local npcObj = NPC.new()
+				npcObj:load("dataS2/npc/farmer/farmer.xml", npcKey, npcName)
+				npcObj.index = npcIndex  -- Important for farmland.npcIndex assignment in updateFarmlands()
+				npcObj.name = npcKey     -- Override XML template default ("Unknown NPC"); must match nameToNPC key so save/reload resolves
+				npcObj.title = npcName
+				npcObj.imageFilename = npcImage
+				return npcObj
+			end)
+
+			if success and npc ~= nil then
+				IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: NPC geladen fuer " .. neighbour.name .. " mit Index " .. npcIndex, nil, nil, nil)
+				IAHelper_registerNpcInManager(npc, npcIndex)
+				if g_npcManager ~= nil and g_npcManager.nameToNPC ~= nil then
+					g_npcManager.nameToNPC[npcKey] = npc
+				end
+				neighbour.registeredNpc = npc
+			else
+				local errMsg = tostring(npc)
+				IAprintDebug("IANeighbours:registerFarmerNPCs()", "- registerFarmerNPCs: FEHLGESCHLAGEN fuer " .. npcName .. ": " .. errMsg, nil, nil, nil)
+			end
 		end
 	end
 	
@@ -738,6 +932,38 @@ function IANeighbours:consoleCommandIaToggleFieldMissionProbeDebug()
 	end
 end
 
+--- Developer console: iaToggleGrassFoliageDebug
+function IANeighbours:consoleCommandIaToggleGrassFoliageDebug()
+	IANeighbours.debugGrassFoliageFill = not IANeighbours.debugGrassFoliageFill
+	print("[iaToggleGrassFoliageDebug] debugGrassFoliageFill=" .. tostring(IANeighbours.debugGrassFoliageFill))
+	if IAFieldOutcomeMission ~= nil and type(IAFieldOutcomeMission.syncGrassFoliageDebugMarkersForAllActive) == "function" then
+		IAFieldOutcomeMission.syncGrassFoliageDebugMarkersForAllActive()
+	end
+end
+
+--- Developer console: iaShowFieldProbes [farmlandId]
+function IANeighbours:consoleCommandIaShowFieldProbes(farmlandIdStr)
+	local farmlandId = tonumber(farmlandIdStr)
+	if farmlandId == nil then
+		print("[iaShowFieldProbes] usage: iaShowFieldProbes <farmlandId>")
+		return
+	end
+	if IAHelper_getFieldForFarmlandId == nil then
+		print("[iaShowFieldProbes] IAHelper_getFieldForFarmlandId not available")
+		return
+	end
+	local field = IAHelper_getFieldForFarmlandId(farmlandId)
+	if field == nil then
+		print("[iaShowFieldProbes] no field found for farmlandId=" .. tostring(farmlandId))
+		return
+	end
+	if IAHelper_showFieldProbesDebug == nil then
+		print("[iaShowFieldProbes] IAHelper_showFieldProbesDebug not available")
+		return
+	end
+	IAHelper_showFieldProbesDebug(field)
+end
+
 --- TEMP developer console: iaCombinePipeInfo
 -- Find the nearest combine with a movable pipe (auger spout) and print its
 -- spec_pipe state fields so we can verify the fold-in mapping before wiring it
@@ -805,6 +1031,482 @@ function IANeighbours:consoleCommandIaUnfoldCombinePipe()
 		tostring(name), math.sqrt(distSq or 0), tostring(ok), tostring(msg)))
 end
 
+--- TEMP developer console: consoleCommandIaOpenConstruction
+function IANeighbours:consoleCommandIaOpenConstruction()
+    if g_gui ~= nil then
+        print("[iaOpenConstruction] trying g_gui:showGui")
+        g_gui:showGui("ConstructionScreen")
+    end
+end
+
+--- Developer console: iaHudForceShow — toggle the construction-place HUD overlay to always draw.
+function IANeighbours:consoleCommandIaHudForceShow()
+	if IAHud == nil then
+		print("[iaHudForceShow] IAHud not available")
+		return
+	end
+	IAHud.forceShow = not IAHud.forceShow
+	print("[iaHudForceShow] forceShow = " .. tostring(IAHud.forceShow))
+end
+
+--- Developer console: iaHudDebugDraw — toggle per-frame debug logging from IAHud:draw().
+function IANeighbours:consoleCommandIaHudDebugDraw()
+	if IAHud == nil then
+		print("[iaHudDebugDraw] IAHud not available")
+		return
+	end
+	IAHud.debugDraw = not IAHud.debugDraw
+	print("[iaHudDebugDraw] debugDraw = " .. tostring(IAHud.debugDraw))
+end
+
+
+--- Developer console: iaSpawnPlaceable
+-- Spawn a placeable at the player's current position. Uses IAPlaceableHelper.spawnPlaceable.
+-- Optional argument: store item XML path (defaults to the delivery silo XML).
+function IANeighbours:consoleCommandIaSpawnPlaceable(xmlFilename)
+	if IAPlaceableHelper == nil or type(IAPlaceableHelper.spawnPlaceable) ~= "function" then
+		print("[iaSpawnPlaceable] IAPlaceableHelper.spawnPlaceable not available")
+		return
+	end
+	local refX, refY, refZ = self:resolvePlayerRefPosition()
+	if refX == nil then
+		print("[iaSpawnPlaceable] could not resolve player position")
+		return
+	end
+	local xml = (type(xmlFilename) == "string" and xmlFilename:match("^%s*(.-)%s*$") ~= "") and xmlFilename:match("^%s*(.-)%s*$")
+		or (IAFieldOutcomeDeliveryHelper ~= nil and IAFieldOutcomeDeliveryHelper.DELIVERY_SILO_XML)
+		or "data/placeables/mapUS/storage/storage.xml"
+	local farmId = g_currentMission ~= nil and type(g_currentMission.getFarmId) == "function" and g_currentMission:getFarmId() or 1
+	print(string.format("[iaSpawnPlaceable] spawning '%s' at (%.1f, %.1f, %.1f) farmId=%d", xml, refX, refY, refZ, farmId))
+	IAPlaceableHelper.spawnPlaceable(xml, refX, refY, refZ, 0, farmId,
+		function(placeable, errorMsg)
+			if placeable ~= nil then
+				print(string.format("[iaSpawnPlaceable] OK — placeable spawned at (%.1f, %.1f, %.1f)", refX, refY, refZ))
+			else
+				print("[iaSpawnPlaceable] FAILED: " .. tostring(errorMsg))
+			end
+		end
+	)
+end
+
+--- TEMP: find all farmer silos and return them as an array of placeables.
+function IANeighbours:iaFindAllFarmerSilos()
+	local out = {}
+	if g_currentMission == nil or g_currentMission.placeableSystem == nil then return out end
+	local ps = g_currentMission.placeableSystem
+	if ps.placeables == nil then return out end
+	for _, p in ipairs(ps.placeables) do
+		if p ~= nil and p.configFileNameClean == "farma400modified" then
+			out[#out + 1] = p
+		end
+	end
+	return out
+end
+
+--- TEMP: iaSiloAccessTest — dump silo data
+function IANeighbours:consoleCommandIaSiloAccessTest()
+	local silos = self:iaFindAllFarmerSilos()
+	print(string.format("[iaSiloAccessTest] Found %d farma400 silo(s)", #silos))
+	for i, s in ipairs(silos) do
+		local ss = s.spec_silo
+		print(string.format("[iaSiloAccessTest] Silo #%d uniqueId=%s ownerFarmId=%d foreignSilo=%s storagePerFarm=%s unloadingStation.ownerFarmId=%d loadingStation.ownerFarmId=%d",
+			i, tostring(s.uniqueId), s.ownerFarmId or -1,
+			tostring(ss ~= nil and ss.foreignSilo), tostring(ss ~= nil and ss.storagePerFarm),
+			ss ~= nil and ss.unloadingStation ~= nil and ss.unloadingStation.ownerFarmId or -1,
+			ss ~= nil and ss.loadingStation ~= nil and ss.loadingStation.ownerFarmId or -1))
+		-- Dump supported fill types
+		if ss ~= nil and ss.unloadingStation ~= nil and ss.unloadingStation.supportedFillTypes ~= nil then
+			local fts = {}
+			for ft, _ in pairs(ss.unloadingStation.supportedFillTypes) do fts[#fts+1] = tostring(ft) end
+			print(string.format("[iaSiloAccessTest]   unloadFillTypes: %s", table.concat(fts, ",")))
+		end
+		if ss ~= nil and ss.loadingStation ~= nil and ss.loadingStation.supportedFillTypes ~= nil then
+			local fts = {}
+			for ft, _ in pairs(ss.loadingStation.supportedFillTypes) do fts[#fts+1] = tostring(ft) end
+			print(string.format("[iaSiloAccessTest]   loadFillTypes: %s", table.concat(fts, ",")))
+		end
+		-- Dump storage fill levels
+		if ss ~= nil and ss.storages ~= nil and ss.storages[1] ~= nil then
+			local st = ss.storages[1]
+			if st.fillLevels ~= nil then
+				local fls = {}
+				for ft, lvl in pairs(st.fillLevels) do
+					fls[#fls+1] = string.format("%s=%d", tostring(ft), lvl)
+				end
+				print(string.format("[iaSiloAccessTest]   fillLevels: {%s}", table.concat(fls, ", ")))
+			end
+			if st.getFreeCapacity ~= nil then
+				print(string.format("[iaSiloAccessTest]   freeCapacity=%d", st:getFreeCapacity()))
+			end
+		end
+	end
+end
+
+--- TEMP: iaSiloSetForeign — set foreignSilo=true on all farmer silos
+function IANeighbours:consoleCommandIaSiloSetForeign()
+	local silos = self:iaFindAllFarmerSilos()
+	for _, s in ipairs(silos) do
+		if s.spec_silo ~= nil then
+			s.spec_silo.foreignSilo = true
+			print(string.format("[iaSiloSetForeign] %s foreignSilo=true", tostring(s.uniqueId)))
+		end
+	end
+	print(string.format("[iaSiloSetForeign] Done. %d silo(s) updated. Try unloading now.", #silos))
+end
+
+--- TEMP: iaSiloSetFarm1 — set ownerFarmId=1 on all farmer silos
+function IANeighbours:consoleCommandIaSiloSetFarm1()
+	local silos = self:iaFindAllFarmerSilos()
+	for _, s in ipairs(silos) do
+		s:setOwnerFarmId(1, true)
+		print(string.format("[iaSiloSetFarm1] %s ownerFarmId=1", tostring(s.uniqueId)))
+	end
+	print(string.format("[iaSiloSetFarm1] Done. %d silo(s) updated. Try unloading now.", #silos))
+end
+
+--- TEMP: iaSiloSetFarm99 — restore ownerFarmId=99
+function IANeighbours:consoleCommandIaSiloSetFarm99()
+	local silos = self:iaFindAllFarmerSilos()
+	for _, s in ipairs(silos) do
+		s:setOwnerFarmId(99, true)
+		print(string.format("[iaSiloSetFarm99] %s ownerFarmId=99", tostring(s.uniqueId)))
+	end
+	print(string.format("[iaSiloSetFarm99] Done. %d silo(s) restored.", #silos))
+end
+
+--- TEMP: iaSiloStationFarm1 — set unloadingStation+loadingStation.ownerFarmId=1 (NOT placeable ownerFarmId)
+function IANeighbours:consoleCommandIaSiloStationFarm1()
+	local silos = self:iaFindAllFarmerSilos()
+	for _, s in ipairs(silos) do
+		local ss = s.spec_silo
+		if ss ~= nil then
+			if ss.unloadingStation ~= nil then
+				self._iaSiloOriginalUnloadFarmId = ss.unloadingStation.ownerFarmId
+				ss.unloadingStation.ownerFarmId = 1
+			end
+			if ss.loadingStation ~= nil then
+				self._iaSiloOriginalLoadFarmId = ss.loadingStation.ownerFarmId
+				ss.loadingStation.ownerFarmId = 1
+			end
+			print(string.format("[iaSiloStationFarm1] %s unloadingStation.ownerFarmId=%s loadingStation.ownerFarmId=%s",
+				tostring(s.uniqueId),
+				tostring(ss.unloadingStation and ss.unloadingStation.ownerFarmId),
+				tostring(ss.loadingStation and ss.loadingStation.ownerFarmId)))
+		end
+	end
+	print(string.format("[iaSiloStationFarm1] Done. %d silo(s) — placeable ownerFarmId unchanged. Try unloading now.", #silos))
+end
+
+--- TEMP: iaSiloStationRestore — restore station ownerFarmIds
+function IANeighbours:consoleCommandIaSiloStationRestore()
+	local silos = self:iaFindAllFarmerSilos()
+	for _, s in ipairs(silos) do
+		local ss = s.spec_silo
+		if ss ~= nil then
+			if ss.unloadingStation ~= nil and self._iaSiloOriginalUnloadFarmId ~= nil then
+				ss.unloadingStation.ownerFarmId = self._iaSiloOriginalUnloadFarmId
+			end
+			if ss.loadingStation ~= nil and self._iaSiloOriginalLoadFarmId ~= nil then
+				ss.loadingStation.ownerFarmId = self._iaSiloOriginalLoadFarmId
+			end
+		end
+	end
+	self._iaSiloOriginalUnloadFarmId = nil
+	self._iaSiloOriginalLoadFarmId = nil
+	print(string.format("[iaSiloStationRestore] Done. Stations restored to original farm IDs."))
+end
+
+--- TEMP: iaSiloDumpFuncs — dump all callable functions on silo stations & storageSystem
+function IANeighbours:consoleCommandIaSiloDumpFuncs()
+	local silos = self:iaFindAllFarmerSilos()
+	if #silos == 0 then print("[iaSiloDumpFuncs] No silos found") return end
+
+	local s = silos[1]
+	local ss = s.spec_silo
+	if ss == nil then print("[iaSiloDumpFuncs] No spec_silo") return end
+
+	print("=== unloadingStation functions ===")
+	if ss.unloadingStation ~= nil then
+		for k, v in pairs(ss.unloadingStation) do
+			if type(v) == "function" then print("  " .. k) end
+		end
+	else
+		print("  nil")
+	end
+
+	print("=== loadingStation functions ===")
+	if ss.loadingStation ~= nil then
+		for k, v in pairs(ss.loadingStation) do
+			if type(v) == "function" then print("  " .. k) end
+		end
+	else
+		print("  nil")
+	end
+
+	print("=== silo storages[1] functions ===")
+	if ss.storages ~= nil and ss.storages[1] ~= nil then
+		for k, v in pairs(ss.storages[1]) do
+			if type(v) == "function" then print("  " .. k) end
+		end
+	else
+		print("  nil")
+	end
+
+	print("=== storageSystem functions ===")
+	if g_currentMission ~= nil and g_currentMission.storageSystem ~= nil then
+		for k, v in pairs(g_currentMission.storageSystem) do
+			if type(v) == "function" then print("  " .. k) end
+		end
+	else
+		print("  nil")
+	end
+
+	print("[iaSiloDumpFuncs] Done. Look for getIsFillType*, canUnload*, isAllowed* functions.")
+end
+
+--- TEMP: iaSiloHookTest — test the silo station access hooks
+-- Usage: iaSiloHookTest           -> show status of all farmer silos + hook state
+--        iaSiloHookTest mark <id>  -> mark silo by uniqueId substring as mission-accessible
+--        iaSiloHookTest unmark <id> -> remove mission access mark
+--        iaSiloHookTest call <id>  -> call getIsFillAllowedFromFarm(1) on silo's unloadingStation
+function IANeighbours:consoleCommandIaSiloHookTest(markOrUnmark, idToken)
+	local silos = self:iaFindAllFarmerSilos()
+	print(string.format("[iaSiloHookTest] Found %d farmer silo(s)", #silos))
+
+	-- Show hook installation status
+	if IABorrowAccess ~= nil then
+		print(string.format("  Hooks installed: accessHandler=%s siloStation=%s",
+			tostring(IABorrowAccess._accessHandlerHookInstalled),
+			tostring(IABorrowAccess._siloStationAccessHookInstalled)))
+		-- Show marked silos
+		local marked = IABorrowAccess._missionAccessiblePlaceableIds or {}
+		local count = 0
+		for _ in pairs(marked) do count = count + 1 end
+		print(string.format("  Mission-accessible silos: %d", count))
+		for uid, _ in pairs(marked) do
+			print(string.format("    %s", uid))
+		end
+	else
+		print("  IABorrowAccess not available")
+	end
+
+	-- Handle mark/unmark/call subcommands
+	if markOrUnmark ~= nil and idToken ~= nil then
+		local cmd = string.lower(tostring(markOrUnmark))
+		if cmd == "mark" or cmd == "unmark" or cmd == "call" then
+			-- Find silo by uniqueId substring
+			local target = nil
+			for _, s in ipairs(silos) do
+				local uid = tostring(s.uniqueId or "")
+				if uid ~= "" and string.find(uid, tostring(idToken), 1, true) ~= nil then
+					target = s
+					break
+				end
+			end
+			if target == nil then
+				print(string.format("[iaSiloHookTest] No silo matching '%s' found. Available:", tostring(idToken)))
+				for _, s in ipairs(silos) do
+					print(string.format("  id=%s ownerFarm=%d foreign=%s",
+						tostring(s.uniqueId or "?"), s.ownerFarmId or -1,
+						tostring(s.spec_silo and s.spec_silo.foreignSilo)))
+				end
+				return
+			end
+
+			if cmd == "mark" then
+				IABorrowAccess.markMissionSilo(target.uniqueId)
+				print(string.format("[iaSiloHookTest] MARKED silo %s as mission-accessible", tostring(target.uniqueId)))
+			elseif cmd == "unmark" then
+				IABorrowAccess.unmarkMissionSilo(target.uniqueId)
+				print(string.format("[iaSiloHookTest] UNMARKED silo %s", tostring(target.uniqueId)))
+			elseif cmd == "call" then
+				-- Directly call getIsFillAllowedFromFarm to verify hook works
+				local ss = target.spec_silo
+				if ss ~= nil and ss.unloadingStation ~= nil then
+					local us = ss.unloadingStation
+					local ok, result = pcall(us.getIsFillAllowedFromFarm, us, 1)
+					print(string.format("[iaSiloHookTest] getIsFillAllowedFromFarm(farmId=1) -> ok=%s result=%s",
+						tostring(ok), tostring(result)))
+					-- Also test the loading station side
+					if ss.loadingStation ~= nil then
+						local ls = ss.loadingStation
+						local ok2, result2 = pcall(ls.getIsFillAllowedToFarm, ls, 1)
+						print(string.format("[iaSiloHookTest] getIsFillAllowedToFarm(farmId=1) -> ok=%s result=%s",
+							tostring(ok2), tostring(result2)))
+					end
+				else
+					print("[iaSiloHookTest] Silo has no unloadingStation")
+				end
+			end
+			return
+		end
+	end
+
+	-- Default: list all farmer silos with their access state
+	for i, s in ipairs(silos) do
+		local ss = s.spec_silo
+		local uid = tostring(s.uniqueId or "?")
+		local marked = IABorrowAccess ~= nil and IABorrowAccess._missionAccessiblePlaceableIds[uid] == true
+
+		-- Dump raw storage structure for debugging
+		local fillSum = 0
+		local storageDetails = ""
+		if ss ~= nil and ss.storages ~= nil then
+			for si, storage in ipairs(ss.storages) do
+				if storage ~= nil then
+					-- Try getFillLevel with no args, with fillTypeIndex=0, and check for getFillLevels (plural)
+					local fl0 = nil
+					local flFunc = nil
+					local flv = nil
+					if type(storage.getFillLevel) == "function" then
+						local ok1, r1 = pcall(storage.getFillLevel, storage)
+						if ok1 then fl0 = r1 end
+						local ok2, r2 = pcall(storage.getFillLevel, storage, 0)
+						if ok2 then flv = r2 end
+					end
+					if storage.fillLevel ~= nil then
+						flFunc = storage.fillLevel
+					end
+					-- Also try getFillLevels (plural) which returns a table
+					local flsTable = {}
+					if type(storage.getFillLevels) == "function" then
+						local ok3, r3 = pcall(storage.getFillLevels, storage)
+						if ok3 and type(r3) == "table" then
+							for ftIdx, amt in pairs(r3) do
+								flsTable[#flsTable+1] = string.format("%d=%dL", ftIdx, amt)
+							end
+						end
+					end
+					local flAny = fl0 or flv or flFunc or 0
+					fillSum = fillSum + (flAny or 0)
+					storageDetails = storageDetails .. string.format(" s[%d]=getFillLevel()=%s getFillLevel(0)=%s fillLevel=%s getFillLevels={%s}",
+						si, tostring(fl0), tostring(flv), tostring(flFunc), table.concat(flsTable, ","))
+				end
+			end
+		elseif ss == nil then
+			storageDetails = " spec_silo=nil"
+		else
+			storageDetails = " storages=nil"
+		end
+
+		-- Test the actual hook inline
+		local unloadResult = "n/a"
+		if ss ~= nil and ss.unloadingStation ~= nil then
+			local ok, r = pcall(ss.unloadingStation.getIsFillAllowedFromFarm, ss.unloadingStation, 1)
+			unloadResult = ok and tostring(r) or ("err:" .. tostring(r))
+		end
+		local loadResult = "n/a"
+		if ss ~= nil and ss.loadingStation ~= nil then
+			local ok, r = pcall(ss.loadingStation.getIsFillAllowedToFarm, ss.loadingStation, 1)
+			loadResult = ok and tostring(r) or ("err:" .. tostring(r))
+		end
+
+		print(string.format("  [%d] uid=%s ownerFarm=%d foreign=%s missionMarked=%s unloadAllow=%s loadAllow=%s fill=%dL",
+			i, uid, s.ownerFarmId or -1,
+			tostring(ss ~= nil and ss.foreignSilo),
+			tostring(marked), unloadResult, loadResult,
+			fillSum))
+	end
+
+	print("Usage: iaSiloHookTest [mark|unmark|call] <uniqueId_substring>")
+end
+
+--- TEMP: iaHarvestTrack — show harvest tracking state for all active FoS delivery missions
+function IANeighbours:consoleCommandIaHarvestTrack()
+	if g_missionManager == nil or g_missionManager.missions == nil then
+		print("[iaHarvestTrack] No mission manager")
+		return
+	end
+	local found = 0
+	for _, m in ipairs(g_missionManager.missions) do
+		if m ~= nil and m.iaFieldsOfStoriesMission == true and m.getMissionTypeName ~= nil then
+			local okName, typeName = pcall(m.getMissionTypeName, m)
+			if okName and typeName == "iaFieldOutcomeMission" and m.status ~= MissionStatus.FINISHED then
+				local jt = IAFieldwork.normalizeFieldworkJobType(tostring(m.iaFoSFieldworkJob or ""))
+				if IAFieldwork.isDeliveryRequiredJobType(jt) then
+					found = found + 1
+					local harvested = m.iaFoSFieldHarvestedLiters or 0
+					local received = m.iaFoSReceivedLiters or 0
+					local target = harvested * 0.99
+					local deliveryPct = target > 0 and math.min(1, received / target) * 100 or 0
+					local probesDone = m.iaProbeEvalAllFinished == true
+					print(string.format("[iaHarvestTrack] Mission farmlandId=%s job=%s probesDone=%s harvested=%.0fL received=%.0fL target=%.0fL (%.0f%%) deliveryComplete=%s nid=%s ftIdx=%s poolTotal=%s",
+						tostring(m.iaFieldFarmlandId),
+						tostring(m.iaFoSFieldworkJob),
+						tostring(probesDone),
+						harvested, received, target, deliveryPct,
+						tostring(m:iaIsDeliveryComplete()),
+						tostring(m.iaFoSNeighbourId),
+						tostring(m.iaFoSFieldHarvestFillTypeIndex or m:iaGetMissionFillTypeIndex()),
+						tostring(IAFieldOutcomeMission._getPoolTotal(m.iaFoSNeighbourId, m.iaFoSFieldHarvestFillTypeIndex or m:iaGetMissionFillTypeIndex()))))
+				end
+			end
+		end
+	end
+	if found == 0 then
+		print("[iaHarvestTrack] No active FoS delivery missions found")
+		return
+	end
+	-- Dump silo storage for each unique neighbour among the found missions
+	local dumpedNeighbourIds = {}
+	for _, m in ipairs(g_missionManager.missions) do
+		if m ~= nil and m.iaFieldsOfStoriesMission == true and m.getMissionTypeName ~= nil then
+			local okName, typeName = pcall(m.getMissionTypeName, m)
+			if okName and typeName == "iaFieldOutcomeMission" and m.status ~= MissionStatus.FINISHED then
+				local jt = IAFieldwork.normalizeFieldworkJobType(tostring(m.iaFoSFieldworkJob or ""))
+				if IAFieldwork.isDeliveryRequiredJobType(jt) then
+					local nid = tonumber(m.iaFoSNeighbourId)
+					if nid ~= nil and not dumpedNeighbourIds[nid] then
+						dumpedNeighbourIds[nid] = true
+						local neighbour = IANeighbours.neighbours[nid]
+						if neighbour == nil or tonumber(neighbour.id) ~= nid then
+							for _, n in pairs(IANeighbours.neighbours) do
+								if n ~= nil and tonumber(n.id) == nid then
+									neighbour = n
+									break
+								end
+							end
+						end
+						local silo = neighbour ~= nil and neighbour:getFirstPlaceable() or nil
+						if silo ~= nil and silo.spec_silo ~= nil and silo.spec_silo.storages ~= nil then
+							local missionFtIdx = m.iaFoSFieldHarvestFillTypeIndex or m:iaGetMissionFillTypeIndex()
+							local windrowFtIdx = m.iaFoSGrassWindrowFillType
+							print(string.format("[iaHarvestTrack] Silo nid=%s uid=%s missionFtIdx=%s windrowFtIdx=%s",
+								tostring(nid), tostring(silo.uniqueId),
+								tostring(missionFtIdx), tostring(windrowFtIdx)))
+							for si, storage in ipairs(silo.spec_silo.storages) do
+								if storage ~= nil then
+									local fls = {}
+									if storage.fillLevels ~= nil then
+										for ft, lvl in pairs(storage.fillLevels) do
+											if lvl > 0 then
+												fls[#fls+1] = string.format("%d=%dL", ft, lvl)
+											end
+										end
+									end
+									print(string.format("[iaHarvestTrack]   storage[%d] fillLevels: {%s}", si, table.concat(fls, ", ")))
+								end
+							end
+							-- unloadingStation getFillLevel for both ftIdx values
+							if silo.spec_silo.unloadingStation ~= nil and type(silo.spec_silo.unloadingStation.getFillLevel) == "function" then
+								local us = silo.spec_silo.unloadingStation
+								local flMission = select(2, pcall(us.getFillLevel, us, missionFtIdx, 1))
+								local flWindrow = windrowFtIdx ~= nil and select(2, pcall(us.getFillLevel, us, windrowFtIdx, 1)) or nil
+								print(string.format("[iaHarvestTrack]   unloadSt.getFillLevel(ftIdx=%s)=%s  getFillLevel(ftIdx=%s)=%s",
+									tostring(missionFtIdx), tostring(flMission),
+									tostring(windrowFtIdx), tostring(flWindrow)))
+							end
+						else
+							print(string.format("[iaHarvestTrack] Silo nid=%s: nil or no storages (silo=%s)",
+								tostring(nid), tostring(silo ~= nil and "found" or "not found")))
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 --- TEMP helper for the pipe console commands: resolve a world reference position
 -- (current vehicle root if seated, otherwise the player position).
 -- @return number|nil x, number|nil y, number|nil z
@@ -820,6 +1522,127 @@ function IANeighbours:resolvePlayerRefPosition()
 		return g_localPlayer:getPosition()
 	end
 	return nil, nil, nil
+end
+
+--- Developer console: iaDumpSeedCalendar
+-- Dumps the current month/period/growthMode and the planting calendar
+-- (growthDataSeasonal.periods[].plantingAllowed) for all fruit types.
+-- Optional argument: a (case-insensitive, partial-match) fruit name filter.
+function IANeighbours:consoleCommandIaDumpSeedCalendar(fruitNameFilter)
+	local month = getEnvironmentMonth1to12()
+	local period = getEnvironmentCurrentPeriodOrNil()
+	local growthMode = getMissionGrowthModeOrNil()
+
+	print(string.format("[iaDumpSeedCalendar] === Planting Calendar ==="))
+	print(string.format("[iaDumpSeedCalendar] Current month (1-12): %s", tostring(month)))
+	print(string.format("[iaDumpSeedCalendar] Current period:        %s", tostring(period)))
+	print(string.format("[iaDumpSeedCalendar] Growth mode:           %s", tostring(growthMode)))
+
+	if g_fruitTypeManager == nil then
+		print("[iaDumpSeedCalendar] g_fruitTypeManager is not available")
+		return "g_fruitTypeManager not available"
+	end
+
+	local fruitTypes = g_fruitTypeManager:getFruitTypes()
+	if fruitTypes == nil then
+		print("[iaDumpSeedCalendar] no fruit types registered")
+		return "no fruit types"
+	end
+
+	local filter = nil
+	if fruitNameFilter ~= nil and fruitNameFilter ~= "" then
+		filter = string.lower(tostring(fruitNameFilter))
+	end
+
+	-- Period index → month number mapping (12 periods = 12 months, 1-based)
+	-- Period 1 = month 1 = early spring, etc.
+	local maxPeriods = 12
+	local fruitCount = 0
+
+	for _, fruitType in ipairs(fruitTypes) do
+		local fruitName = fruitType.name or "?"
+		if filter == nil or string.find(string.lower(tostring(fruitName)), filter, 1, true) ~= nil then
+			fruitCount = fruitCount + 1
+			local parts = {}
+
+			-- Try the preferred engine API first (respects growthMode)
+			local hasEngineApi = (fruitType.getIsPlantingAllowedInPeriod ~= nil and growthMode ~= nil)
+
+			for p = 1, maxPeriods do
+				local allowed = nil
+				if hasEngineApi then
+					local ok, r = pcall(function()
+						return fruitType:getIsPlantingAllowedInPeriod(growthMode, p)
+					end)
+					if ok and type(r) == "boolean" then
+						allowed = r
+					else
+						local ok2, r2 = pcall(function()
+							return fruitType:getIsPlantingAllowedInPeriod(p, growthMode)
+						end)
+						if ok2 and type(r2) == "boolean" then
+							allowed = r2
+						end
+					end
+				end
+				if allowed == nil then
+					-- Fallback: growthDataSeasonal.periods[p].plantingAllowed
+					local gd = fruitType.growthDataSeasonal
+					if type(gd) == "table" then
+						local periods = gd.periods
+						if periods == nil and growthMode ~= nil then
+							local sub = gd[growthMode]
+							if type(sub) == "table" then
+								periods = sub.periods
+							end
+						end
+						if type(periods) == "table" then
+							local row = periods[p]
+							if type(row) == "table" and row.plantingAllowed ~= nil then
+								if row.plantingAllowed == true or row.plantingAllowed == 1 then
+									allowed = true
+								elseif row.plantingAllowed == false or row.plantingAllowed == 0 then
+									allowed = false
+								end
+							end
+						end
+					end
+				end
+
+				if allowed == true then
+					table.insert(parts, tostring(p))
+				end
+			end
+
+			local isCurrentPlantable = false
+			if period ~= nil then
+				local ok3, r3 = pcall(function()
+					return iaIsFruitTypePlantingAllowedInPeriod(fruitType.index, period, growthMode)
+				end)
+				if ok3 then
+					isCurrentPlantable = r3
+				end
+			end
+
+			local marker = ""
+			if isCurrentPlantable == true then
+				marker = "  <-- PLANTABLE NOW"
+			elseif isCurrentPlantable == false then
+				marker = "  (not plantable now)"
+			else
+				marker = "  (no calendar data)"
+			end
+
+			local plantableMonths = #parts > 0 and table.concat(parts, ", ") or "none"
+			print(string.format("[iaDumpSeedCalendar] %s (idx=%s): plantable months = [%s]%s",
+				tostring(fruitName), tostring(fruitType.index), plantableMonths, marker))
+		end
+	end
+
+	local summary = string.format("[iaDumpSeedCalendar] done: %d fruit type(s) listed, month=%s, period=%s",
+		fruitCount, tostring(month), tostring(period))
+	print(summary)
+	return summary
 end
 
 --- Developer console: iaDumpGrowthStates
@@ -1162,6 +1985,50 @@ function IANeighbours:consoleCommandIaForceFieldwork(argStr)
 	end
 end
 
+--- Rebuild a neighbour's daily fieldwork schedule (regenerates contract offers immediately).
+function IANeighbours:consoleCommandIaRebuildSchedule(argStr)
+	if self.BlockMod == true or self.removeModRequested == true then
+		print("[iaRebuildSchedule] Mod inactive.")
+		return
+	end
+	local token
+	if type(argStr) == "string" then
+		token = argStr:match("^%s*(.-)%s*$") or ""
+	else
+		token = tostring(argStr or ""):match("^%s*(.-)%s*$") or ""
+	end
+	if token == "" then
+		print("[iaRebuildSchedule] Usage: iaRebuildSchedule <1-based index | characterId | name>")
+		local list = self.neighbours or {}
+		for i = 1, #list do
+			local n = list[i]
+			if n ~= nil then
+				print(string.format("  [%d] id=%s name=%s", i, tostring(n.id), tostring(n.name)))
+			end
+		end
+		return
+	end
+	local neighbour = self:resolveNeighbourForConsoleToken(token)
+	if neighbour == nil then
+		print("[iaRebuildSchedule] No neighbour matches: " .. token)
+		return
+	end
+	if self.gameLoopHelper == nil or self.gameLoopHelper.rebuildDailyFieldworkSchedule == nil then
+		print("[iaRebuildSchedule] gameLoopHelper not available")
+		return
+	end
+	self.gameLoopHelper:rebuildDailyFieldworkSchedule(neighbour)
+	local tasks = neighbour.fieldworkScheduleTasks or {}
+	local contractCount = 0
+	for _, row in ipairs(tasks) do
+		if row ~= nil and row.contractEnabled == true then
+			contractCount = contractCount + 1
+		end
+	end
+	print(string.format("[iaRebuildSchedule] Done: %s -> %d tasks, %d contract offers",
+		tostring(neighbour.name), #tasks, contractCount))
+end
+
 --- Best-effort cleanup: each neighbour's :delete() (situations, vehicles, NPCs, hotspots), then clear mod runtime tables.
 function IANeighbours:performRemoveModCleanup()
 	pcall(function() IANeighbours:clearAllDebugPoints() end)
@@ -1183,6 +2050,7 @@ function IANeighbours:performRemoveModCleanup()
 	self.activeDialogText = ""
 	self.situationConfigs = {}
 	self.vehicleIdMapping = {}
+	self.placeableIdMapping = {}
 	IANeighbours.clearPlayerStyleTemplates()
 	-- Clean up orphaned farm 99 vehicles that are no longer tracked by any neighbour
 	if self.xmlHelper ~= nil and self.xmlHelper.removeOrphanedFarm99Vehicles ~= nil then
@@ -1578,6 +2446,80 @@ function IANeighbours.addIncomingPhoneIngameNotification(callerName)
 	g_currentMission:addIngameNotification(FSBaseMission.INGAME_NOTIFICATION_OK, msg)
 end
 
+--- Count initialized, non-deleted neighbours whose homebase setup is incomplete.
+--- A neighbour is complete when every per-size required count is met (actual >= required).
+--- @return number count of neighbours with incomplete homebase setup
+function IANeighbours:getIncompleteHomebaseNeighbourCount()
+	local count = 0
+	if self.neighbours == nil then
+		return 0
+	end
+	for _, n in pairs(self.neighbours) do
+		if n ~= nil and n.initialized and not n.isDeleted
+			and type(n.getActualHomebasePlaces) == "function"
+			and type(n.getRequiredHomebasePlaces) == "function" then
+			local act = n:getActualHomebasePlaces()
+			local req = n:getRequiredHomebasePlaces()
+			if act ~= nil and req ~= nil then
+				local complete = true
+				for k, rv in pairs(req) do
+					if k ~= "total" and (rv or 0) > 0 and ((act[k] or 0) < rv) then
+						complete = false
+						break
+					end
+				end
+				if not complete then
+					count = count + 1
+				end
+			end
+		end
+	end
+	return count
+end
+
+--- Real-time recurring warning while any character's homebase still requires setup.
+--- Cooldown starts at 60 s (first warning) and is raised to 600 s after it fires. dt is ms per frame.
+function IANeighbours:updateHomebaseSetupWarning(dt)
+	if not self.outboundXMLLoaded then
+		return
+	end
+
+	IANeighbours._homebaseSetupWarningAccumSec = (IANeighbours._homebaseSetupWarningAccumSec or 0) + ((dt or 0) / 1000)
+
+	local cooldown = IANeighbours._homebaseSetupWarningCooldownSec or 60
+	if IANeighbours._homebaseSetupWarningAccumSec < cooldown then
+		return
+	end
+	IANeighbours._homebaseSetupWarningAccumSec = 0
+
+	if self:getIncompleteHomebaseNeighbourCount() <= 0 then
+		return
+	end
+
+	if g_currentMission == nil or g_currentMission.addIngameNotification == nil then
+		return
+	end
+	if FSBaseMission == nil then
+		return
+	end
+
+	local msg = nil
+	if g_i18n ~= nil and g_i18n.getText ~= nil then
+		msg = g_i18n:getText("ia_homebase_setup_warning")
+	end
+	if msg == nil or tostring(msg) == "" then
+		msg = "Fields of Stories: Homebases are not complete. Place the required homebase areas to finish setup."
+	end
+
+	local notifType = FSBaseMission.INGAME_NOTIFICATION_WARNING
+		or FSBaseMission.INGAME_NOTIFICATION_INFO
+		or FSBaseMission.INGAME_NOTIFICATION_OK
+	if notifType ~= nil then
+		g_currentMission:addIngameNotification(notifType, msg)
+		IANeighbours._homebaseSetupWarningCooldownSec = 600
+	end
+end
+
 --- Schedule incoming ring for any topic: ring sound + payload only (no GUI). Player opens IAPhoneDialogGUI with IAStartConversation when ready.
 --- Caller supplies a fully prepared IAConversation (not started yet).
 --- @param IANeighbour neighbour caller (must match ringPayload.neighbourId when set)
@@ -1628,6 +2570,91 @@ function IANeighbours.tryShowIncomingPhoneRing(neighbour, ringPayload)
 		IATestRunner.onPhoneRingStart(neighbour)
 	end
 	return true
+end
+
+--- Console command: trigger the next incoming phone call immediately, bypassing all cooldowns,
+--- time-of-day checks, per-day caps, and retry intervals. Clears any pending ring first.
+--- @param argStr string|nil optional neighbour identifier (index|id|name); if omitted, picks the first farmer with contract rows.
+function IANeighbours:consoleCommandIaTriggerNextCall(argStr)
+	if self.BlockMod == true or self.removeModRequested == true then
+		print("[iaTriggerNextCall] Mod inactive (multiplayer or removed).")
+		return
+	end
+
+	-- Resolve the target neighbour (or pick the first eligible farmer).
+	local target = nil
+	local token = nil
+	if type(argStr) == "string" then
+		token = argStr:match("^%s*(.-)%s*$") or ""
+	else
+		token = tostring(argStr or ""):match("^%s*(.-)%s*$") or ""
+	end
+	if token ~= nil and token ~= "" then
+		target = self:resolveNeighbourForConsoleToken(token)
+		if target == nil then
+			print("[iaTriggerNextCall] No neighbour matches: " .. token)
+			return
+		end
+	else
+		-- No argument: pick the first farmer neighbour with contract-enabled tasks.
+		local nbs = self.neighbours or {}
+		for i = 1, #nbs do
+			local n = nbs[i]
+			if n ~= nil and n.initialized and n.job == "Farmer" and n.role == "Neighbour" then
+				local tasks = n.fieldworkScheduleTasks
+				if tasks ~= nil then
+					for _, row in ipairs(tasks) do
+						if row ~= nil and row.contractEnabled == true then
+							target = n
+							break
+						end
+					end
+				end
+			end
+			if target ~= nil then
+				break
+			end
+		end
+		if target == nil then
+			print("[iaTriggerNextCall] No farmer neighbour with contract-enabled tasks found. " ..
+				"Provide a neighbour argument (iaTriggerNextCall <index|id|name>) to target a specific neighbour.")
+			return
+		end
+	end
+
+	-- Bypass checks.
+	if target.job ~= "Farmer" or target.role ~= "Neighbour" then
+		print("[iaTriggerNextCall] Neighbour " .. tostring(target.name) .. " is not a Farmer/Neighbour (job=" .. tostring(target.job) .. " role=" .. tostring(target.role) .. ").")
+		return
+	end
+
+	-- Clear any currently pending phone ring so it doesn't block the forced one.
+	if IANeighbours._incomingPhonePayload ~= nil then
+		print("[iaTriggerNextCall] Clearing existing pending phone payload before forcing new call.")
+		IANeighbours.clearPendingIncomingPhoneOffer(IANeighbours.IncomingCallEndReason.DECLINED)
+	end
+
+	-- Reset the global inbound phone cooldown.
+	IANeighbours._globalInboundPhoneCooldownUntilWallClockSec = 0
+
+	-- Reset per-neighbour daily state so onContractCallTimeTriggered isn't blocked by already-answered / ring-limit checks.
+	target.contractCallRingAnsweredToday = false
+	target.contractCallRingOpensCount = 0
+	target.contractCallLastRingScheduleKey = nil
+	target.contractCallLastRingTotalMinutes = nil
+	target.contractCallTriggerFiredForScheduleKey = nil
+
+	if IANeighbours.debug then
+		print("[iaTriggerNextCall] Forcing call from neighbour " .. tostring(target.name) .. " (id=" .. tostring(target.id) .. ")")
+	end
+
+	local showed = target:onContractCallTimeTriggered()
+	if showed then
+		print("[iaTriggerNextCall] OK: incoming call ring triggered for " .. tostring(target.name))
+	else
+		print("[iaTriggerNextCall] Failed: onContractCallTimeTriggered returned false for " .. tostring(target.name) ..
+			" (no valid contract rows, player in conversation, or dialog blocked).")
+	end
 end
 
 --- Open phone shell from IAStartConversation when no NPC conversation is active.
@@ -1805,8 +2832,8 @@ function IANeighbours:update(dt)
 			IABorrowAccess.rebuildBorrowedIdSet()
 		end
 
-		if IANeighbours.debug then
-			if IATestRegistry.verbose then
+		if IANeighbours.debug and IATestRunner ~= nil then
+			if IATestRegistry ~= nil and IATestRegistry.verbose then
 				print("[FOS_TEST] IATestRunner: outboundXMLLoaded = true, will call tryAutoRun()")
 			end
 
@@ -1847,6 +2874,9 @@ function IANeighbours:update(dt)
 		end
 	end
 
+	-- Recurring real-time warning while any character's homebase setup is incomplete.
+	IANeighbours:updateHomebaseSetupWarning(dt)
+
 	-- Deferred first-run places: show warning dialog once (after outbound load), OK runs bootstrap + saveAutoPlaces
 	if self.outboundXMLLoaded and IANeighbours.pendingMapPlacesBootstrap
 		and not IANeighbours.mapPlacesBootstrapDialogShown
@@ -1885,12 +2915,19 @@ function IANeighbours:update(dt)
 
 	IANeighbours:updateNeighbours(dt,self.gameSeconds,game5Seconds)
 
+	-- Tool placeable detection: convert placed markers into real IAMapPlace entries
+	if IAPlaceablePlacementDetector ~= nil and IAPlaceablePlacementDetector.checkForNewToolPlaceables ~= nil then
+		IAPlaceablePlacementDetector:checkForNewToolPlaceables()
+		-- Live preview + construction-context keybind (self-contained in detector)
+		IAPlaceablePlacementDetector:checkForPreview()
+	end
+
 	if not IANeighbours.skipBorrowUpdate and IAMissionBorrow ~= nil and type(IAMissionBorrow.update) == "function" then
 		IAMissionBorrow.update(dt)
 	end
 
 	-- AI-assisted test runner: process action queue when a test is active
-	if IANeighbours.debug then
+	if IANeighbours.debug and IATestRunner ~= nil then
 		IATestRunner.update(dt)
 
 		-- Auto-run system: count down the startup delay and launch tests when ready.
@@ -1911,11 +2948,23 @@ function IANeighbours:update(dt)
 	end
 
 	local hasDebugPoints = next(IANeighbours.debugPoints) ~= nil
-	local hasProbeSpheres = IANeighbours.collisionProbeSpheres ~= nil and #IANeighbours.collisionProbeSpheres > 0
-	local hasPlaceBoxes = IANeighbours.mapInitPlaceDebugBoxes ~= nil and #IANeighbours.mapInitPlaceDebugBoxes > 0
+	local markersOn = IANeighbours.mapInitPlaceMarkersVisible == true
+	local hasProbeSpheres = markersOn and IANeighbours.collisionProbeSpheres ~= nil and #IANeighbours.collisionProbeSpheres > 0
+	local hasPlaceBoxes = markersOn and IANeighbours.mapInitPlaceDebugBoxes ~= nil and #IANeighbours.mapInitPlaceDebugBoxes > 0
+	-- In construction mode, suppress place markers when the construction menu is closed.
+	-- Probe/outcome debug points are NOT flagged as constructionSuppressed, so they keep drawing.
+	local suppressPlaceMarkers = false
+	if IAMapInitDialogGUI ~= nil and IAMapInitDialogGUI.constructionMenuMode == true then
+		if g_constructionScreen == nil or not g_constructionScreen.isOpen then
+			markersOn = false
+			hasProbeSpheres = false
+			hasPlaceBoxes = false
+			suppressPlaceMarkers = true
+		end
+	end
 	if hasDebugPoints or hasProbeSpheres or hasPlaceBoxes then
 		-- Only draw debug markers within this distance (m) from player / current vehicle
-		local debugPointDrawRangeSq = 50 * 50
+		local debugPointDrawRangeSq = 200 * 200
 		local refX, refY, refZ = nil, nil, nil
 		if g_localPlayer then
 			local v = g_localPlayer.getCurrentVehicle and g_localPlayer:getCurrentVehicle()
@@ -1927,17 +2976,39 @@ function IANeighbours:update(dt)
 			end
 		end
 
+		-- Second reference: construction menu cursor position (if open and valid)
+		local cursorRefX, cursorRefY, cursorRefZ = nil, nil, nil
+		if g_constructionScreen ~= nil and g_constructionScreen.isOpen and g_constructionScreen.cursor ~= nil then
+			local cx = g_constructionScreen.cursor.currentHitX
+			local cy = g_constructionScreen.cursor.currentHitY
+			local cz = g_constructionScreen.cursor.currentHitZ
+			if cx ~= nil and cz ~= nil and cy ~= nil and cy == cy then
+				cursorRefX = cx
+				cursorRefY = cy
+				cursorRefZ = cz
+			end
+		end
+
+		-- Helper: true if a point (x,y,z) is within rangeSq of EITHER ref point
+		local function inRangeOf(x, y, z, rangeSq, rx, ry, rz, crx, cry, crz)
+			if rx ~= nil then
+				local dx, dy, dz = x - rx, y - ry, z - rz
+				if (dx * dx + dy * dy + dz * dz) <= rangeSq then return true end
+			end
+			if crx ~= nil then
+				local dx, dy, dz = x - crx, y - cry, z - crz
+				if (dx * dx + dy * dy + dz * dz) <= rangeSq then return true end
+			end
+			return false
+		end
+
 		if hasProbeSpheres then
 			for _, sp in ipairs(IANeighbours.collisionProbeSpheres) do
 				if sp ~= nil and sp.x ~= nil and sp.z ~= nil and sp.radius ~= nil and sp.radius > 0 then
-					local inRange = true
-					if refX ~= nil and refY ~= nil and refZ ~= nil then
-						local sy = sp.y or 0
-						local dx, dy, dz = sp.x - refX, sy - refY, sp.z - refZ
-						inRange = (dx * dx + dy * dy + dz * dz) <= debugPointDrawRangeSq
-					end
-					if inRange then
-						IANeighbours.drawCollisionProbeSphereWireframe(sp.x, sp.y or 0, sp.z, sp.radius, sp.r, sp.g, sp.b)
+					local sy = sp.y or 0
+					if inRangeOf(sp.x, sy, sp.z, debugPointDrawRangeSq,
+						refX, refY, refZ, cursorRefX, cursorRefY, cursorRefZ) then
+						IANeighbours.drawCollisionProbeSphereWireframe(sp.x, sy, sp.z, sp.radius, sp.r, sp.g, sp.b)
 					end
 				end
 			end
@@ -1947,18 +3018,17 @@ function IANeighbours:update(dt)
 			if debugPoint ~= nil then
 				local node = type(debugPoint) == "table" and debugPoint.node or debugPoint
 				local label = type(debugPoint) == "table" and debugPoint.text or nil
-				if node ~= nil and entityExists(node) then
-					local x, y, z = getWorldTranslation(node)
-					if x ~= nil and y ~= nil and z ~= nil then
-						local inRange = true
-						if refX ~= nil and refY ~= nil and refZ ~= nil then
-							local dx, dy, dz = x - refX, y - refY, z - refZ
-							inRange = (dx * dx + dy * dy + dz * dz) <= debugPointDrawRangeSq
-						end
-						if inRange then
-							drawDebugPoint(x, y, z, 50, 50, 50, 100, false)
-							if label ~= nil and label ~= "" and Utils.renderTextAtWorldPosition and getCorrectTextSize then
-								Utils.renderTextAtWorldPosition(x, y, z, label, getCorrectTextSize(0.012), 0)
+				local isPlaceMarker = type(debugPoint) == "table" and debugPoint.constructionSuppressed == true
+				if not (suppressPlaceMarkers and isPlaceMarker) then
+					if node ~= nil and entityExists(node) then
+						local x, y, z = getWorldTranslation(node)
+						if x ~= nil and y ~= nil and z ~= nil then
+							if inRangeOf(x, y, z, debugPointDrawRangeSq,
+								refX, refY, refZ, cursorRefX, cursorRefY, cursorRefZ) then
+								drawDebugPoint(x, y, z, 50, 50, 50, 100, false)
+								if label ~= nil and label ~= "" and Utils.renderTextAtWorldPosition and getCorrectTextSize then
+									Utils.renderTextAtWorldPosition(x, y, z, label, getCorrectTextSize(0.012), 0)
+								end
 							end
 						end
 					end
@@ -1967,7 +3037,8 @@ function IANeighbours:update(dt)
 		end
 
 		if hasPlaceBoxes then
-			IAHelper_drawMapInitPlaceDebugBoxes(IANeighbours, refX, refY, refZ, debugPointDrawRangeSq)
+			IAHelper_drawMapInitPlaceDebugBoxes(IANeighbours, refX, refY, refZ, debugPointDrawRangeSq,
+				cursorRefX, cursorRefY, cursorRefZ)
 		end
 	end
 	end -- IANeighbours.skipDebugDrawing guard
@@ -2248,80 +3319,6 @@ function IANeighbours:updateFarmlands()
 	
 	local farmlands = g_farmlandManager:getFarmlands()
 
-	-- Live density sample vs Field cache: FieldState:update(worldX, worldZ) (engine; see FieldManager debug / GDN).
-	local IA_DEBUG_FIELDSTATE_FARMLAND_ID = nil--110
-	if IANeighbours.debug then
-		local dbgFarmland = nil
-		for _, f in pairs(farmlands) do
-			if f ~= nil and f.id == IA_DEBUG_FIELDSTATE_FARMLAND_ID then
-				dbgFarmland = f
-				break
-			end
-		end
-		if dbgFarmland ~= nil and dbgFarmland.field ~= nil then
-			local field = dbgFarmland.field
-			local cx, cz = nil, nil
-			if type(field.getCenterOfFieldWorldPosition) == "function" then
-				cx, cz = field:getCenterOfFieldWorldPosition()
-			end
-			local function fieldStateToStr(label, fs)
-				if fs == nil then
-					return label .. "=nil"
-				end
-				return string.format(
-					"%s valid=%s fruit=%s growth=%s ground=%s spray=%s/%s lime=%s plow=%s weed=%s roller=%s stones=%s",
-					label,
-					tostring(fs.isValid),
-					tostring(fs.fruitTypeIndex),
-					tostring(fs.growthState),
-					tostring(fs.groundType),
-					tostring(fs.sprayType),
-					tostring(fs.sprayLevel),
-					tostring(fs.limeLevel),
-					tostring(fs.plowLevel),
-					tostring(fs.weedState),
-					tostring(fs.rollerLevel),
-					tostring(fs.stoneLevel)
-				)
-			end
-			local cachedStr = "cached=n/a"
-			if type(field.getFieldState) == "function" then
-				local okC, fsCached = pcall(field.getFieldState, field)
-				if okC and fsCached ~= nil then
-					cachedStr = fieldStateToStr("cached", fsCached)
-				elseif not okC then
-					cachedStr = "cached pcall error: " .. tostring(fsCached)
-				end
-			end
-			local sampledStr = "sampled=n/a"
-			if cx ~= nil and cz ~= nil and FieldState ~= nil and type(FieldState.new) == "function" then
-				local probe = FieldState.new()
-				if type(probe.update) == "function" then
-					local okU, errU = pcall(probe.update, probe, cx, cz)
-					if okU then
-						sampledStr = fieldStateToStr("sampled(FieldState:update)", probe)
-					else
-						sampledStr = "sampled FieldState:update error: " .. tostring(errU)
-					end
-				else
-					sampledStr = "sampled: FieldState instance has no update()"
-				end
-			elseif cx == nil or cz == nil then
-				sampledStr = "sampled: no field center (getCenterOfFieldWorldPosition)"
-			end
-			print(string.format(
-				"--- IANeighbours:updateFarmlands() - fieldState debug farmlandId=%s center=(%.2f, %.2f) | %s | %s",
-				tostring(IA_DEBUG_FIELDSTATE_FARMLAND_ID),
-				cx or 0,
-				cz or 0,
-				cachedStr,
-				sampledStr
-			))
-		else
-			print("--- IANeighbours:updateFarmlands() - fieldState debug: no farmland or field for id " .. tostring(IA_DEBUG_FIELDSTATE_FARMLAND_ID))
-		end
-	end
-
 	local totalFarmlands = 0
 	local ownedFarmlands = 0
 	local unownedFarmlandsCount = 0
@@ -2525,9 +3522,9 @@ function IANeighbours:updateFarmlands()
 	if IANeighbours.debug then
 		for _, neighbour in pairs(farmerNeighbours) do
 			local count = neighbour.assignedFarmlands ~= nil and #neighbour.assignedFarmlands or 0
-			print("--- IANeighbours:updateFarmlands() - "..tostring(neighbour.name).." has "..tostring(count).." assigned farmlands")
+			--print("--- IANeighbours:updateFarmlands() - "..tostring(neighbour.name).." has "..tostring(count).." assigned farmlands")
 		end
-		print("--- IANeighbours:updateFarmlands() - Finished farmland update")
+		--print("--- IANeighbours:updateFarmlands() - Finished farmland update")
 	end
 end
 
@@ -2730,6 +3727,44 @@ function IANeighbours:loadVehicleIdMapping()
 		--print("--- IANeighbours:loadVehicleIdMapping() - Loaded "..tostring(vehicleIndex).." vehicle mappings")
 	end
 end
+
+--- Load placeable ID mappings from outbound XML (mirrors loadVehicleIdMapping).
+function IANeighbours:loadPlaceableIdMapping()
+	if g_currentMission.missionInfo.savegameDirectory == nil then
+		return
+	end
+	local filePath = g_currentMission.missionInfo.savegameDirectory.."/IANeighbours_outbound.xml"
+	
+	if not fileExists(filePath) then
+		IANeighbours.placeableIdMapping = {}
+		return
+	end
+	
+	local xmlFile = loadXMLFile("IANeighboursOutbound", filePath)
+	if xmlFile == nil then
+		IANeighbours.placeableIdMapping = {}
+		return
+	end
+	
+	IANeighbours.placeableIdMapping = {}
+	
+	local rootKey = "IANeighboursOutbound"
+	local placeableIndex = 0
+	while true do
+		local placeableKey = rootKey..".placeables.placeable("..placeableIndex..")"
+		local externalId = getXMLString(xmlFile, placeableKey.."#externalId", nil)
+		if externalId == nil then
+			break
+		end
+		local uniqueId = getXMLString(xmlFile, placeableKey.."#uniqueId", nil)
+		if uniqueId ~= nil then
+			IANeighbours.placeableIdMapping[externalId] = uniqueId
+		end
+		placeableIndex = placeableIndex + 1
+	end
+	
+	delete(xmlFile)
+end
 -- Get IANeighbourVehicle and its neighbour by game vehicle uniqueId
 -- @param number|string uniqueId - Game vehicle uniqueId
 -- @return IANeighbourVehicle|nil, IANeighbour|nil
@@ -2760,7 +3795,7 @@ end
 -- @param number z world Z
 -- @param string|nil text optional label (e.g. place type) to render at position
 -- @param number|nil rotationY optional yaw in radians (so the "2 units behind" tick uses correct direction)
-function IANeighbours:addDebugPointAtPosition(x, y, z, text, rotationY)
+function IANeighbours:addDebugPointAtPosition(x, y, z, text, rotationY, constructionSuppressed)
 	if x == nil or y == nil or z == nil then
 		return
 	end
@@ -2776,11 +3811,7 @@ function IANeighbours:addDebugPointAtPosition(x, y, z, text, rotationY)
 		setRotation(node, 0, rotationY, 0)
 	end
 	link(g_currentMission.terrainRootNode, node)
-	if text ~= nil and text ~= "" then
-		table.insert(IANeighbours.debugPoints, { node = node, text = text })
-	else
-		table.insert(IANeighbours.debugPoints, node)
-	end
+	table.insert(IANeighbours.debugPoints, { node = node, text = text, constructionSuppressed = constructionSuppressed == true })
 	return node
 end
 
@@ -2866,6 +3897,9 @@ function IANeighbours.getPlaceDebugBoxLength(withVehicle, withAttachment, sizeTy
 	if st == "large_area" then
 		return IANeighbours.PLACE_DEBUG_BOX_LENGTH_LARGE_AREA
 	end
+	if st == "silo" then
+		return IANeighbours.PLACE_DEBUG_BOX_LENGTH_SILO
+	end
 	if st == "oversize_vehicle" then
 		return IANeighbours.PLACE_DEBUG_BOX_LENGTH_OVERSIZE
 	end
@@ -2886,6 +3920,9 @@ function IANeighbours.getPlaceDebugBoxSide(withVehicle, withAttachment, sizeType
 	local st = sizeType ~= nil and string.lower(tostring(sizeType)) or nil
 	if st == "large_area" then
 		return IANeighbours.PLACE_DEBUG_SIDE_LARGE_AREA
+	end
+	if st == "silo" then
+		return IANeighbours.PLACE_DEBUG_SIDE_SILO
 	end
 	return IANeighbours.PLACE_DEBUG_SIDE_M
 end
@@ -3038,14 +4075,14 @@ function IANeighbours:addPlaceDebugPointsAt(x, y, z, rotation, label, withVehicl
 			end
 		end
 	end
-	IANeighbours:addDebugPointAtPosition(x, yVal, z, label .. statusSuffix, rot)
+	IANeighbours:addDebugPointAtPosition(x, yVal, z, label .. statusSuffix, rot, true)
 	if blocked and blockingNodeIds and #blockingNodeIds > 0 then
 		for i, nodeId in ipairs(blockingNodeIds) do
 			if nodeId ~= nil and entityExists(nodeId) then
 				local bx, by, bz = getWorldTranslation(nodeId)
 				if bx ~= nil and bz ~= nil then
 					local nodeLabel = (blockingInfos and blockingInfos[i]) or ("id=" .. tostring(nodeId))
-					self:addDebugPointAtPosition(bx, by or 0, bz, "block: " .. nodeLabel, nil)
+					self:addDebugPointAtPosition(bx, by or 0, bz, "block: " .. nodeLabel, nil, true)
 				end
 			end
 		end
@@ -3180,8 +4217,8 @@ function IANeighbours:addStoreSpawnAreaDebugPoints()
 					end
 					local xEnd = sx + ux * L + vx * W
 					local zEnd = sz + uz * L + vz * W
-					self:addDebugPointAtPosition(sx, worldYAt(sx, sz), sz, string.format("Vehicle shop area start (#%d)", si), nil)
-					self:addDebugPointAtPosition(xEnd, worldYAt(xEnd, zEnd), zEnd, string.format("Vehicle shop area end (#%d)", si), nil)
+					self:addDebugPointAtPosition(sx, worldYAt(sx, sz), sz, string.format("Vehicle shop area start (#%d)", si), nil, true)
+					self:addDebugPointAtPosition(xEnd, worldYAt(xEnd, zEnd), zEnd, string.format("Vehicle shop area end (#%d)", si), nil, true)
 				end
 			end
 		end
@@ -3237,7 +4274,34 @@ function IANeighbours:removeNearestPlace()
 	if bestIdx == nil then
 		return false
 	end
+	local removedPlace = places[bestIdx]
 	table.remove(places, bestIdx)
+
+	-- Clean up the removed place ID from all neighbours' assignedHomebasePlaceIds / assignedWorkplacePlaceIds
+	if removedPlace and removedPlace.id ~= nil and self.neighbours ~= nil then
+		local removedId = removedPlace.id
+		for _, n in pairs(self.neighbours) do
+			if n and not n.isDeleted then
+				if n.assignedHomebasePlaceIds ~= nil then
+					for i = #n.assignedHomebasePlaceIds, 1, -1 do
+						local aid = n.assignedHomebasePlaceIds[i]
+						if aid == removedId or (tonumber(tostring(aid)) == tonumber(tostring(removedId))) then
+							table.remove(n.assignedHomebasePlaceIds, i)
+						end
+					end
+				end
+				if n.assignedWorkplacePlaceIds ~= nil then
+					for i = #n.assignedWorkplacePlaceIds, 1, -1 do
+						local wid = n.assignedWorkplacePlaceIds[i]
+						if wid == removedId or (tonumber(tostring(wid)) == tonumber(tostring(removedId))) then
+							table.remove(n.assignedWorkplacePlaceIds, i)
+						end
+					end
+				end
+			end
+		end
+	end
+
 	if IANeighbours.xmlHelper and g_currentMission and g_currentMission.missionInfo and g_currentMission.missionInfo.mapId then
 		if IANeighbours.debug then
 			print("--- saveMapConfigToFile caller: IANeighbours:removeNearestPlace mapId=" .. tostring(g_currentMission.missionInfo.mapId))
@@ -3248,6 +4312,226 @@ function IANeighbours:removeNearestPlace()
 		IANeighbours:rebuildMapInitDebugPoints()
 	end
 	return true
+end
+
+--- Find the place nearest to a given world position (x,z), within maxDist meters, without removing it.
+-- Used by the "remove" tool to inspect the place type before deletion.
+-- @param x number World X of reference point
+-- @param z number World Z of reference point
+-- @param maxDist number Maximum distance in meters (default 5)
+-- @return IAMapPlace|nil the nearest place within range, or nil
+function IANeighbours:findNearestPlaceAt(x, z, maxDist)
+	local places = self.places
+	if x == nil or z == nil or places == nil or #places == 0 then
+		return nil
+	end
+	local maxDistSq = (maxDist or 5) * (maxDist or 5)
+	local bestPlace = nil
+	local bestDistSq = math.huge
+	for _, place in ipairs(places) do
+		if place and place.x ~= nil and place.z ~= nil then
+			local dx = (place.x or 0) - x
+			local dz = (place.z or 0) - z
+			local distSq = dx * dx + dz * dz
+			if distSq < bestDistSq then
+				bestDistSq = distSq
+				bestPlace = place
+			end
+		end
+	end
+	if bestDistSq > maxDistSq then
+		return nil
+	end
+	return bestPlace
+end
+
+--- Remove the place nearest to a given world position (x,z), within maxDist meters.
+-- Used by the "remove" tool placeable via IAPlaceablePlacementDetector.
+-- @param x number World X of reference point
+-- @param z number World Z of reference point
+-- @param maxDist number Maximum distance in meters (default 5)
+-- @return IAMapPlace|nil the removed place, or nil if none found
+function IANeighbours:removeNearestPlaceAt(x, z, maxDist)
+	local places = self.places
+	if x == nil or z == nil or places == nil or #places == 0 then
+		return nil
+	end
+	local maxDistSq = (maxDist or 5) * (maxDist or 5)
+	local bestIdx = nil
+	local bestDistSq = math.huge
+	for i, place in ipairs(places) do
+		if place and place.x ~= nil and place.z ~= nil then
+			local dx = (place.x or 0) - x
+			local dz = (place.z or 0) - z
+			local distSq = dx * dx + dz * dz
+			if distSq < bestDistSq then
+				bestDistSq = distSq
+				bestIdx = i
+			end
+		end
+	end
+	if bestIdx == nil or bestDistSq > maxDistSq then
+		return nil
+	end
+	local removedPlace = places[bestIdx]
+	table.remove(places, bestIdx)
+
+	-- Clean up the removed place ID from all neighbours' assignedHomebasePlaceIds / assignedWorkplacePlaceIds
+	if removedPlace and removedPlace.id ~= nil and self.neighbours ~= nil then
+		local removedId = removedPlace.id
+		for _, n in pairs(self.neighbours) do
+			if n and not n.isDeleted then
+				if n.assignedHomebasePlaceIds ~= nil then
+					for i = #n.assignedHomebasePlaceIds, 1, -1 do
+						local aid = n.assignedHomebasePlaceIds[i]
+						if aid == removedId or (tonumber(tostring(aid)) == tonumber(tostring(removedId))) then
+							table.remove(n.assignedHomebasePlaceIds, i)
+						end
+					end
+				end
+				if n.assignedWorkplacePlaceIds ~= nil then
+					for i = #n.assignedWorkplacePlaceIds, 1, -1 do
+						local wid = n.assignedWorkplacePlaceIds[i]
+						if wid == removedId or (tonumber(tostring(wid)) == tonumber(tostring(removedId))) then
+							table.remove(n.assignedWorkplacePlaceIds, i)
+						end
+					end
+				end
+			end
+		end
+	end
+
+	if IANeighbours.xmlHelper and g_currentMission and g_currentMission.missionInfo and g_currentMission.missionInfo.mapId then
+		if IANeighbours.debug then
+			print("--- saveMapConfigToFile caller: IANeighbours:removeNearestPlaceAt mapId=" .. tostring(g_currentMission.missionInfo.mapId))
+		end
+		IANeighbours.xmlHelper:saveMapConfigToFile(g_currentMission.missionInfo.mapId)
+	end
+	if IANeighbours.mapInitPlaceMarkersVisible == true then
+		IANeighbours:rebuildMapInitDebugPoints()
+	end
+	return removedPlace
+end
+
+--- Remove ALL places matching a given type (and optionally sizeType + characterId).
+-- For public places (shop, gas_station, etc.), all places of that type are removed.
+-- For character_homebase, only places assigned to the given characterId are removed.
+-- @param ptype string Place type (e.g. "public_place", "character_homebase")
+-- @param sizeType string|nil Optional size type filter (e.g. "vehicle")
+-- @param characterId number|nil Optional character ID to scope removal to (for homebases)
+-- @return number Count of places removed
+function IANeighbours:removePlacesByType(ptype, sizeType, characterId)
+	local places = self.places
+	if ptype == nil or places == nil or #places == 0 then
+		return 0
+	end
+
+	-- If characterId is given, collect the set of place IDs assigned to that character
+	local assignedPlaceIds = nil
+	if characterId ~= nil and self.neighbours ~= nil then
+		for _, n in pairs(self.neighbours) do
+			if n ~= nil and not n.isDeleted and n.id == characterId and n.assignedHomebasePlaceIds ~= nil then
+				assignedPlaceIds = {}
+				for _, pid in ipairs(n.assignedHomebasePlaceIds) do
+					assignedPlaceIds[tostring(pid)] = true
+				end
+				break
+			end
+		end
+	end
+
+	-- Collect indices to remove (iterate backwards for stable removal)
+	local toRemove = {}
+	for i = #places, 1, -1 do
+		local place = places[i]
+		if place ~= nil then
+			local st = (place.getSemanticType ~= nil and place:getSemanticType()) or place.type
+			if st == ptype then
+				local sizeMatch = (sizeType == nil or place.sizeType == sizeType)
+				local charMatch = true
+				if characterId ~= nil then
+					if assignedPlaceIds ~= nil and place.id ~= nil then
+						charMatch = assignedPlaceIds[tostring(place.id)] == true
+					else
+						charMatch = false
+					end
+				end
+				if sizeMatch and charMatch then
+					toRemove[#toRemove + 1] = i
+				end
+			end
+		end
+	end
+
+	if #toRemove == 0 then
+		return 0
+	end
+
+	-- Remove places (already in descending index order from the backwards loop)
+	for _, idx in ipairs(toRemove) do
+		local removedPlace = places[idx]
+		table.remove(places, idx)
+
+		-- Clean up the removed place ID from all neighbours' assignedHomebasePlaceIds / assignedWorkplacePlaceIds
+		if removedPlace and removedPlace.id ~= nil and self.neighbours ~= nil then
+			local removedId = removedPlace.id
+			for _, n in pairs(self.neighbours) do
+				if n and not n.isDeleted then
+					if n.assignedHomebasePlaceIds ~= nil then
+						for j = #n.assignedHomebasePlaceIds, 1, -1 do
+							local aid = n.assignedHomebasePlaceIds[j]
+							if aid == removedId or (tonumber(tostring(aid)) == tonumber(tostring(removedId))) then
+								table.remove(n.assignedHomebasePlaceIds, j)
+							end
+						end
+					end
+					if n.assignedWorkplacePlaceIds ~= nil then
+						for j = #n.assignedWorkplacePlaceIds, 1, -1 do
+							local wid = n.assignedWorkplacePlaceIds[j]
+							if wid == removedId or (tonumber(tostring(wid)) == tonumber(tostring(removedId))) then
+								table.remove(n.assignedWorkplacePlaceIds, j)
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	local count = #toRemove
+
+	-- Save and rebuild
+	if IANeighbours.xmlHelper and g_currentMission and g_currentMission.missionInfo and g_currentMission.missionInfo.mapId then
+		if IANeighbours.debug then
+			print(string.format("--- saveMapConfigToFile caller: IANeighbours:removePlacesByType ptype=%s count=%d mapId=%s",
+				tostring(ptype), count, tostring(g_currentMission.missionInfo.mapId)))
+		end
+		IANeighbours.xmlHelper:saveMapConfigToFile(g_currentMission.missionInfo.mapId)
+	end
+	if IANeighbours.mapInitPlaceMarkersVisible == true then
+		IANeighbours:rebuildMapInitDebugPoints()
+	end
+
+	return count
+end
+
+--- Cycle the placeable tool size index (1-5) used by IAPlaceablePlacementDetector.
+-- Called by the "Fields of Stories: Place Size Selection" keybind and /iaCyclePlaceSize console command.
+function IANeighbours:cyclePlaceableToolSize()
+	local idx = (self.placeableToolSizeIndex or 1) + 1
+	if idx > (self.PLACEABLE_TOOL_MAX_SIZE or 5) then
+		idx = 1
+	end
+	self.placeableToolSizeIndex = idx
+	if self.debug then
+		local sizeNames = { "character", "vehicle", "vehicle+attachment", "oversize", "large area", "silo" }
+		print("--- IANeighbours: placeableToolSizeIndex = " .. tostring(idx) .. " (" .. (sizeNames[idx] or "?") .. ")")
+	end
+end
+
+--- Console command handler: cycle placeable tool size.
+function IANeighbours:consoleCommandIaCyclePlaceSize()
+	self:cyclePlaceableToolSize()
 end
 
 --- End the map init phase: remove init vehicle (eject player and delete), clear all debug points, close dialog.
@@ -3459,6 +4743,39 @@ function IANeighbours:setVehicleIdMapping(externalId, uniqueId)
 		IANeighbours.vehicleIdMapping = {}
 	end
 	IANeighbours.vehicleIdMapping[externalId] = uniqueId
+end
+
+--- Static placeable definitions per farmer neighbour (keyed by externalId).
+-- Each entry maps an externalId string to an array of placeable definitions.
+-- A placeable definition contains:
+--   xmlFilename (string) — Store item XML path relative to mod directory
+-- The position is resolved from the neighbour's homebase / large_area farm place.
+-- Silo placeables are now spawned via dedicated silo IAMapPlaces (sizeType="silo").
+-- Add non-silo farmer placeables here (e.g. sheds) by farmer externalId.
+IANeighbours.FARMER_PLACEABLES = {
+}
+
+--- Get placeable uniqueId by externalId (mirrors vehicleIdMapping pattern).
+-- @param string externalId
+-- @return string|nil uniqueId
+function IANeighbours:getPlaceableUniqueIdByExternalId(externalId)
+	if externalId == nil or IANeighbours.placeableIdMapping == nil then
+		return nil
+	end
+	return IANeighbours.placeableIdMapping[externalId]
+end
+
+--- Set placeable ID mapping (externalId -> uniqueId).
+-- @param string externalId
+-- @param string uniqueId
+function IANeighbours:setPlaceableIdMapping(externalId, uniqueId)
+	if externalId == nil or uniqueId == nil then
+		return
+	end
+	if IANeighbours.placeableIdMapping == nil then
+		IANeighbours.placeableIdMapping = {}
+	end
+	IANeighbours.placeableIdMapping[externalId] = uniqueId
 end
 
 --- Add a single map-init entry to IANeighbours.places (via IAPlacesLoader so it is available for situation spawning).

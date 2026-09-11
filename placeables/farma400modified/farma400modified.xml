@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<placeable type="silo" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
+    <storeData>
+        <name>Farma 400 Fields of Stories Edition</name>
+        <functions>
+            <function>$l10n_function_farmSilo</function>
+        </functions>
+        <image>$data/placeables/unia/farma/farma400/store_farma400.dds</image>
+        <price>0</price>
+        <dailyUpkeep>0</dailyUpkeep>
+        <lifetime>1000</lifetime>
+        <rotation>0</rotation>
+        <brand>UNIA</brand>
+        <species>PLACEABLE</species>
+        <category>silos</category>
+        <brush>
+            <type>placeable</type>
+            <category>buildings</category>
+            <tab>silos</tab>
+        </brush>
+        <vertexBufferMemoryUsage>1011200</vertexBufferMemoryUsage>
+        <indexBufferMemoryUsage>176896</indexBufferMemoryUsage>
+        <textureMemoryUsage>917504</textureMemoryUsage>
+        <instanceVertexBufferMemoryUsage>0</instanceVertexBufferMemoryUsage>
+        <instanceIndexBufferMemoryUsage>0</instanceIndexBufferMemoryUsage>
+        <audioMemoryUsage>0</audioMemoryUsage>
+    </storeData>
+
+    <base>
+        <filename>placeables/farma400modified/farma400modified.i3d</filename>
+        <canBeRenamed>true</canBeRenamed>
+    </base>
+
+    <placement useRandomYRotation="false" useManualYRotation="true" >
+        <testAreas>
+            <testArea startNode="testAreaStart01" endNode="testAreaEnd01" />
+            <testArea startNode="testAreaStart02" endNode="testAreaEnd02" />
+        </testAreas>
+
+        <sounds>
+            <place template="siloImp" />
+        </sounds>
+    </placement>
+
+    <clearAreas>
+        <clearArea startNode="clearAreaStart02" widthNode="clearAreaWidth02" heightNode="clearAreaHeight02"/>
+    </clearAreas>
+
+    <leveling requireLeveling="true" maxSmoothDistance="1" maxSlope="75" maxEdgeAngle="30">
+        <levelAreas>
+            <levelArea startNode="levelAreaStart01" widthNode="levelAreaWidth01" heightNode="levelAreaHeight01" groundType="asphalt"/>
+            <levelArea startNode="levelAreaStart02" widthNode="levelAreaWidth02" heightNode="levelAreaHeight02" groundType="asphalt"/>
+        </levelAreas>
+    </leveling>
+
+    <indoorAreas/>
+
+    <tipOcclusionUpdateAreas>
+        <tipOcclusionUpdateArea startNode="tipOcclusionUpdateAreaStart01" endNode="tipOcclusionUpdateAreaEnd01" />
+    </tipOcclusionUpdateAreas>
+
+    <ai>
+        <updateAreas>
+            <updateArea startNode="tipOcclusionUpdateAreaStart01" endNode="tipOcclusionUpdateAreaEnd01" />
+        </updateAreas>
+        <splines>
+            <spline node="aiSpline" />
+        </splines>
+    </ai>
+
+    <dynamicallyLoadedParts>
+        <dynamicallyLoadedPart filename="$data/placeables/shared/sellingStationGeneric/sellingStationGenericSmall.i3d" node="0" linkNode="grainGutterLinkNode" />
+    </dynamicallyLoadedParts>
+
+    <infoTrigger triggerNode="infoTrigger"/>
+
+    <silo>
+        <loadingStation node="loadingTrigger" supportsExtension="true" storageRadius="50">
+            <loadTrigger triggerNode="loadingTrigger" fillLitersPerSecond="500" dischargeNode="dischargeNode" fillTypeCategories="BULK LIQUID slurryTank sprayer" aiNode="aiLoadingNode">
+                <effectNode effectClass="PipeEffect" effectNode="pipeEffect"      materialType="pipe"           fadeTime="0.5" maxBending="0" controlPoint="4.8 0 0 0" />
+                <effectNode                          effectNode="pipeEffectSmoke" materialType="unloadingSmoke" fadeTime="0.5" />
+                <sounds>
+                    <loading template="silosActive" />
+                </sounds>
+            </loadTrigger>
+        </loadingStation>
+
+        <unloadingStation supportsExtension="true" storageRadius="50">
+            <unloadTrigger exactFillRootNode="exactFillRootNode" fillTypeCategories="BULK LIQUID slurryTank sprayer" aiNode="aiUnloadingNode"/>
+            <baleTrigger triggerNode="baleTrigger" deleteLitersPerSecond="10000" fillTypeCategories="BULK" />
+        </unloadingStation>
+
+        <storages>
+            <storage node="storage" fillTypeCategories="BULK LIQUID slurryTank sprayer" capacity="999000000" isExtension="true"/>
+        </storages>
+    </silo>
+
+    <triggerMarkers>
+        <triggerMarker node="markerLoading"   filename="$data/shared/assets/marker/markerIconLoad.i3d" />
+        <triggerMarker node="markerUnloading" filename="$data/shared/assets/marker/markerIconUnload.i3d" />
+    </triggerMarkers>
+
+    <i3dMappings>
+        <i3dMapping id="clearAreaStart01" node="0>0|0" />
+        <i3dMapping id="clearAreaWidth01" node="0>0|0|0" />
+        <i3dMapping id="clearAreaHeight01" node="0>0|0|1" />
+        <i3dMapping id="clearAreaStart02" node="0>0|1" />
+        <i3dMapping id="clearAreaWidth02" node="0>0|1|0" />
+        <i3dMapping id="clearAreaHeight02" node="0>0|1|1" />
+        <i3dMapping id="levelAreaStart01" node="0>1|0" />
+        <i3dMapping id="levelAreaWidth01" node="0>1|0|0" />
+        <i3dMapping id="levelAreaHeight01" node="0>1|0|1" />
+        <i3dMapping id="levelAreaStart02" node="0>1|1" />
+        <i3dMapping id="levelAreaWidth02" node="0>1|1|0" />
+        <i3dMapping id="levelAreaHeight02" node="0>1|1|1" />
+        <i3dMapping id="testAreaStart01" node="0>2|0" />
+        <i3dMapping id="testAreaEnd01" node="0>2|0|0" />
+        <i3dMapping id="testAreaStart02" node="0>2|1" />
+        <i3dMapping id="testAreaEnd02" node="0>2|1|0" />
+        <i3dMapping id="tipOcclusionUpdateAreaStart01" node="0>3|0" />
+        <i3dMapping id="tipOcclusionUpdateAreaEnd01" node="0>3|0|0" />
+        <i3dMapping id="loadingTrigger" node="0>4|0|0|0" />
+        <i3dMapping id="dischargeNode" node="0>4|0|0|1" />
+        <i3dMapping id="dischargeEffect" node="0>4|0|0|2" />
+        <i3dMapping id="pipeEffect" node="0>4|0|0|2|0" />
+        <i3dMapping id="pipeEffectSmoke" node="0>4|0|0|2|1" />
+        <i3dMapping id="aiLoadingNode" node="0>4|0|0|3" />
+        <i3dMapping id="markerLoading" node="0>4|0|1" />
+        <i3dMapping id="exactFillRootNode" node="0>4|1|0" />
+        <i3dMapping id="grainGutterLinkNode" node="0>4|1|1" />
+        <i3dMapping id="aiUnloadingNode" node="0>4|1|2" />
+        <i3dMapping id="markerUnloading" node="0>4|1|3" />
+        <i3dMapping id="baleTrigger" node="0>4|1|4" />
+        <i3dMapping id="mapPosition" node="0>4|2" />
+        <i3dMapping id="storage" node="0>4|3" />
+        <i3dMapping id="infoTrigger" node="0>4|4" />
+        <i3dMapping id="aiSpline" node="0>4|5" />
+        <i3dMapping id="teleportNode" node="0>6" />
+    </i3dMappings>
+</placeable>

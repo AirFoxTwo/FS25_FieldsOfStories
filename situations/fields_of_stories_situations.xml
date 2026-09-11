@@ -377,6 +377,45 @@
       <item>Family Member</item>
     </characterRoles>
   </situation>
+  <situation id="77">
+    <type>Fieldwork</type>
+    <intent>Grass mowing</intent>
+    <roleplayDescription>mow grass on the field</roleplayDescription>
+    <occurrence>random</occurrence>
+    <trigger>random</trigger>
+    <vehicles>Force</vehicles>
+    <fieldwork>grass_mowing</fieldwork>
+    <createdAt>2026-08-01 08:09:29</createdAt>
+    <updatedAt>2026-08-01 08:12:29</updatedAt>
+    <months>
+      <item>5</item>
+      <item>6</item>
+      <item>7</item>
+      <item>8</item>
+      <item>9</item>
+      <item>10</item>
+    </months>
+    <vehicleTypes>
+      <item>Tractor</item>
+      <item>Attachment</item>
+    </vehicleTypes>
+    <attachmentCategories>
+      <item>Front Mower</item>
+      <item>mowers</item>
+    </attachmentCategories>
+    <characterRoles>
+      <item>Neighbour</item>
+    </characterRoles>
+    <characterJobs>
+      <item>Farmer</item>
+    </characterJobs>
+    <triggerFruitTypeIndex>
+      <item>GRASS</item>
+    </triggerFruitTypeIndex>
+    <triggerGrowthState>
+      <item>harvestReady</item>
+    </triggerGrowthState>
+  </situation>
   <situation id="71">
     <type>Work</type>
     <intent>Güllefass abschmieren, Öl nachfüllen und Gestänge einstellen</intent>
@@ -426,7 +465,7 @@
     <characterVisibility>in_car</characterVisibility>
     <fieldwork>harvest</fieldwork>
     <createdAt>2026-01-27 22:22:05</createdAt>
-    <updatedAt>2026-05-15 21:13:34</updatedAt>
+    <updatedAt>2026-08-01 08:14:35</updatedAt>
     <vehicleTypes>
       <item>Attachment</item>
       <item>Combine</item>
@@ -513,6 +552,48 @@
     <characterJobs>
       <item>Forester</item>
     </characterJobs>
+  </situation>
+  <situation id="76">
+    <type>Fieldwork</type>
+    <intent>Lime spreading</intent>
+    <occurrence>random</occurrence>
+    <trigger>random</trigger>
+    <vehicles>Force</vehicles>
+    <characterVisibility>in_car</characterVisibility>
+    <fieldwork>lime</fieldwork>
+    <createdAt>2026-08-01 07:00:56</createdAt>
+    <updatedAt>2026-08-01 08:34:57</updatedAt>
+    <months>
+      <item>2</item>
+      <item>3</item>
+      <item>4</item>
+      <item>5</item>
+      <item>6</item>
+      <item>7</item>
+      <item>8</item>
+      <item>9</item>
+      <item>10</item>
+      <item>11</item>
+    </months>
+    <vehicleTypes>
+      <item>Tractor</item>
+      <item>Attachment</item>
+    </vehicleTypes>
+    <attachmentCategories>
+      <item>Lime Spreader</item>
+    </attachmentCategories>
+    <characterRoles>
+      <item>Neighbour</item>
+    </characterRoles>
+    <characterJobs>
+      <item>Farmer</item>
+    </characterJobs>
+    <triggerGrowthState>
+      <item>harvested</item>
+    </triggerGrowthState>
+    <triggerLimeLevel>
+      <item>0</item>
+    </triggerLimeLevel>
   </situation>
   <situation id="60">
     <type>Work</type>
@@ -1422,6 +1503,7 @@
     </vehicleTypes>
     <attachmentCategories>
       <item>Fertilizer Spreader</item>
+      <item>Weight</item>
     </attachmentCategories>
     <characterRoles>
       <item>Neighbour</item>
@@ -1724,7 +1806,7 @@
     <characterVisibility>in_car</characterVisibility>
     <fieldwork>stubble_cultivation</fieldwork>
     <createdAt>2026-02-02 21:59:56</createdAt>
-    <updatedAt>2026-05-04 23:17:40</updatedAt>
+    <updatedAt>2026-08-01 08:43:35</updatedAt>
     <vehicleTypes>
       <item>Tractor Large</item>
       <item>Attachment</item>
@@ -1742,6 +1824,11 @@
     <triggerGrowthState>
       <item>harvested</item>
     </triggerGrowthState>
+    <triggerLimeLevel>
+      <item>1</item>
+      <item>2</item>
+      <item>3</item>
+    </triggerLimeLevel>
   </situation>
   <situation id="68">
     <type>Work</type>

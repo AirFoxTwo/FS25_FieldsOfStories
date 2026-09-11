@@ -263,6 +263,7 @@ function IAXMLHelper:loadInboundXML()
 	end
 
 	self.ianeighbours:loadVehicleIdMapping()
+	self.ianeighbours:loadPlaceableIdMapping()
 
 	local filePath = g_currentMission.missionInfo.savegameDirectory.."/IANeighbours_inbound.xml"
 	
@@ -1308,6 +1309,8 @@ function IAXMLHelper:loadVehiclesFromXML(xmlFile, neighbourKey, existingNeighbou
 		local manufacturer = getXMLString(xmlFile, vehicleKey.."#manufacturer", nil)
 		local category = getXMLString(xmlFile, vehicleKey.."#category", nil)
 		local colorIndex = getXMLInt(xmlFile, vehicleKey.."#colorIndex", nil)
+		local headerTrailerId = getXMLString(xmlFile, vehicleKey.."#headerTrailer", nil)
+		local headerTrailerExternalIdFromOutbound = getXMLString(xmlFile, vehicleKey.."#headerTrailerExternalId", nil)
 		
 		-- For scenario format, use id as externalId if not already set
 		if vehicleExternalId == nil and vehicleId ~= nil then
@@ -1435,7 +1438,15 @@ function IAXMLHelper:loadVehiclesFromXML(xmlFile, neighbourKey, existingNeighbou
 		if category ~= nil then
 			existingVehicle.category = category
 		end
-		
+		if headerTrailerExternalIdFromOutbound ~= nil then
+			existingVehicle.headerTrailerExternalId = headerTrailerExternalIdFromOutbound
+		elseif headerTrailerId ~= nil then
+			existingVehicle.headerTrailerExternalId = headerTrailerId
+		end
+		-- Note: headerTrailerExternalId (and other static vehicle fields) that are
+		-- still nil after outbound load are filled by mergeScenarioVehicleDefaults()
+		-- which runs once after all neighbours/vehicles are loaded.
+
 		-- Initialize vehicle if needed
 		if not existingVehicle.initialized or existingVehicle.uniqueId == nil then
 			existingVehicle:initialize(function(uniqueId, externalId, ia_vehicle)
@@ -1456,6 +1467,254 @@ function IAXMLHelper:loadVehiclesFromXML(xmlFile, neighbourKey, existingNeighbou
 		end
 		
 		vehicleIndex = vehicleIndex + 1
+	end
+end
+
+--- Load placeables for a neighbour from outbound XML.
+-- @param xmlFile table XML file handle
+-- @param neighbourKey string XML key path for the neighbour
+-- @param existingNeighbour table IANeighbour instance
+function IAXMLHelper:loadPlaceablesFromXML(xmlFile, neighbourKey, existingNeighbour)
+	if existingNeighbour == nil then
+		return
+	end
+
+	local placeableIndex = 0
+	while true do
+		local placeableKey = neighbourKey..".placeable("..placeableIndex..")"
+		local placeableUniqueIdStr = getXMLString(xmlFile, placeableKey.."#uniqueId", nil)
+		local placeableId = getXMLString(xmlFile, placeableKey.."#id", nil)
+
+		if placeableUniqueIdStr == nil and placeableId == nil then
+			break
+		end
+
+		local placeableUniqueId = placeableUniqueIdStr
+		local placeableExternalId = placeableId
+
+		-- Resolve uniqueId from mapping if only externalId is present
+		if placeableUniqueId == nil and placeableExternalId ~= nil then
+			placeableUniqueId = self.ianeighbours:getPlaceableUniqueIdByExternalId(placeableExternalId)
+		end
+
+		local xmlFilename = getXMLString(xmlFile, placeableKey.."#xmlFilename", nil)
+		local positionX = getXMLFloat(xmlFile, placeableKey.."#positionX", nil)
+		local positionY = getXMLFloat(xmlFile, placeableKey.."#positionY", nil)
+		local positionZ = getXMLFloat(xmlFile, placeableKey.."#positionZ", nil)
+		local rotation = getXMLFloat(xmlFile, placeableKey.."#rotation", nil)
+		local farmId = getXMLInt(xmlFile, placeableKey.."#farmId", nil) or existingNeighbour.farmId or 99
+
+		-- Check if placeable already exists
+		local existingPlaceable = nil
+		if placeableUniqueId ~= nil then
+			existingPlaceable = existingNeighbour:getPlaceable(placeableUniqueId)
+		end
+		if existingPlaceable == nil and placeableExternalId ~= nil then
+			existingPlaceable = existingNeighbour:getPlaceableByExternalId(placeableExternalId)
+		end
+
+		if existingPlaceable == nil then
+			existingPlaceable = IANeighbourPlaceable.new(placeableUniqueId, placeableExternalId, farmId, existingNeighbour)
+			existingPlaceable.xmlFilename = xmlFilename
+			existingPlaceable.positionX = positionX
+			existingPlaceable.positionY = positionY
+			existingPlaceable.positionZ = positionZ
+			existingPlaceable.rotation = rotation
+
+			-- Try attaching to an existing game placeable (restore from save)
+			if placeableUniqueId ~= nil then
+				existingPlaceable:loadPlaceableById(placeableUniqueId)
+			end
+		end
+
+		placeableIndex = placeableIndex + 1
+	end
+end
+
+--- Spawn static placeable definitions for a neighbour that doesn't have them yet
+-- (fresh start from scenario or first-time placeable definitions).
+-- @param neighbour table IANeighbour instance
+function IAXMLHelper:spawnStaticPlaceablesForNeighbour(neighbour)
+	if neighbour == nil or neighbour.externalIdStr == nil then
+		return
+	end
+
+	local defs = IANeighbours.FARMER_PLACEABLES
+	if defs == nil then
+		return
+	end
+
+	local extId = tostring(neighbour.externalIdStr)
+	local placeableDefs = defs[extId]
+	if placeableDefs == nil or #placeableDefs == 0 then
+		return
+	end
+
+	for _, def in ipairs(placeableDefs) do
+		if def.xmlFilename == nil then
+			-- skip invalid defs
+		else
+			local externalId = extId .. "_pl_" .. tostring(_)
+			local iaPl = IANeighbourPlaceable.new(nil, externalId, neighbour.farmId or 99, neighbour)
+			iaPl.xmlFilename = def.xmlFilename
+			-- Position: use neighbour's current position (from vehicle/homebase)
+			iaPl.positionX = def.positionX or neighbour.positionX
+			iaPl.positionY = def.positionY or neighbour.positionY
+			iaPl.positionZ = def.positionZ or neighbour.positionZ
+			iaPl.rotation = def.rotation or neighbour.rotation or 0
+
+			iaPl:spawn(function(placeable, errorMsg)
+				if placeable ~= nil then
+					IAprintDebug("IAXMLHelper", string.format("Spawned static placeable '%s' for neighbour %s (extId=%s)", def.xmlFilename, tostring(neighbour.name), externalId))
+				else
+					IAprintDebug("IAXMLHelper", string.format("Failed to spawn static placeable '%s' for neighbour %s: %s", def.xmlFilename, tostring(neighbour.name), tostring(errorMsg)))
+				end
+			end)
+		end
+	end
+end
+
+--- After loading from outbound XML, merge static vehicle fields from the bundled
+--- scenario XML for any vehicle that is missing them (e.g. saves from before the
+--- field was added to the outbound save format). Also adds vehicles that exist in
+--- the scenario XML but are absent from the outbound savegame (e.g. newly defined
+--- header trailers for combines). Never re-adds removed characters.
+function IAXMLHelper:mergeScenarioVehicleDefaults()
+	local bundledFile = self.ianeighbours.dir .. "default_scenarios/fields_of_stories_scenario.xml"
+	if not fileExists(bundledFile) then
+		return
+	end
+
+	local scenarioXml = loadXMLFile("ScenarioVehicleMerge", bundledFile)
+	if scenarioXml == nil or scenarioXml == 0 then
+		return
+	end
+
+	local rootKey = "scenario"
+
+	-- Build lookup: externalId (scenario vehicle #id) -> { category, name, manufacturer, type, headerTrailerExternalId, neighbourId, xmlFilename, colorIndex, vehicleId }
+	local scenarioVehicleData = {}
+	local nbIdx = 0
+	while true do
+		local nbKey = rootKey .. ".neighbours.neighbour(" .. nbIdx .. ")"
+		local nbId = getXMLInt(scenarioXml, nbKey .. "#id", nil)
+		if nbId == nil then break end
+
+		local vehIdx = 0
+		while true do
+			local vehKey = nbKey .. ".vehicle(" .. vehIdx .. ")"
+			local extId = getXMLString(scenarioXml, vehKey .. "#id", nil)
+			if extId == nil then break end
+
+			scenarioVehicleData[extId] = {
+				category = getXMLString(scenarioXml, vehKey .. "#category", nil),
+				name = getXMLString(scenarioXml, vehKey .. "#name", nil),
+				manufacturer = getXMLString(scenarioXml, vehKey .. "#manufacturer", nil),
+				type = getXMLString(scenarioXml, vehKey .. "#type", nil),
+				headerTrailerExternalId = getXMLString(scenarioXml, vehKey .. "#headerTrailer", nil),
+				neighbourId = nbId,
+				xmlFilename = getXMLString(scenarioXml, vehKey .. "#xmlFilename", nil),
+				colorIndex = getXMLInt(scenarioXml, vehKey .. "#colorIndex", nil),
+				vehicleId = getXMLString(scenarioXml, vehKey .. "#vehicleId", nil),
+			}
+			vehIdx = vehIdx + 1
+		end
+		nbIdx = nbIdx + 1
+	end
+
+	delete(scenarioXml)
+
+	-- Build set of externalIds already present across all neighbours (for the add-missing pass below)
+	local existingVehicleExtIds = {}
+	for _, neighbour in pairs(self.ianeighbours.neighbours) do
+		if neighbour ~= nil and neighbour.vehicles ~= nil then
+			for _, vehicle in pairs(neighbour.vehicles) do
+				if vehicle ~= nil and vehicle.externalId ~= nil then
+					existingVehicleExtIds[tostring(vehicle.externalId)] = true
+				end
+			end
+		end
+	end
+
+	-- PASS 1 — Merge into existing vehicles: only fill fields that are nil on the vehicle
+	local mergedCount = 0
+	for _, neighbour in pairs(self.ianeighbours.neighbours) do
+		if neighbour ~= nil and neighbour.vehicles ~= nil then
+			for _, vehicle in pairs(neighbour.vehicles) do
+				if vehicle ~= nil and vehicle.externalId ~= nil then
+					local data = scenarioVehicleData[tostring(vehicle.externalId)]
+					if data ~= nil then
+						local changed = false
+						if vehicle.category == nil and data.category ~= nil then
+							vehicle.category = data.category
+							changed = true
+						end
+						if vehicle.vehicleName == nil and data.name ~= nil then
+							vehicle.vehicleName = data.name
+							changed = true
+						end
+						if vehicle.manufacturer == nil and data.manufacturer ~= nil then
+							vehicle.manufacturer = data.manufacturer
+							changed = true
+						end
+						if vehicle.type == nil and data.type ~= nil then
+							vehicle.type = data.type
+							changed = true
+						end
+						if vehicle.headerTrailerExternalId == nil and data.headerTrailerExternalId ~= nil then
+							vehicle.headerTrailerExternalId = data.headerTrailerExternalId
+							changed = true
+						end
+						if changed then
+							mergedCount = mergedCount + 1
+						end
+					end
+				end
+			end
+		end
+	end
+
+	-- PASS 2 — Add vehicles from scenario XML that are missing in the outbound savegame.
+	-- Only adds to neighbours that already exist (identified by matching scenario neighbour id).
+	local addedCount = 0
+	for extId, data in pairs(scenarioVehicleData) do
+		if not existingVehicleExtIds[extId] then
+			-- Find the target neighbour by matching scenario neighbour id
+			local targetNeighbour = nil
+			for _, neighbour in pairs(self.ianeighbours.neighbours) do
+				if neighbour ~= nil and neighbour.id ~= nil and tostring(neighbour.id) == tostring(data.neighbourId) then
+					targetNeighbour = neighbour
+					break
+				end
+			end
+			if targetNeighbour ~= nil then
+				local newVehicle = IANeighbourVehicle.new(nil, targetNeighbour.farmId, targetNeighbour)
+				newVehicle.externalId = extId
+				newVehicle.category = data.category
+				newVehicle.vehicleName = data.name
+				newVehicle.manufacturer = data.manufacturer
+				newVehicle.type = data.type
+				newVehicle.headerTrailerExternalId = data.headerTrailerExternalId
+				if data.xmlFilename ~= nil then
+					newVehicle.xmlFilename = data.xmlFilename
+				end
+				if data.colorIndex ~= nil then
+					newVehicle.colorIndex = data.colorIndex
+				end
+				if data.vehicleId ~= nil then
+					newVehicle.vehicleId = data.vehicleId
+				end
+
+				newVehicle:initialize(function(uniqueId, externalId, ia_vehicle)
+					targetNeighbour:addVehicle(newVehicle)
+				end)
+				addedCount = addedCount + 1
+			end
+		end
+	end
+
+	if self.ianeighbours.debug and (mergedCount > 0 or addedCount > 0) then
+		print("--- IAXMLHelper:mergeScenarioVehicleDefaults() - Merged scenario defaults for " .. tostring(mergedCount) .. " vehicles, added " .. tostring(addedCount) .. " new vehicles")
 	end
 end
 
@@ -1603,7 +1862,8 @@ function IAXMLHelper:loadOutboundXML()
 	end
 
 	-- Load vehicle ID mapping from outbound XML first
-	--self.ianeighbours:loadVehicleIdMapping()
+	self.ianeighbours:loadVehicleIdMapping()
+	self.ianeighbours:loadPlaceableIdMapping()
 
 	local filePath = g_currentMission.missionInfo.savegameDirectory.."/IANeighbours_outbound.xml"
 	
@@ -1641,6 +1901,9 @@ function IAXMLHelper:loadOutboundXML()
 		
 		-- Load vehicles for this neighbour
 		self:loadVehiclesFromXML(xmlFile, neighbourKey, existingNeighbour)
+
+		-- Load placeables for this neighbour
+		self:loadPlaceablesFromXML(xmlFile, neighbourKey, existingNeighbour)
 		
 		-- Load situation for this neighbour
 		local loadedSituation = self:loadSituationFromXML(xmlFile, neighbourKey, existingNeighbour)
@@ -1777,6 +2040,8 @@ function IAXMLHelper:scenarioInitialize()
 		
 		-- Load vehicles using unified method (handles both formats)
 		self:loadVehiclesFromXML(xmlFile, neighbourKey, existingNeighbour)
+		-- Load placeables for this neighbour
+		self:loadPlaceablesFromXML(xmlFile, neighbourKey, existingNeighbour)
 		
 		neighbourIndex = neighbourIndex + 1
 	end
@@ -1952,7 +2217,7 @@ function IAXMLHelper:loadConversationsStructureRegistry()
 	if structXml == nil then
 		return
 	end
-	local rootKey = "conversationsData"
+	local rootKey = "conversationsStructure.conversationsData"
 	local charIndex = 0
 	while true do
 		local charKey = rootKey .. ".character(" .. charIndex .. ")"
@@ -1997,6 +2262,62 @@ function IAXMLHelper:loadConversationsStructureRegistry()
 			charIndex = charIndex + 1
 		end
 	end
+
+	-- Parse <dynamicConversationsData> section for dynamic conversation variants (same structure pattern).
+	-- Fills IAConversation.dynamicSituationVariantIds[charIndex][topicId] and
+	-- IAConversation.structureDynamicCharacterIndexByFolderId[folderCharId] = charIndex
+	if IAConversation.dynamicSituationVariantIds == nil then
+		IAConversation.dynamicSituationVariantIds = {}
+	end
+	if IAConversation.structureDynamicCharacterIndexByFolderId == nil then
+		IAConversation.structureDynamicCharacterIndexByFolderId = {}
+	end
+	local dynRootKey = "conversationsStructure.dynamicConversationsData"
+	local dynCharIndex = 0
+	while true do
+		local dynCharKey = dynRootKey .. ".character(" .. dynCharIndex .. ")"
+		local dynCharId = getXMLString(structXml, dynCharKey .. "#id", nil)
+		if dynCharId == nil then
+			break
+		end
+		local dynCharStructIndex = getXMLString(structXml, dynCharKey .. "#index", nil)
+		if dynCharStructIndex == nil or dynCharStructIndex == "" then
+			if self.ianeighbours ~= nil and self.ianeighbours.debug then
+				print("--- IAXMLHelper:loadConversationsStructureRegistry() - skip dynamic character id=" .. tostring(dynCharId) .. " (missing #index)")
+			end
+			dynCharIndex = dynCharIndex + 1
+		else
+			dynCharId = tostring(dynCharId)
+			dynCharStructIndex = tostring(dynCharStructIndex)
+			IAConversation.structureDynamicCharacterIndexByFolderId[dynCharId] = dynCharStructIndex
+			if IAConversation.dynamicSituationVariantIds[dynCharStructIndex] == nil then
+				IAConversation.dynamicSituationVariantIds[dynCharStructIndex] = {}
+			end
+			local topicIndex = 0
+			while true do
+				local topicKey = dynCharKey .. ".topic(" .. topicIndex .. ")"
+				local topicId = getXMLString(structXml, topicKey .. "#id", nil)
+				if topicId == nil then
+					break
+				end
+				local variantIds = {}
+				local varIndex = 0
+				while true do
+					local varKey = topicKey .. ".variant(" .. varIndex .. ")"
+					local varIdStr = getXMLString(structXml, varKey .. "#id", nil)
+					if varIdStr == nil then
+						break
+					end
+					table.insert(variantIds, varIdStr)
+					varIndex = varIndex + 1
+				end
+				IAConversation.dynamicSituationVariantIds[dynCharStructIndex][topicId] = variantIds
+				topicIndex = topicIndex + 1
+			end
+			dynCharIndex = dynCharIndex + 1
+		end
+	end
+
 	delete(structXml)
 	if self.ianeighbours ~= nil and self.ianeighbours.debug then
 		print("--- IAXMLHelper:loadConversationsStructureRegistry() - OK")
@@ -2046,8 +2367,15 @@ function IAXMLHelper:loadData()
 		if self.ianeighbours.debug then
 			print("--- IAXMLHelper:loadData() - Successfully loaded from outbound XML")
 		end
+		-- Merge static vehicle fields from the bundled scenario XML for vehicles
+		-- that are missing them (e.g. saves from before a field was added).
+		self:mergeScenarioVehicleDefaults()
 		-- Merge map-config homebase + workplace assignments into neighbours (add-only: never removes outbound/savegame assignments).
 		self:mergeMapConfigNeighbourHomebaseAssignments()
+		-- Neighbours consumed map homebase pending in tryAutoAssign during load; clear so nothing treats this as live state later (e.g. places bootstrap).
+		if self.ianeighbours ~= nil then
+			self.ianeighbours.mapConfigNeighbourHomebaseAssignments = nil
+		end
 		self:applyMapConfigNeighbourWorkplaceAssignments()
 		if self.ianeighbours ~= nil and self.ianeighbours.reclassifyPlacesByPlayerFarmland ~= nil then
 			self.ianeighbours:reclassifyPlacesByPlayerFarmland()
@@ -2058,6 +2386,12 @@ function IAXMLHelper:loadData()
 			end)
 		end
 		self:removeOrphanedFarm99Vehicles()
+		-- Spawn static placeables for farmers that don't have them yet (fresh start or new definitions)
+		self:spawnPendingPlaceablesForAllNeighbours()
+		-- Ensure silo IAMapPlaces have corresponding game placeables (IAMapPlace → game object direction)
+		self:reconcileAllSiloPlaceables()
+		-- Clean up legacy farma400modified silos spawned at large_area corners that are not linked to any IAMapPlace
+		self:removeOrphanedSiloPlaceables()
 		return true
 	end
 	
@@ -2073,6 +2407,12 @@ function IAXMLHelper:loadData()
 		self:applyMapConfigNeighbourWorkplaceAssignments()
 	end
 	self:removeOrphanedFarm99Vehicles()
+	-- Spawn static placeables for farmers (fresh save)
+	self:spawnPendingPlaceablesForAllNeighbours()
+	-- Ensure silo IAMapPlaces have corresponding game placeables (IAMapPlace → game object direction)
+	self:reconcileAllSiloPlaceables()
+	-- Clean up legacy farma400modified silos spawned at large_area corners that are not linked to any IAMapPlace
+	self:removeOrphanedSiloPlaceables()
 	if self.ianeighbours ~= nil and self.ianeighbours.reclassifyPlacesByPlayerFarmland ~= nil then
 		self.ianeighbours:reclassifyPlacesByPlayerFarmland()
 	end
@@ -2083,6 +2423,295 @@ function IAXMLHelper:loadData()
 	end
 
 	return success
+end
+
+--- Spawn static placeables for all neighbours that have definitions in FARMER_PLACEABLES
+-- but don't yet have them in their placeables table (fresh start or newly added definitions).
+function IAXMLHelper:spawnPendingPlaceablesForAllNeighbours()
+	if self.ianeighbours == nil or self.ianeighbours.neighbours == nil then
+		return
+	end
+	if IANeighbours.FARMER_PLACEABLES == nil then
+		return
+	end
+	if IANeighbourPlaceable == nil then
+		print("[IAXMLHelper] IANeighbourPlaceable not loaded -- skipping placeable spawn")
+		return
+	end
+
+	for _, neighbour in pairs(self.ianeighbours.neighbours) do
+		if neighbour ~= nil and neighbour.id ~= nil then
+			local extId = tostring(neighbour.id)
+			local defs = IANeighbours.FARMER_PLACEABLES[extId]
+			if defs ~= nil and #defs > 0 then
+				-- Check which placeables are already spawned
+				for _, def in ipairs(defs) do
+					if def.xmlFilename ~= nil then
+						-- Check if this placeable def already has a matching spawned entry
+						local alreadySpawned = false
+						if neighbour.placeables ~= nil then
+							for _, iaPl in pairs(neighbour.placeables) do
+								if iaPl ~= nil and iaPl.xmlFilename == def.xmlFilename then
+									alreadySpawned = true
+									break
+								end
+							end
+						end
+						if not alreadySpawned then
+							local externalId = extId .. "_pl_" .. def.xmlFilename:gsub("[^%w]", "_")
+							local iaPl = IANeighbourPlaceable.new(nil, externalId, neighbour.farmId or 99, neighbour)
+							iaPl.xmlFilename = def.xmlFilename
+							-- Position resolved automatically by IANeighbourPlaceable:spawn() (large_area corner)
+							-- Only set when explicitly provided in the definition
+							iaPl.positionX = def.positionX
+							iaPl.positionY = def.positionY
+							iaPl.positionZ = def.positionZ
+							iaPl.rotation = def.rotation
+
+							iaPl:spawn(function(placeable, errorMsg)
+								if placeable ~= nil then
+									if self.ianeighbours.debug then
+										print(string.format("[IAXMLHelper] Spawned static placeable '%s' for neighbour %s (extId=%s)", def.xmlFilename, tostring(neighbour.name), externalId))
+									end
+								else
+									print(string.format("[IAXMLHelper] Failed to spawn static placeable '%s' for neighbour %s: %s", def.xmlFilename, tostring(neighbour.name), tostring(errorMsg)))
+								end
+							end)
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+--- Resolve which neighbour (character) a given IAMapPlace belongs to by checking
+-- each neighbour's assignedHomebasePlaceIds list (runtime, not XML).
+-- @param IAMapPlace place
+-- @return number|nil neighbour.id if the place is a homebase of some character
+function IAXMLHelper:_findCharacterForPlace(place)
+	if place == nil or place.id == nil then return nil end
+	if self.ianeighbours == nil or self.ianeighbours.neighbours == nil then return nil end
+	for _, n in pairs(self.ianeighbours.neighbours) do
+		if n ~= nil and n.assignedHomebasePlaceIds ~= nil then
+			for _, pid in ipairs(n.assignedHomebasePlaceIds) do
+				if pid == place.id then
+					return n.id
+				end
+			end
+		end
+	end
+	return nil
+end
+
+--- Register a spawned or linked silo as an IANeighbourPlaceable so it appears in
+-- neighbour.placeables, getFirstPlaceable(), outbound XML persistence, and mission silo lookups.
+-- Idempotent: skips if the silo uniqueId is already registered for this neighbour.
+-- @param number|nil characterNumber neighbour.id
+-- @param string|nil siloUniqueId game placeable uniqueId
+-- @param IAMapPlace place the associated IAMapPlace (for position metadata)
+-- @param string|nil xmlFilename the store item XML path (falls back to farma400modified)
+function IAXMLHelper:_registerSiloAsNeighbourPlaceable(characterNumber, siloUniqueId, place, xmlFilename)
+	if characterNumber == nil or siloUniqueId == nil then return end
+	if self.ianeighbours == nil or self.ianeighbours.neighbours == nil then return end
+	if IANeighbourPlaceable == nil then return end
+
+	local neighbour = self.ianeighbours.neighbours[characterNumber]
+	if neighbour == nil or tonumber(neighbour.id) ~= tonumber(characterNumber) then
+		for _, n in pairs(self.ianeighbours.neighbours) do
+			if n ~= nil and tonumber(n.id) == tonumber(characterNumber) then
+				neighbour = n
+				break
+			end
+		end
+	end
+	if neighbour == nil then return end
+
+	-- Idempotent: skip if this silo uniqueId is already registered
+	if neighbour.placeables ~= nil then
+		for _, existingPl in pairs(neighbour.placeables) do
+			if existingPl ~= nil and existingPl.uniqueId == siloUniqueId then
+				return  -- already registered
+			end
+		end
+	end
+
+	local extId = tostring(characterNumber) .. "_pl_silo"
+	local xmlFile = xmlFilename or "placeables/farma400modified/farma400modified.xml"
+	local iaPl = IANeighbourPlaceable.new(siloUniqueId, extId, neighbour.farmId or 99, neighbour)
+	iaPl.xmlFilename = xmlFile
+	-- Attach to the in-world placeable (may be nil if called before spawn completes)
+	if g_currentMission ~= nil and g_currentMission.placeableSystem ~= nil
+		and g_currentMission.placeableSystem.placableByUniqueId ~= nil then
+		iaPl.placeable = g_currentMission.placeableSystem.placableByUniqueId[tostring(siloUniqueId)]
+	end
+	iaPl.positionX = place.x
+	iaPl.positionY = place.y or 0
+	iaPl.positionZ = place.z
+	iaPl.rotation = place.rotation or 0
+	neighbour:addPlaceable(iaPl)
+	if self.ianeighbours.debug then
+		print(string.format("[IAXMLHelper] Registered silo %s as IANeighbourPlaceable for neighbour %d (%s)",
+			tostring(siloUniqueId), characterNumber, tostring(neighbour.name)))
+	end
+end
+
+--- Spawn a farma400modified game placeable at a silo IAMapPlace position, linking them via _siloPlaceableUniqueId.
+-- Idempotent: no-ops if place already has a link, or if a farma400modified already exists within 5m of the place.
+-- Called when a silo place is created manually (construction tool / SHIFT+F3) and on savegame-load reconciliation.
+-- @param IAMapPlace place the silo place (must have sizeType == "silo", x, z)
+-- @param number|nil characterNumber The neighbour.id this place belongs to. Passed directly from
+--   addPlaceFromMapInitEntry (which has entry.characterNumber). On savegame load (reconcileAllSiloPlaceables)
+--   this is nil; the function resolves it via neighbour.assignedHomebasePlaceIds.
+function IAXMLHelper:ensureSiloPlaceableForPlace(place, characterNumber)
+	if place == nil or place.x == nil or place.z == nil then
+		return
+	end
+	if place.sizeType ~= "silo" then
+		return
+	end
+	if place._siloPlaceableUniqueId ~= nil then
+		return  -- already linked
+	end
+
+	-- Guard 1: Proximity – if a farma400modified already exists within 5m of this
+	-- IAMapPlace (e.g. after savegame reload), link to it instead of spawning.
+	if g_currentMission ~= nil and g_currentMission.placeableSystem ~= nil then
+		local ps = g_currentMission.placeableSystem
+		if ps.placeables ~= nil then
+			for _, p in ipairs(ps.placeables) do
+				if p ~= nil and p.configFileNameClean == "farma400modified"
+					and p.rootNode ~= nil and entityExists(p.rootNode) then
+					local px, _, pz = getWorldTranslation(p.rootNode)
+					if px ~= nil and pz ~= nil then
+						local dx, dz = px - place.x, pz - place.z
+						if dx * dx + dz * dz < 25 then  -- within 5m
+							place._siloPlaceableUniqueId = p.uniqueId
+							-- Register as IANeighbourPlaceable so the neighbour can find it
+							self:_registerSiloAsNeighbourPlaceable(characterNumber, p.uniqueId, place, xmlPath)
+							if self.ianeighbours ~= nil and self.ianeighbours.debug then
+								print(string.format("[IAXMLHelper] Linked nearby silo uid=%s to IAMapPlace '%s'",
+									tostring(p.uniqueId), tostring(place.name)))
+							end
+							return
+						end
+					end
+				end
+			end
+		end
+	end
+
+	-- Guard 2: Per-character – only 1 farma400modified silo per character.
+	-- Uses a simple map (IAXMLHelper._charSiloMap) keyed by characterNumber.
+	-- The map is populated on spawn and checked on subsequent placements.
+	if characterNumber ~= nil then
+		self._charSiloMap = self._charSiloMap or {}
+		local existingUid = self._charSiloMap[characterNumber]
+		if existingUid ~= nil then
+			-- Verify the linked silo still exists in the world
+			local ps = g_currentMission and g_currentMission.placeableSystem
+			if ps and ps.placeables then
+				for _, p in ipairs(ps.placeables) do
+					if p ~= nil and p.uniqueId == existingUid
+						and p.rootNode ~= nil and entityExists(p.rootNode)
+						and not p.isDeleted and not p.isDeleting then
+						place._siloPlaceableUniqueId = existingUid
+						-- Register as IANeighbourPlaceable so the neighbour can find it
+						self:_registerSiloAsNeighbourPlaceable(characterNumber, existingUid, place, xmlPath)
+						if self.ianeighbours and self.ianeighbours.debug then
+							print(string.format("[IAXMLHelper] Linked existing silo uid=%s to IAMapPlace '%s' (shared per character %d)",
+								tostring(existingUid), tostring(place.name), characterNumber))
+						end
+						return
+					end
+				end
+			end
+			-- Silo was deleted externally; clear stale map entry so we re-spawn
+			self._charSiloMap[characterNumber] = nil
+		end
+	end
+
+	-- Spawn the game placeable at the IAMapPlace position.
+	if IAPlaceableHelper == nil or type(IAPlaceableHelper.spawnPlaceable) ~= "function" then
+		if self.ianeighbours ~= nil and self.ianeighbours.debug then
+			print("[IAXMLHelper] IAPlaceableHelper.spawnPlaceable not available for silo auto-spawn")
+		end
+		return
+	end
+
+	-- Mark pending BEFORE the async spawn so guard 2 catches concurrent calls
+	if characterNumber ~= nil then
+		self._charSiloMap = self._charSiloMap or {}
+		self._charSiloMap[characterNumber] = true  -- pending marker
+	end
+
+	local xmlPath = "placeables/farma400modified/farma400modified.xml"
+	IAPlaceableHelper.spawnPlaceable(xmlPath, place.x, place.y or 0, place.z,
+		place.rotation or 0, 99,
+		function(spawnedPlaceable, errorMsg)
+			if spawnedPlaceable ~= nil then
+				place._siloPlaceableUniqueId = spawnedPlaceable.uniqueId
+				-- Update the character→silo map with the real uniqueId
+				if characterNumber ~= nil then
+					self._charSiloMap = self._charSiloMap or {}
+					self._charSiloMap[characterNumber] = spawnedPlaceable.uniqueId
+				end
+				-- Register as IANeighbourPlaceable for neighbour.placeables, outbound XML, and mission lookups.
+				self:_registerSiloAsNeighbourPlaceable(characterNumber, spawnedPlaceable.uniqueId, place, xmlPath)
+				-- Link any other same-character silo places that are unbound
+				if characterNumber ~= nil
+					and self.ianeighbours ~= nil
+					and self.ianeighbours.places ~= nil then
+					for _, p in ipairs(self.ianeighbours.places) do
+						if p ~= nil and p ~= place
+							and p.sizeType == "silo"
+							and p._siloPlaceableUniqueId == nil then
+							-- Check if this other place belongs to the same character
+							local otherChar = self:_findCharacterForPlace(p)
+							if otherChar == characterNumber then
+								p._siloPlaceableUniqueId = spawnedPlaceable.uniqueId
+							end
+						end
+					end
+				end
+				if self.ianeighbours ~= nil and self.ianeighbours.debug then
+					print(string.format("[IAXMLHelper] Auto-spawned silo for IAMapPlace '%s' at (%.1f, %.1f) uid=%s",
+						tostring(place.name), place.x, place.z, tostring(spawnedPlaceable.uniqueId)))
+				end
+			else
+				-- Spawn failed: clear pending marker so a future attempt can retry
+				if characterNumber ~= nil then
+					self._charSiloMap = self._charSiloMap or {}
+					if self._charSiloMap[characterNumber] == true then
+						self._charSiloMap[characterNumber] = nil
+					end
+				end
+				print("[IAXMLHelper] Failed to auto-spawn silo for IAMapPlace '" .. tostring(place.name) .. "': " .. tostring(errorMsg))
+			end
+		end
+	)
+end
+
+--- Ensure every silo IAMapPlace (sizeType == "silo") in IANeighbours.places has a corresponding game placeable.
+-- Complement to the reconciliation pass in spawnPendingPlaceablesForAllNeighbours (which goes game-placeable → IAMapPlace).
+-- This goes the reverse direction: IAMapPlace → game placeable.
+-- Called after loadData completes (both outbound-XML and scenarioInitialize paths).
+function IAXMLHelper:reconcileAllSiloPlaceables()
+	if self.ianeighbours == nil or self.ianeighbours.places == nil then
+		return
+	end
+	local count = 0
+	for _, place in ipairs(self.ianeighbours.places) do
+		if place ~= nil and place.sizeType == "silo" and place._siloPlaceableUniqueId == nil
+			and place.x ~= nil and place.z ~= nil then
+			local charId = self:_findCharacterForPlace(place)
+			self:ensureSiloPlaceableForPlace(place, charId)
+			count = count + 1
+		end
+	end
+	if count > 0 and self.ianeighbours.debug then
+		print(string.format("[IAXMLHelper] reconcileAllSiloPlaceables: queued spawn for %d silo place(s)", count))
+	end
 end
 
 -- Remove all vehicles with farmId 99 that are not part of the neighbours
@@ -2173,6 +2802,87 @@ function IAXMLHelper:removeOrphanedFarm99Vehicles()
 	end
 	
 	return #removedVehicles
+end
+
+--- Remove orphaned farma400modified silo placeables that are not linked to any silo IAMapPlace.
+-- These are legacy silos spawned at large_area corners before the silo IAMapPlace system was introduced.
+-- Runs after reconcileAllSiloPlaceables so newly-linked silos are preserved.
+-- @return number - Number of orphaned silo placeables removed
+function IAXMLHelper:removeOrphanedSiloPlaceables()
+	if self.ianeighbours == nil or self.ianeighbours.places == nil then
+		return 0
+	end
+
+	-- Collect all _siloPlaceableUniqueId values from silo IAMapPlaces (the "good" silos)
+	local linkedSiloUids = {}
+	for _, place in ipairs(self.ianeighbours.places) do
+		if place ~= nil and place.sizeType == "silo" and place._siloPlaceableUniqueId ~= nil then
+			linkedSiloUids[place._siloPlaceableUniqueId] = true
+		end
+	end
+
+	-- Also collect from _charSiloMap (silos linked per-character)
+	if self._charSiloMap ~= nil then
+		for _, uid in pairs(self._charSiloMap) do
+			if uid ~= nil and uid ~= true then  -- skip pending markers (true)
+				linkedSiloUids[uid] = true
+			end
+		end
+	end
+
+	if g_currentMission == nil or g_currentMission.placeableSystem == nil then
+		return 0
+	end
+
+	local ps = g_currentMission.placeableSystem
+	if ps.placeables == nil then
+		return 0
+	end
+
+	local removed = 0
+	-- Copy the list to avoid mutation-during-iteration issues
+	local placeablesCopy = {}
+	for _, p in ipairs(ps.placeables) do
+		if p ~= nil then
+			table.insert(placeablesCopy, p)
+		end
+	end
+
+	for _, p in ipairs(placeablesCopy) do
+		if p ~= nil and not p.isDeleted and not p.isDeleting
+			and p.configFileNameClean == "farma400modified" then
+			local uid = p.uniqueId
+			if uid ~= nil and not linkedSiloUids[uid] then
+				-- Clean up neighbour.placeables references to this silo
+				if self.ianeighbours.neighbours ~= nil then
+					for _, neighbour in pairs(self.ianeighbours.neighbours) do
+						if neighbour ~= nil and neighbour.placeables ~= nil then
+							for _, iaPl in pairs(neighbour.placeables) do
+								if iaPl ~= nil and iaPl.uniqueId == uid then
+									iaPl.placeable = nil
+									iaPl.uniqueId = nil
+								end
+							end
+						end
+					end
+				end
+				-- Delete the game placeable
+				if p.delete ~= nil then
+					pcall(p.delete, p)
+					removed = removed + 1
+					if self.ianeighbours.debug then
+						print(string.format("[IAXMLHelper] Removed orphaned silo uid=%s (not linked to any IAMapPlace)", tostring(uid)))
+					end
+				end
+			end
+		end
+	end
+
+	if removed > 0 and self.ianeighbours.debug then
+		print(string.format("[IAXMLHelper] Removed %d orphaned farma400modified silo(s) — legacy large_area spawns", removed))
+	end
+
+	return removed
 end
 
 -- Load situation configurations from situations XML file
@@ -2297,6 +3007,32 @@ function IAXMLHelper:loadSituationConfigs()
 			end
 			table.insert(data.triggerSprayLevel, sprayLevel)
 			sprayLevelIndex = sprayLevelIndex + 1
+		end
+
+		-- triggerStoneLevel
+		data.triggerStoneLevel = {}
+		local stoneLevelIndex = 0
+		while true do
+			local stoneLevelKey = situationKey..".triggerStoneLevel.item("..stoneLevelIndex..")"
+			local stoneLevel = getXMLInt(xmlFile, stoneLevelKey, nil)
+			if stoneLevel == nil then
+				break
+			end
+			table.insert(data.triggerStoneLevel, stoneLevel)
+			stoneLevelIndex = stoneLevelIndex + 1
+		end
+
+		-- triggerLimeLevel
+		data.triggerLimeLevel = {}
+		local limeLevelIndex = 0
+		while true do
+			local limeLevelKey = situationKey..".triggerLimeLevel.item("..limeLevelIndex..")"
+			local limeLevel = getXMLInt(xmlFile, limeLevelKey, nil)
+			if limeLevel == nil then
+				break
+			end
+			table.insert(data.triggerLimeLevel, limeLevel)
+			limeLevelIndex = limeLevelIndex + 1
 		end
 		
 		-- placetypes
@@ -2496,6 +3232,19 @@ function IAXMLHelper:loadMapConfiguration()
 	end
 	if mapGameId ~= nil then
 		self.ianeighbours.mapGameId = mapGameId
+	end
+
+	-- Optional map-level collision whitelist by node name (legacy XMLs without this section load unchanged)
+	self.ianeighbours.mapCollisionExcludeNodeNames = {}
+	local cwKey = rootKey..".collisionWhitelist"
+	local cwIdx = 0
+	while true do
+		local cwName = getXMLString(xmlFile, cwKey..".nodeName("..cwIdx..")#name", nil)
+		if cwName == nil or cwName == "" then
+			break
+		end
+		self.ianeighbours.mapCollisionExcludeNodeNames[#self.ianeighbours.mapCollisionExcludeNodeNames + 1] = string.lower(cwName)
+		cwIdx = cwIdx + 1
 	end
 
 	-- Load places (assignment is on neighbour.assignedHomebasePlaceIds, not characterNumber on place)
@@ -2856,6 +3605,7 @@ function IAXMLHelper:reloadSingleCharacter(neighbourId)
 	self:applyMapAssignmentsForNeighbourFromMapFile(nb)
 	nb:initialize()
 	self:loadVehiclesFromXML(xmlFile, neighbourKey, nb)
+	self:loadPlaceablesFromXML(xmlFile, neighbourKey, nb)
 	-- Persist scenario appearance on the neighbour for outbound save; do not apply to the live NPC until the next savegame load (style stack not safe mid-session).
 	nb.suppressNpcStyleApplicationUntilSavegameLoad = true
 	delete(xmlFile)
@@ -3059,6 +3809,7 @@ function IAXMLHelper:loadPlaceablePlacesFromFile()
 		local ignoreCollision = getXMLBool(xmlFile, placeKey..".ignoreCollision", false)
 		local placeJob = getXMLString(xmlFile, placeKey.."#job", nil)
 		local sizeType = getXMLString(xmlFile, placeKey..".sizeType", nil)
+		local characterNumber = getXMLInt(xmlFile, placeKey.."#characterNumber", nil)
 		local nodeName = getXMLString(xmlFile, placeKey.."#nodeName", nil)
 		local referenceId = getXMLInt(xmlFile, placeKey.."#referenceId", nil)
 		local referenceFilename = self:normalizeFsRelativePath(getXMLString(xmlFile, placeKey.."#referenceFilename", nil))
@@ -3310,6 +4061,16 @@ function IAXMLHelper:saveMapConfigToFile(mapId)
 	setXMLString(xmlFile, mapKey..".name", mapDisplayName)
 	if self.ianeighbours.mapGameId ~= nil then
 		setXMLString(xmlFile, mapKey..".mapGameId", tostring(self.ianeighbours.mapGameId))
+	end
+	-- Optional map-level collision whitelist (written only when present so legacy files stay clean)
+	local cwNames = self.ianeighbours.mapCollisionExcludeNodeNames
+	if cwNames ~= nil and #cwNames > 0 then
+		local cwKey = rootKey..".collisionWhitelist"
+		for i, n in ipairs(cwNames) do
+			if n ~= nil and tostring(n) ~= "" then
+				setXMLString(xmlFile, cwKey..".nodeName("..(i - 1)..")#name", tostring(n))
+			end
+		end
 	end
 	-- Places (same structure as load: mapConfiguration.places.place(i))
 	for i, entry in ipairs(list) do
@@ -3574,6 +4335,21 @@ function IAXMLHelper:saveOutboundXMLToXMLFile()
 						setXMLString(xmlFile, vehicleKey.."#externalId", ia_vehicle.externalId)
 						setXMLString(xmlFile, vehicleKey.."#uniqueId", ia_vehicle.uniqueId)
 						vehicleIndex = vehicleIndex + 1
+					end
+				end
+			end
+		end
+
+		-- Save placeable ID mappings (mirrors vehicle mapping pattern)
+		local placeableIndex = 0
+		for _, neighbour in pairs(self.ianeighbours.neighbours) do
+			if neighbour ~= nil and neighbour.placeables ~= nil then
+				for _, ia_placeable in pairs(neighbour.placeables) do
+					if ia_placeable ~= nil and ia_placeable.externalId ~= nil and ia_placeable.uniqueId ~= nil then
+						local placeableKey = "IANeighboursOutbound.placeables.placeable("..placeableIndex..")"
+						setXMLString(xmlFile, placeableKey.."#externalId", ia_placeable.externalId)
+						setXMLString(xmlFile, placeableKey.."#uniqueId", ia_placeable.uniqueId)
+						placeableIndex = placeableIndex + 1
 					end
 				end
 			end
@@ -4004,8 +4780,46 @@ function IAXMLHelper:saveOutboundXMLToXMLFile()
 							if ia_vehicle.colorIndex ~= nil then
 								setXMLInt(xmlFile, vehicleKey.."#colorIndex", ia_vehicle.colorIndex)
 							end
+							if ia_vehicle.headerTrailerExternalId ~= nil then
+								setXMLString(xmlFile, vehicleKey.."#headerTrailerExternalId", ia_vehicle.headerTrailerExternalId)
+							end
 							
 							vehicleIndex = vehicleIndex + 1
+						end
+					end
+				end
+
+				-- Save all placeables for this neighbour
+				if neighbour.placeables ~= nil then
+					local placeableIndex = 0
+					for _, ia_placeable in pairs(neighbour.placeables) do
+						if ia_placeable ~= nil then
+							local placeableKey = neighbourKey..".placeable("..placeableIndex..")"
+							if ia_placeable.uniqueId ~= nil then
+								setXMLString(xmlFile, placeableKey.."#uniqueId", tostring(ia_placeable.uniqueId))
+							end
+							if ia_placeable.externalId ~= nil then
+								setXMLString(xmlFile, placeableKey.."#id", ia_placeable.externalId)
+							end
+							if ia_placeable.xmlFilename ~= nil then
+								setXMLString(xmlFile, placeableKey.."#xmlFilename", ia_placeable.xmlFilename)
+							end
+							if ia_placeable.positionX ~= nil then
+								setXMLFloat(xmlFile, placeableKey.."#positionX", ia_placeable.positionX)
+							end
+							if ia_placeable.positionY ~= nil then
+								setXMLFloat(xmlFile, placeableKey.."#positionY", ia_placeable.positionY)
+							end
+							if ia_placeable.positionZ ~= nil then
+								setXMLFloat(xmlFile, placeableKey.."#positionZ", ia_placeable.positionZ)
+							end
+							if ia_placeable.rotation ~= nil then
+								setXMLFloat(xmlFile, placeableKey.."#rotation", ia_placeable.rotation)
+							end
+							if ia_placeable.farmId ~= nil then
+								setXMLInt(xmlFile, placeableKey.."#farmId", ia_placeable.farmId)
+							end
+							placeableIndex = placeableIndex + 1
 						end
 					end
 				end
@@ -4193,32 +5007,8 @@ function IAXMLHelper:saveOutboundXMLToXMLFile()
 			--printObj(farmland.field,3,"farmland.field")
 			if farmland.field ~= nil then
 				local field = farmland.field
-				-- Prefer live density sample at field center (FieldState:update) over cached field.fieldState / getFieldState().
-				local fs = nil
-				if FieldState ~= nil and type(FieldState.new) == "function" then
-					local cx, cz = nil, nil
-					if type(field.getCenterOfFieldWorldPosition) == "function" then
-						cx, cz = field:getCenterOfFieldWorldPosition()
-					end
-					if cx ~= nil and cz ~= nil then
-						local probe = FieldState.new()
-						if type(probe.update) == "function" then
-							local okUp, _ = pcall(probe.update, probe, cx, cz)
-							if okUp then
-								fs = probe
-							end
-						end
-					end
-				end
-				if fs == nil and type(field.getFieldState) == "function" then
-					local okG, g = pcall(field.getFieldState, field)
-					if okG and g ~= nil then
-						fs = g
-					end
-				end
-				if fs == nil and field.fieldState ~= nil then
-					fs = field.fieldState
-				end
+				-- Sample fresh FieldState from live terrain (same helper used by schedule rebuild)
+				local fs = IAHelper_getFieldStateFresh(field)
 				if fs ~= nil then
 					setXMLInt(xmlFile, farmlandKey.."#fruitTypeIndex", fs.fruitTypeIndex)
 					for _, fruitType in ipairs(fruitTypes) do

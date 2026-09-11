@@ -60,10 +60,27 @@ IASettings.FIELDWORK_COMPLETION_THRESHOLD_LABELS = {
 }
 IASettings.FIELDWORK_COMPLETION_THRESHOLD_DEFAULT_INDEX = 7  -- "90%"
 
+-- 1-based UI option index (1..10) → voice volume multiplier 0.1..1.0. Default 100 %.
+IASettings.VOICE_VOLUME_VALUES = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 }
+IASettings.VOICE_VOLUME_LABELS = {
+	"ia_settings_voiceVolume_10",
+	"ia_settings_voiceVolume_20",
+	"ia_settings_voiceVolume_30",
+	"ia_settings_voiceVolume_40",
+	"ia_settings_voiceVolume_50",
+	"ia_settings_voiceVolume_60",
+	"ia_settings_voiceVolume_70",
+	"ia_settings_voiceVolume_80",
+	"ia_settings_voiceVolume_90",
+	"ia_settings_voiceVolume_100",
+}
+IASettings.VOICE_VOLUME_DEFAULT_INDEX = 10  -- 100 %
+
 IASettings.contractCallsPerDayIndex = IASettings.CONTRACT_CALLS_PER_DAY_DEFAULT_INDEX
 IASettings.missionOfferModeIndex = IASettings.MISSION_OFFER_MODE_DEFAULT_INDEX
 IASettings.contractMaxFieldsPerNeighbourIndex = IASettings.CONTRACT_MAX_FIELDS_PER_NEIGHBOUR_DEFAULT_INDEX
 IASettings.fieldworkCompletionThresholdIndex = IASettings.FIELDWORK_COMPLETION_THRESHOLD_DEFAULT_INDEX
+IASettings.voiceVolumeIndex = IASettings.VOICE_VOLUME_DEFAULT_INDEX
 IASettings._initialized = false
 IASettings._uiRegistered = false
 
@@ -103,6 +120,15 @@ local function clampFieldworkCompletionThresholdIndex(v)
 	v = tonumber(v) or IASettings.FIELDWORK_COMPLETION_THRESHOLD_DEFAULT_INDEX
 	if v < 1 or v > n then
 		v = IASettings.FIELDWORK_COMPLETION_THRESHOLD_DEFAULT_INDEX
+	end
+	return math.floor(v)
+end
+
+local function clampVoiceVolumeIndex(v)
+	local n = #IASettings.VOICE_VOLUME_VALUES
+	v = tonumber(v) or IASettings.VOICE_VOLUME_DEFAULT_INDEX
+	if v < 1 or v > n then
+		v = IASettings.VOICE_VOLUME_DEFAULT_INDEX
 	end
 	return math.floor(v)
 end
@@ -156,6 +182,11 @@ function IASettings.getFieldworkCompletionThreshold()
 	return IASettings.FIELDWORK_COMPLETION_THRESHOLD_VALUES[clampFieldworkCompletionThresholdIndex(IASettings.fieldworkCompletionThresholdIndex)]
 end
 
+--- @return number voice volume multiplier (0.1..1.0); default 1.0 (100 %).
+function IASettings.getVoiceVolume()
+	return IASettings.VOICE_VOLUME_VALUES[clampVoiceVolumeIndex(IASettings.voiceVolumeIndex)]
+end
+
 --- @return boolean true if a new contract call ring is still allowed today.
 function IASettings.canTriggerContractCallNow()
 	refreshDayCounter()
@@ -204,6 +235,10 @@ function IASettings.load()
 			if fieldworkThresholdIdx ~= nil then
 				IASettings.fieldworkCompletionThresholdIndex = clampFieldworkCompletionThresholdIndex(fieldworkThresholdIdx)
 			end
+			local voiceVolumeIdx = getXMLInt(xml, "IASettings.voiceVolume#index")
+			if voiceVolumeIdx ~= nil then
+				IASettings.voiceVolumeIndex = clampVoiceVolumeIndex(voiceVolumeIdx)
+			end
 			delete(xml)
 		end
 	end
@@ -225,6 +260,8 @@ function IASettings.save()
 	IASettings.fieldworkCompletionThresholdIndex = clampFieldworkCompletionThresholdIndex(IASettings.fieldworkCompletionThresholdIndex)
 	setXMLInt(xml, "IASettings.fieldworkCompletionThreshold#index", IASettings.fieldworkCompletionThresholdIndex)
 	setXMLInt(xml, "IASettings.fieldworkCompletionThreshold#percent", IASettings.getFieldworkCompletionThreshold())
+	IASettings.voiceVolumeIndex = clampVoiceVolumeIndex(IASettings.voiceVolumeIndex)
+	setXMLInt(xml, "IASettings.voiceVolume#index", IASettings.voiceVolumeIndex)
 	saveXMLFile(xml)
 	delete(xml)
 end
@@ -305,6 +342,12 @@ local function applyFieldworkCompletionThresholdToUI()
 	end
 end
 
+local function applyVoiceVolumeToUI()
+	if IASettings._uiVoiceVolumeOption ~= nil then
+		IASettings._uiVoiceVolumeOption:setState(clampVoiceVolumeIndex(IASettings.voiceVolumeIndex))
+	end
+end
+
 --- MultiTextOptionElement callback: invoked with `IASettings` as `self`.\n
 function IASettings.onContractCallsPerDayChanged(self, newState)
 	IASettings.contractCallsPerDayIndex = clampIndex(newState)
@@ -314,6 +357,10 @@ end
 function IASettings.onMissionOfferModeChanged(self, newState)
 	IASettings.missionOfferModeIndex = clampModeIndex(newState)
 	IASettings.save()
+	-- Reset the strip flag so switching to realistic mid-game re-deletes classic vanilla missions on the next updateFarmlands cycle.
+	if IANeighbours ~= nil then
+		IANeighbours.didStripVanillaFieldMissionsOnLoad = false
+	end
 end
 
 function IASettings.onContractMaxFieldsPerNeighbourChanged(self, newState)
@@ -323,6 +370,11 @@ end
 
 function IASettings.onFieldworkCompletionThresholdChanged(self, newState)
 	IASettings.fieldworkCompletionThresholdIndex = clampFieldworkCompletionThresholdIndex(newState)
+	IASettings.save()
+end
+
+function IASettings.onVoiceVolumeChanged(self, newState)
+	IASettings.voiceVolumeIndex = clampVoiceVolumeIndex(newState)
 	IASettings.save()
 end
 
@@ -390,6 +442,31 @@ local function buildMaxFieldsControl(settingsPage)
 	IASettings._uiMaxFieldsOption = option
 end
 
+local function buildVoiceVolumeControl(settingsPage)
+	local box = settingsPage.multiVolumeVoiceBox:clone(settingsPage.gameSettingsLayout)
+	recursivelyAssignFocusIds(box)
+	box.id = "ia_settings_voiceVolumeBox"
+
+	local option = box.elements[1]
+	option.id = "ia_settings_voiceVolume"
+	option.target = IASettings
+	option:setCallback("onClickCallback", "onVoiceVolumeChanged")
+	option:setDisabled(false)
+
+	local texts = {}
+	for _, key in ipairs(IASettings.VOICE_VOLUME_LABELS) do
+		table.insert(texts, g_i18n:getText(key))
+	end
+	option:setTexts(texts)
+
+	box.elements[2]:setText(g_i18n:getText("ia_settings_voiceVolume_title"))
+	option.elements[1]:setText(g_i18n:getText("ia_settings_voiceVolume_info"))
+
+	table.insert(settingsPage.controlsList, box)
+	IASettings._uiVoiceVolumeBox = box
+	IASettings._uiVoiceVolumeOption = option
+end
+
 --- Idempotent; safe to call from every InGameMenu.onMenuOpened.\n
 function IASettings.registerInGameMenuSettings()
 	if IASettings._uiRegistered then
@@ -435,6 +512,9 @@ function IASettings.registerInGameMenuSettings()
 	-- Contract Max Fields Per Neighbour choice control
 	buildMaxFieldsControl(settingsPage)
 
+	-- Voice Volume choice control (1..10 scale)
+	buildVoiceVolumeControl(settingsPage)
+
 	-- Fieldwork Completion Threshold choice control
 	local thresholdBox = settingsPage.multiVolumeVoiceBox:clone(settingsPage.gameSettingsLayout)
 	recursivelyAssignFocusIds(thresholdBox)
@@ -468,10 +548,12 @@ function IASettings.registerInGameMenuSettings()
 		InGameMenuSettingsFrame.onFrameOpen, applyContractMaxFieldsPerNeighbourToUI)
 	InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(
 		InGameMenuSettingsFrame.onFrameOpen, applyFieldworkCompletionThresholdToUI)
+	InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(
+		InGameMenuSettingsFrame.onFrameOpen, applyVoiceVolumeToUI)
 
 	-- Register our cloned controls with the FocusManager when a GUI gets shown.
 	FocusManager.setGui = Utils.appendedFunction(FocusManager.setGui, function(_, _)
-		for _, ctrl in ipairs({ IASettings._uiSection, IASettings._uiBox, IASettings._uiMissionModeBox, IASettings._uiMaxFieldsBox, IASettings._uiFieldworkThresholdBox }) do
+		for _, ctrl in ipairs({ IASettings._uiSection, IASettings._uiBox, IASettings._uiMissionModeBox, IASettings._uiMaxFieldsBox, IASettings._uiFieldworkThresholdBox, IASettings._uiVoiceVolumeBox }) do
 			if ctrl ~= nil
 				and (ctrl.focusId == nil
 					or not FocusManager.currentFocusData.idToElementMapping[ctrl.focusId])
@@ -488,6 +570,7 @@ function IASettings.registerInGameMenuSettings()
 	applyMissionOfferModeToUI()
 	applyContractMaxFieldsPerNeighbourToUI()
 	applyFieldworkCompletionThresholdToUI()
+	applyVoiceVolumeToUI()
 	settingsPage.gameSettingsLayout:invalidateLayout()
 	IASettings._uiRegistered = true
 end

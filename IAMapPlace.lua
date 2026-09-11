@@ -66,6 +66,10 @@ function IAMapPlace.new(id, name, type, x, y, z, rotation, withVehicle, withAtta
 		self.sizeType = "character"
 		self.withVehicle = false
 		self.withAttachment = false
+	elseif st == "silo" then
+		self.sizeType = "silo"
+		self.withVehicle = true
+		self.withAttachment = true
 	else
 		self.withVehicle = withVehicle or false
 		self.withAttachment = (withAttachment == true)

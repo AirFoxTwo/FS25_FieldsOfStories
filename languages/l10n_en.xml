@@ -14,6 +14,7 @@
             <text name="gui_voice_pack_warn_message" text="You are playing Fields of Stories without voice pack (optional). Required version: %s" />
             <text name="gui_voice_pack_warn_recheck" text="Check again"/>
             <text name="gui_voice_pack_warn_ok_notification" text="Voice pack OK: version matches Fields of Stories."/>
+            <text name="ia_homebase_setup_warning" text="Fields of Stories: Homebases are not complete. Place the required homebase areas to finish setup."/>
             <text name="gui_dialog_button_ignore" text="Ignore"/>
             <text name="gui_mapplaces_gen_title" text="Fields of Stories – Generating map places"/>
             <text name="gui_mapplaces_gen_message" text="Experimental: No saved configuration was found for this map. If you continue, &quot;Fields of Stories&quot; will automatically create hundreds to thousands of places on the map. The game will appear frozen until generation finishes."/>
@@ -28,6 +29,37 @@
             <text name="gui_firstload_tutorial_message6" text="5. Note the roadmap: The mod is still a small part of the vision of the project:&#10;-Helpers and contractors,&#10;-moving and driving characters,&#10;-large events,&#10;-dozens of mission types, all of this is possible, but it takes time and your support."/>
             <text name="gui_phone_title" text="%s"/>
             <text name="gui_phone_title_default" text="Phone"/>
+            <text name="construction_foS_category" text="Fields of Stories"/>
+            <text name="construction_foS_tab_placeables" text="General Places"/>
+            <text name="construction_foS_tab_character_homebase" text="Character Home"/>
+            <text name="fos_char_homebase_name" text="Character Homebase: %s"/>
+            <text name="fos_char_homebase_desc" text="Homebase placeable for character #%s. Places a silo and farmyard."/>
+            <text name="fos_char_homebase_name_1" text="Mary Carter (Family Member, Farmer)"/>
+            <text name="fos_char_homebase_desc_1" text="Home place for Mary Carter."/>
+            <text name="fos_char_homebase_name_2" text="John Carter (Family Member, Farmer)"/>
+            <text name="fos_char_homebase_desc_2" text="Home place for John Carter."/>
+            <text name="fos_char_homebase_name_10" text="Sharon Whitaker (Official)"/>
+            <text name="fos_char_homebase_desc_10" text="Home place for Sharon Whitaker."/>
+            <text name="fos_char_homebase_name_11" text="Kyle Bennett (Civilian)"/>
+            <text name="fos_char_homebase_desc_11" text="Home place for Kyle Bennett."/>
+            <text name="fos_char_homebase_name_13" text="Lukas Brenner (Neighbour, Forester)"/>
+            <text name="fos_char_homebase_desc_13" text="Home place for Lukas Brenner."/>
+            <text name="fos_char_homebase_name_14" text="Martin Walker (Official, Mayor)"/>
+            <text name="fos_char_homebase_desc_14" text="Home place for Martin Walker."/>
+            <text name="fos_char_homebase_name_15" text="Susan Keller (Business Partner, Grain Trader)"/>
+            <text name="fos_char_homebase_desc_15" text="Home place for Susan Keller."/>
+            <text name="fos_char_homebase_name_16" text="Andy Hoffman (Business Partner, Agricultural Machinery Dealer)"/>
+            <text name="fos_char_homebase_desc_16" text="Home place for Andy Hoffman."/>
+            <text name="fos_char_homebase_name_17" text="Paul Meyer (Business Partner, Agricultural Contractor)"/>
+            <text name="fos_char_homebase_desc_17" text="Home place for Paul Meyer."/>
+            <text name="fos_char_homebase_name_18" text="Marcus Brown (Neighbour, Farmer)"/>
+            <text name="fos_char_homebase_desc_18" text="Home place for Marcus Brown."/>
+            <text name="fos_char_homebase_name_19" text="Jacob Miller (Neighbour, Farmer)"/>
+            <text name="fos_char_homebase_desc_19" text="Home place for Jacob Miller."/>
+            <text name="fos_char_homebase_name_20" text="Emma Kensington (Neighbour, Farmer)"/>
+            <text name="fos_char_homebase_desc_20" text="Home place for Emma Kensington."/>
+            <text name="fos_char_homebase_name_21" text="Brian Winter (Neighbour, Farmer)"/>
+            <text name="fos_char_homebase_desc_21" text="Home place for Brian Winter."/>
             <text name="gui_phone_message" text="Incoming call"/>
             <text name="gui_phone_answer" text="Answer"/>
             <text name="gui_phone_decline" text="Decline"/>
@@ -37,6 +69,8 @@
             <text name="gui_phone_incoming_notification" text="Incoming call from %s. Open your phone to answer or decline."/>
             <text name="gui_mapinit_dialog_title" text="Configure places"/>
             <text name="gui_mapinit_dialog_message" text="Add and remove places for character situations. Note the recommended amount shown in the list. First, select the place size at the top (on foot, with vehicle, or vehicle with implement)."/>
+            <text name="gui_mapinit_dialog_first_title" text="Configure places"/>
+            <text name="gui_mapinit_dialog_first_message" text="Open the Construction Menu to create places all over the Map. Or Enable the Classic Mode from Release 1.0 which needs driving around to save places."/>
             <text name="gui_mapinit_characters_title" text="Character details"/>
             <text name="gui_mapinit_characters_message" text="Review the character details and configure them."/>
             <text name="gui_mapinit_general_actions_title" text="General actions"/>
@@ -62,7 +96,7 @@
             <text name="gui_help_characters_title" text="Characters"/>
             <text name="gui_help_characters_body" text="These are the neighbours in your world. Each one has their own personality, role and job, as well as their own backstory.&#10;&#10;Roles you may meet include farmers, a forester, the mayor, a machinery dealer, an agricultural contractor, a grain trader, family members and ordinary civilians. A character's role and job determine what they do all day and what you can talk about with them.&#10;&#10;Spend time with the characters whose stories interest you the most."/>
             <text name="gui_help_places_title" text="Creating map places"/>
-            <text name="gui_help_places_body" text="Places are the anchors that bring a map to life. They tell the mod where characters can stand, park, shop, relax and live. On the supported maps this is already set up; this topic is for your own maps.&#10;&#10;How to create a place:&#10;1. Open the menu with SHIFT+F3 and go to the Settings tab.&#10;2. Pick a place size at the top.&#10;3. Stand (or park your vehicle) exactly where the place should be.&#10;4. Click the place type you want. The current position is saved and you get a 'Place saved' confirmation. The more places you save, the more dynamic and unique the gameplay becomes.&#10;&#10;Place sizes:&#10;- Character: on foot only, for standing situations without vehicles.&#10;- Vehicle: room for one car or tractor.&#10;- Vehicle with implement: a vehicle plus a trailer or implement (optional).&#10;- Oversize vehicle (homebase only): an extra-wide parking spot for combines and self-propelled harvesters.&#10;- Large area: a wide, open area for situations that need space, such as homebase machine preparation, markets or events.&#10;&#10;Common place types and their purpose:&#10;- Character homebase: where a neighbour lives (see 'Homebases').&#10;- Shop, gas station, workshop, shed, sell point, industry, public infrastructure: functional public spots.&#10;- Roadside, dirt road, trees: roadside encounters.&#10;- Public place and public relax place: social and leisure spots; private relax place is for quieter routines.&#10;- Player farm: events on your own farm.&#10;&#10;Map generator for new maps:&#10;On an unknown map the generator can create many places automatically from the map data. Be patient: a large number of places may be created and the game can look frozen for a moment while it works.&#10;&#10;Ready-to-use map configurations: for many maps you can download a finished setup, or upload and share your own via the official Website of the Mod. This can be found through the Mod´s Github page."/>
+            <text name="gui_help_places_body" text="Places are the anchors that bring a map to life. They tell the mod where characters can stand, park, shop, relax and live. On the supported maps this is already set up; this topic is for your own maps.&#10;&#10;How to create a place (construction menu, recommended):&#10;1. Open the construction menu (build tool) and select the 'Fields of Stories' category.&#10;2. Open the 'General Places' tab and pick a place marker (e.g. Public Place, Shop, Gas station, ...).&#10;3. Move the marker to the desired spot, rotate it and click to place it. The marker is converted into a real place and removed again automatically.&#10;4. While placing, press SHIFT+Q to switch the place size. A green outline shows the footprint and an on-screen panel lists the sizes and how many places are still required.&#10;5. To remove places, place the 'Remove Place' tool near an existing place (removes the nearest within 5 m), or press SHIFT+DELETE to remove all places of the selected type at once.&#10;&#10;Classic way (driving around): open the menu with SHIFT+F3, go to the Settings tab, pick a place size at the top, stand (or park your vehicle) exactly where the place should be, and click the place type you want. The current position is saved and you get a 'Place saved' confirmation. The more places you save, the more dynamic and unique the gameplay becomes.&#10;&#10;Place sizes:&#10;- Character: on foot only, for standing situations without vehicles.&#10;- Vehicle: room for one car or tractor.&#10;- Vehicle with implement: a vehicle plus a trailer or implement (optional).&#10;- Oversize vehicle (homebase only): an extra-wide parking spot for combines and self-propelled harvesters.&#10;- Large area: a wide, open area for situations that need space, such as homebase machine preparation, markets or events.&#10;- Silo: marks the spot for the farmer's silo (homebase farms only). The silo building spawns here and is used as delivery and refill point.&#10;&#10;Common place types and their purpose:&#10;- Character homebase: where a neighbour lives (see 'Homebases').&#10;- Shop, gas station, workshop, shed, sell point, industry, public infrastructure: functional public spots.&#10;- Roadside, dirt road, trees: roadside encounters.&#10;- Public place and public relax place: social and leisure spots; private relax place is for quieter routines.&#10;- Player farm: events on your own farm.&#10;&#10;Map generator for new maps:&#10;On an unknown map the generator can create many places automatically from the map data. Be patient: a large number of places may be created and the game can look frozen for a moment while it works.&#10;&#10;Ready-to-use map configurations: for many maps you can download a finished setup, or upload and share your own via the official Website of the Mod. This can be found through the Mod´s Github page."/>
             <text name="gui_help_char_age" text="Age"/>
             <text name="gui_help_char_gender" text="Gender"/>
             <text name="gui_help_char_gender_male" text="Male"/>
@@ -103,15 +137,15 @@
             <text name="gui_help_conversations_title" text="Meeting and talking"/>
             <text name="gui_help_conversations_body" text="Neighbours are scattered around the map living their lives. Meeting them and talking is, alongside the realistic behaviour patterns, a central part of the mod.&#10;&#10;How to start a conversation:&#10;1. Walk up to a character on foot. When you are close enough (about 5 metres), you can perform the 'Start Conversation' action.&#10;2. Press SHIFT+R to begin the conversation.&#10;3. Listen to the conversation or read the subtitles.&#10;4. When several replies appear, choose the line you want to say. Your choice shapes the conversation and how your relationship changes.&#10;5. In the future you will be able to discuss both small talk and real actions (e.g. borrowing machinery).&#10;&#10;Finding people: characters appear all over the map. A farmer in a vehicle is usually hard to reach, but if you approach on foot to within about 20 metres he will stop, switch off the machine and step out after a short while so you can talk to him.&#10;&#10;Voiced conversations are played when a voice pack is installed; if not, you can simply read the text."/>
             <text name="gui_help_controls_title" text="Controls"/>
-            <text name="gui_help_controls_body" text="SHIFT+R: Start a conversation with a nearby person. If nobody is close, your phone opens instead.&#10;SHIFT+F3: Open the story and settings menu for Fields of Stories."/>
+            <text name="gui_help_controls_body" text="SHIFT+R: Start a conversation with a nearby person. If nobody is close, your phone opens instead.&#10;SHIFT+F3: Open the story and settings menu for Fields of Stories.&#10;&#10;In the construction menu (while placing a Fields of Stories marker):&#10;SHIFT+Q: Switch the place size.&#10;SHIFT+DELETE: Remove all places of the selected type."/>
             <text name="gui_help_relationships_title" text="Relationships"/>
             <text name="gui_help_relationships_body" text="Every neighbour remembers how they feel about you. Good encounters build trust over time; bad ones cost you.&#10;&#10;How it works:&#10;- Each character has a relationship level (starts at 1) and points that fill toward the next level.&#10;- A friendly conversation earns points (and a small matching cash reward).&#10;- When the points bar is full, the relationship level rises and the points reset for the next level. Higher levels need more points, but also grant higher bonuses when you reach the level.&#10;- Rude or dismissive replies can cost points. Sometimes even a seemingly friendly reply can trigger a negative feeling and worsen your relationship. Points never drop below zero and never lower a level you already reached.&#10;&#10;Field contracts count too: a completed contract improves your relationship with that farmer, while failing, cancelling or letting a contract expire lowers it by the same amount.&#10;&#10;At the end of a conversation, messages such as 'Relationship improved' or 'Relationship level increased' appear."/>
             <text name="gui_help_story_title" text="Story tab"/>
             <text name="gui_help_story_body" text="The Story tab gives you a quick overview of every character and your relationship with them. Open the menu with SHIFT+F3 and choose the Story tab.&#10;&#10;On the left is a scrollable list of all neighbours - click a name to select it. On the right you see the selected character's portrait, your current relationship (such as Known, Friend or Family), the relationship level, and a progress bar showing how many relationship points you have earned toward the next level.&#10;&#10;Use it to see at a glance who you already know well and who you should visit more often. See the Relationships topic for how points and levels are gained and lost."/>
             <text name="gui_help_contracts_title" text="Field contracts and calls"/>
-            <text name="gui_help_contracts_body" text="Farmers sometimes have more fieldwork than they can manage and will call you for help. These offers are real, paid jobs on their fields. They may give you a whole series of fields to complete.&#10;&#10;The call:&#10;1. A farmer can call you during the day (roughly between 08:00 and 15:00). You hear a ring and see a call notice.&#10;2. Open your phone and press Answer to hear the offer, or Decline / Esc to dismiss it.&#10;3. The same farmer may try again later. There is a daily limit on contract calls (configurable in the game settings). If you do not answer a call at all, there will be a total of three further attempts to call you.&#10;&#10;Choosing the work: in the phone conversation you can usually accept the entire field area or just the first half, and you can choose whether to use your own equipment or borrow the neighbour's machines. This requires that the farmer can spare his machines. Of course you can also simply decline the request.&#10;&#10;Without borrowing: you complete the contract with your own machines. The work is paid per hectare and is done as soon as the field reaches the required state (progress is currently not calculated evenly).&#10;&#10;These contracts are always requested by phone and will be visible in the usual mission menu only after accepting.&#10;&#10;Reward and reputation: a completed contract pays you out and improves your relationship with the farmer. Failing, cancelling or expiry do the opposite."/>
+            <text name="gui_help_contracts_body" text="Farmers sometimes have more fieldwork than they can manage and will call you for help. These offers are real, paid jobs on their fields. They may give you a whole series of fields to complete.&#10;&#10;The call:&#10;1. A farmer can call you during the day (roughly between 08:00 and 15:00). You hear a ring and see a call notice.&#10;2. Open your phone and press Answer to hear the offer, or Decline / Esc to dismiss it.&#10;3. The same farmer may try again later. There is a daily limit on contract calls (configurable in the game settings). If you do not answer a call at all, there will be a total of three further attempts to call you.&#10;&#10;Choosing the work: in the phone conversation you can usually accept the entire field area or just the first half, and you can choose whether to use your own equipment or borrow the neighbour's machines. This requires that the farmer can spare his machines. Of course you can also simply decline the request.&#10;&#10;Without borrowing: you complete the contract with your own machines. The work is paid per hectare and is done as soon as the field reaches the required state. The field is checked with probe points, and the completion threshold is configurable in the game settings.&#10;&#10;These contracts are always requested by phone and will be visible in the usual mission menu only after accepting.&#10;&#10;Reward and reputation: a completed contract pays you out and improves your relationship with the farmer. Failing, cancelling or expiry do the opposite."/>
             <text name="gui_help_contracts_body2" text="With borrowing: the neighbour lends you exactly the implements needed (weights and the tractor are not lent out, however). Where needed, borrowed machines start already filled with seed, spray, fertilizer, manure or slurry, which can be refilled at the neighbour's farm when required.&#10;Borrowing means slightly less pay than using your own equipment. Important: a contract with borrowed equipment stays at 99 percent until you drive every borrowed machine back to the neighbour's farm and detach it there. Only then is the contract considered complete.&#10;&#10;If you borrow the equipment, you will find a marker on the map showing where the machines can be picked up. There you can refill the consumables (e.g. slurry, seed or herbicide) and, at the end of the contract, park the machines again."/>
-            <text name="gui_help_contracts_body3" text=""/>
+            <text name="gui_help_contracts_body3" text="Harvest and delivery contracts&#10;&#10;Some fieldwork contracts also require you to deliver the harvest:&#10;&#10;Harvest delivery: harvest a crop (e.g. corn, wheat, canola) and deliver the grain to the farmer's silo. The game tracks what your combine collects and compares it with what you deliver. You must deliver at least 99 % of what you harvested.&#10;&#10;Grass mowing delivery: mow grass and deliver it (bales or loose) to the farmer's silo.&#10;&#10;Pickup and delivery: harvest or mow the crop and bring it to the farmer's silo, which is marked on the map with a red circle. The silo is temporarily accessible to you for the duration of the contract — unloading anywhere else (e.g. selling the crop) does not count.&#10;&#10;Consumable jobs (lime, fertilizer, slurry, spray, seed, manure): the farmer's silo is stocked with the required consumable so you can refill your implement there instead of buying it.&#10;&#10;If several delivery contracts share the same silo and crop type, deliveries are split proportionally across them.&#10;&#10;Task list: the mission details show Fieldwork, Delivery and (if you borrowed machines) Return equipment as separate tasks with the current delivery progress.&#10;&#10;Force complete: a 'Force Complete' button in the contracts menu finishes a nearly completed contract (over 70 %).&#10;&#10;Progress display:&#10;0-80 % covers the fieldwork, 80-99 % means fieldwork is done but delivery is still pending. At 100 % both are finished — collect the contract from the mission menu to get your payment.&#10;&#10;Extra delivery bonus:&#10;The farmer expects the entire harvest to be delivered — keep nothing for yourself. You can keep delivering after the contract reaches 100 %. When you collect it, any surplus beyond what was in the silo at completion earns a +50 relationship bonus."/>
             <text name="gui_help_contract_cap_call_info" text="When a farmer needs a hand, you hear a ring and see an incoming-call notice (roughly between 08:00 and 15:00)."/>
             <text name="gui_help_contract_cap_call" text="Open your phone and press Answer to hear the offer, or Decline / Esc to dismiss it.&#10;&#10;You can adjust the number of job calls in the game settings. This refers to the number of farmers seeking help, not the number of calls.&#10;&#10;Important: If you do not answer a call at all, there will be a total of three further attempts to call you."/>
             <text name="gui_help_contract_cap_choices" text="In the call you pick the work: the whole field or just the first half, and whether to use your own equipment or borrow the neighbour's machines."/>
@@ -123,9 +157,9 @@
             <text name="gui_help_privatelife_title" text="Private life"/>
             <text name="gui_help_privatelife_body" text="Away from work, the characters have a life of their own. Every neighbour has a home they return to, and many follow personal routines throughout the day.&#10;&#10;Things you might catch them doing:&#10;- Relaxing at home or tidying the house.&#10;- Spending time with friends, having a picnic, or playing with the kids.&#10;- Going for a walk, walking the dog, or reading a book.&#10;- Running everyday errands or refuelling the car.&#10;- Checking the vehicle at the roadside or driving to the workshop for repairs.&#10;&#10;Routines depend on the time of day (morning, day, evening and night) as well as the character's role and job, so a farmer, the mayor and a civilian spend their free time differently.&#10;&#10;This is exactly what makes the world feel alive: if you roam the map at different times you will meet people in all sorts of situations. Approaching them on foot lets you start a conversation and get to know them better."/>
             <text name="gui_help_homebases_title" text="Homebases"/>
-            <text name="gui_help_homebases_body" text="A homebase is a character's home: the place where they live, return to in the evening, and can be found when they are off duty. Without a homebase a character does not really exist in the game – every neighbour needs at least one.&#10;&#10;Two spawn points per character: each character should have at least two home places – one with the place size 'Character' (on foot; this is where the person stands and sleeps) and one with the place size 'Vehicle' (where their car parks). That way every neighbour has both an on-foot and a vehicle spawn point.&#10;&#10;Creating home places:&#10;1. Open the menu with SHIFT+F3 and go to the Settings tab.&#10;2. Choose the matching place size at the top ('Character' or 'Vehicle').&#10;3. Stand on foot or park your vehicle exactly at the desired spot at the residence.&#10;4. Open the menu and select 'Home of [Name]' in the place list to save the position.&#10;Alternatively, in the Characters section use 'Add nearest Homebase' to assign the nearest place directly to the selected character.&#10;&#10;Removing existing home places: if you want to reset a character's residences, select them in the Characters section and use the 'Remove Homeplaces' button. This detaches all home places assigned to that character – the places themselves remain and can be reassigned afterwards.&#10;&#10;Homebases are a good place to find someone, especially early in the morning or late at night.&#10;&#10;Farmers: for them the homebase is also the farm and additionally needs space for machinery. You can learn how to design a farm properly in the 'Designing farms' chapter."/>
+            <text name="gui_help_homebases_body" text="A homebase is a character's home: the place where they live, return to in the evening, and can be found when they are off duty. Without a homebase a character does not really exist in the game – every neighbour needs at least one.&#10;&#10;Two spawn points per character: each character should have at least two home places – one with the place size 'Character' (on foot; this is where the person stands and sleeps) and one with the place size 'Vehicle' (where their car parks). That way every neighbour has both an on-foot and a vehicle spawn point.&#10;&#10;Creating home places (construction menu, recommended):&#10;1. Open the construction menu (build tool) and select the 'Fields of Stories' category, then the 'Character Home' tab.&#10;2. Pick the placeable for the desired character (e.g. 'Mary Carter').&#10;3. Place it at the residence. Use SHIFT+Q to switch the size ('Character' for the person, 'Vehicle' for their car, 'Large area' for the farm, 'Silo' for the silo).&#10;&#10;Classic way: open the menu with SHIFT+F3, go to the Settings tab, choose the matching place size at the top ('Character' or 'Vehicle'), stand on foot or park your vehicle exactly at the desired spot at the residence, and select 'Home of [Name]' in the place list to save the position. Alternatively, in the Characters section use 'Add nearest Homebase' to assign the nearest place directly to the selected character.&#10;&#10;Removing existing home places: if you want to reset a character's residences, select them in the Characters section and use the 'Remove Homeplaces' button. This detaches all home places assigned to that character – the places themselves remain and can be reassigned afterwards.&#10;&#10;Homebases are a good place to find someone, especially early in the morning or late at night.&#10;&#10;Farmers: for them the homebase is also the farm and additionally needs space for machinery. You can learn how to design a farm properly in the 'Designing farms' chapter."/>
             <text name="gui_help_homebasedesign_title" text="Designing farms"/>
-            <text name="gui_help_homebasedesign_body" text="This chapter is about the farms of the farmer characters. For a farmer, the homebase is also his farm: when the machines are not in use or out on a contract, they are parked there. So plan the farm generously, because a farmer owns many vehicles and implements (currently about 10 implements, 1 combine, 2 tractors and a car; the agricultural contractor even 23 implements, 6 self-propelled machines, 2 tractors and a car).&#10;&#10;How to create the spots: open the menu with SHIFT+F3, go to the Settings tab, choose the matching place size at the top and save a 'Character homebase' at the desired spot (you will find the exact workflow in the 'Creating map places' chapter).&#10;&#10;Which place sizes a farm needs:&#10;- 'Character' (on foot): for the farmer himself.&#10;- 'Vehicle': for cars and tractors.&#10;- 'Oversize vehicle': for combines and self-propelled harvesters.&#10;- 'Vehicle + implement': for implements and trailers.&#10;- 'Large area': for spacious situations at the farm, such as machine preparation.&#10;If you cannot find a spot for every machine, that is not a problem – depending on use they are parked or hidden."/>
+            <text name="gui_help_homebasedesign_body" text="This chapter is about the farms of the farmer characters. For a farmer, the homebase is also his farm: when the machines are not in use or out on a contract, they are parked there. So plan the farm generously, because a farmer owns many vehicles and implements (currently about 10 implements, 1 combine, 2 tractors and a car; the agricultural contractor even 23 implements, 6 self-propelled machines, 2 tractors and a car).&#10;&#10;How to create the spots: open the menu with SHIFT+F3, go to the Settings tab, choose the matching place size at the top and save a 'Character homebase' at the desired spot (you will find the exact workflow in the 'Creating map places' chapter).&#10;&#10;Which place sizes a farm needs:&#10;- 'Character' (on foot): for the farmer himself.&#10;- 'Vehicle': for cars and tractors.&#10;- 'Oversize vehicle': for combines and self-propelled harvesters.&#10;- 'Vehicle + implement': for implements and trailers.&#10;- 'Large area': for spacious situations at the farm, such as machine preparation.&#10;- 'Silo': for the farmer's silo, which serves as delivery and refill point for harvest and grass-mowing contracts.&#10;If you cannot find a spot for every machine, that is not a problem – depending on use they are parked or hidden."/>
             <text name="gui_help_homebasedesign_body2" text="Making the farm accessible: to borrow a farmer's machines, his farm has to be drivable. You need to be able to drive a vehicle up to the parked machines and back out again. So when placing farms, make sure no fences, gates, walls, trees or other objects block the entrance and exit.&#10;&#10;Removing a gate: if a gate or door blocks the access, you can remove it directly in Fields of Stories. Stand or drive close to the gate (within about 20 m), open the menu with SHIFT+F3 on the Settings tab and click 'Remove nearest gate'. The nearest object whose node name contains 'gate' is permanently deleted from the map and stays gone after reloading. The following images show how removing the gate clears the access so the machines can be borrowed."/>
             <text name="gui_help_voices_title" text="Voices and language"/>
             <text name="gui_help_voices_body" text="Conversations can be fully voiced. The spoken audio comes as a separate voice pack so the mod itself stays small.&#10;&#10;Installing a voice pack: download the voice pack (see the Mod´s GitHub page for the exact download location: AirFoxTwo/FS25_FieldsOfStories), then unpack it so that its 'conversations' folder sits in the mod's modSettings folder (modSettings/FS25_FIELDS_OF_STORIES). If the pack is missing or out of date, a warning dialog appears with the 'Check again' and 'Ignore' buttons. You can keep playing without it; conversations will then still show subtitles, just without spoken audio.&#10;&#10;Languages: the mod is fully translated into English and German. The displayed text follows your game language automatically. Voice packs come in matching English and German versions, and the mod plays the audio matching the installed pack, otherwise matching the game language.&#10;&#10;Conversation generation (advanced): each character has individual conversation texts with you. In total this adds up to over 10,000 written and voiced conversation parts. Every conversation was checked manually (at least for plausibility). Wording or grammar mistakes cannot, however, be ruled out.&#10;&#10;Voice generation (advanced): each character has their own voice, generated from a text-to-speech voice design. These voices are then recorded for all conversation texts via voice cloning on a local NVIDIA RTX 5080. The plan is to improve quality through further optimization or even real voice actors, which however involves considerable effort."/>
@@ -133,12 +167,15 @@
             <text name="gui_help_support_body" text="Found a bug, or have an idea to make the mod better? Your feedback is very welcome.&#10;&#10;Feedback, bug reports and feature requests are best sent through the mod's GitHub Page: AirFoxTwo/FS25_FieldsOfStories&#10;&#10;When reporting a problem, it helps a lot to include:&#10;- a short description of what happened and what you expected,&#10;- the steps to reproduce it,&#10;- the map you are playing,&#10;- your log file if you can attach it.&#10;&#10;Clear, detailed reports speed up fixes enormously. Thank you for helping improve Fields of Stories."/>
             <text name="gui_mapinit_remove_mod_disclaimer" text="Note: After this, the game must be saved."/>
             <text name="gui_mapinit_remove_mod" text="Remove Mod data"/>
+            <text name="gui_mapinit_open_construction_menu" text="Open Construction Menu"/>
+            <text name="gui_mapinit_classic_init_mode" text="Classic Init Mode"/>
             <text name="gui_mapinit_place_size_label" text="Place size:"/>
             <text name="gui_mapinit_place_size_character" text="Character"/>
             <text name="gui_mapinit_place_size_vehicle" text="Vehicle"/>
             <text name="gui_mapinit_place_size_vehicle_attachment" text="Vehicle + Attachment"/>
             <text name="gui_mapinit_place_size_oversize_vehicle" text="Oversize vehicle"/>
             <text name="gui_mapinit_place_size_large_area" text="Large area"/>
+            <text name="gui_mapinit_place_size_silo" text="Silo"/>
             <text name="gui_mapinit_place_type_label" text="Place type:"/>
             <text name="gui_mapinit_place_type_shop" text="Shop"/>
             <text name="gui_mapinit_place_type_gas_station" text="Gas station"/>
@@ -158,9 +195,51 @@
             <text name="gui_mapinit_place_type_workshop" text="Workshop"/>
             <text name="gui_mapinit_place_type_shed" text="Shed"/>
             <text name="gui_mapinit_place_type_fieldwork" text="Fieldwork"/>
+            <!-- Tool placeable store names -->
+            <text name="fos_place_character_public_place" text="Place: Public Place Marker"/>
+            <text name="fos_place_character_public_place_desc" text="Fields of Stories - A bustling public square where NPCs gather, chat, and spend their leisure time"/>
+            <text name="fos_place_character_shop" text="Place: Shop Marker"/>
+            <text name="fos_place_character_shop_desc" text="Fields of Stories - A shopping area where NPCs go to browse and purchase goods"/>
+            <text name="fos_place_character_gas_station" text="Place: Gas Station Marker"/>
+            <text name="fos_place_character_gas_station_desc" text="Fields of Stories - A fuel station where NPCs refuel their vehicles and meet others"/>
+            <text name="fos_place_character_roadside" text="Place: Roadside Marker"/>
+            <text name="fos_place_character_roadside_desc" text="Fields of Stories - A roadside spot where NPCs stop for a chat or take a break from driving"/>
+            <text name="fos_place_character_dirt_road" text="Place: Dirt Road Marker"/>
+            <text name="fos_place_character_dirt_road_desc" text="Fields of Stories - A quiet dirt road where NPCs enjoy walks and rustic encounters"/>
+            <text name="fos_place_character_player_farm" text="Place: Player Farm Marker"/>
+            <text name="fos_place_character_player_farm_desc" text="Fields of Stories - Marks the player's farmstead, the heart of your agricultural operations"/>
+            <text name="fos_place_character_public_relax_place" text="Place: Relax Area Marker"/>
+            <text name="fos_place_character_public_relax_place_desc" text="Fields of Stories - A public relaxation area where NPCs unwind and enjoy their free time"/>
+            <text name="fos_place_character_private_relax_place" text="Place: Private Relax Area Marker"/>
+            <text name="fos_place_character_private_relax_place_desc" text="Fields of Stories - A secluded retreat where NPCs go for privacy and quiet reflection"/>
+            <text name="fos_place_character_sell_point" text="Place: Sell Point Marker"/>
+            <text name="fos_place_character_sell_point_desc" text="Fields of Stories - A trading point where NPCs deliver goods and conduct business"/>
+            <text name="fos_place_character_church" text="Place: Church Marker"/>
+            <text name="fos_place_character_church_desc" text="Fields of Stories - A place of worship where NPCs attend services and community gatherings"/>
+            <text name="fos_place_character_public_infrastructure" text="Place: Infrastructure Marker"/>
+            <text name="fos_place_character_public_infrastructure_desc" text="Fields of Stories - Public utilities and infrastructure hub for the local community"/>
+            <text name="fos_place_character_industry" text="Place: Industry Marker"/>
+            <text name="fos_place_character_industry_desc" text="Fields of Stories - An industrial zone where NPCs work and produce goods"/>
+            <text name="fos_place_character_workshop" text="Place: Workshop Marker"/>
+            <text name="fos_place_character_workshop_desc" text="Fields of Stories - A repair workshop where NPCs maintain and fix their equipment"/>
+            <text name="fos_place_character_shed" text="Place: Shed Marker"/>
+            <text name="fos_place_character_shed_desc" text="Fields of Stories - A storage shed where NPCs keep their tools and equipment"/>
+            <text name="fos_place_character_remove" text="Tool: Remove Place"/>
+            <text name="fos_place_character_remove_desc" text="Fields of Stories - Removes the nearest place marker within 5 meters when placed"/>
+            <text name="gui_fos_place_created" text="Place created: %s (%s)"/>
+            <text name="gui_fos_bulk_remove_title" text="Bulk Remove Places"/>
+            <text name="gui_fos_bulk_remove_confirm" text="Remove %d place(s) of type '%s'?"/>
+            <text name="gui_fos_bulk_remove_confirm_char" text="Remove %d place(s) for '%s'?"/>
+            <text name="gui_fos_bulk_remove_btn_yes" text="Remove All"/>
+            <text name="gui_fos_bulk_remove_btn_no" text="Cancel"/>
+            <text name="gui_fos_bulk_remove_none" text="No places of this type to remove."/>
+            <text name="gui_fos_bulk_remove_done" text="Removed %d place(s)."/>
             <text name="input_IAMapInitDialog" text="Fields of Stories Menu"/>
             <text name="input_IAI3DReferencesDebug" text="Fields of Stories - Show debug points at all i3d reference nodes"/>
             <text name="input_IADumpUserAttributes" text="Fields of Stories - Dump user attributes of map nodes to log"/>
+            <text name="input_IAPlaceSizeSelect" text="Place Size Selection (Fields of Stories)"/>
+            <text name="input_IAPlaceBulkRemove" text="Bulk Remove Places (Fields of Stories)"/>
+            <text name="gui_fos_place_size_select" text="Place Size"/>
             <text name="gui_mapinit_add_nearest_homebase" text="Add nearest Homebase"/>
             <text name="gui_mapinit_add_nearest_homebase_info" text="The nearest place was assigned to character %s."/>
             <text name="gui_mapinit_notify_place_saved" text="Place saved: %s"/>
@@ -202,10 +281,25 @@
             <text name="ia_field_outcome_mission_desc_short" text="Use a %s to finish this task."/>
             <text name="ia_field_outcome_mission_desc_seed" text="Use a %s to sow %s."/>
             <text name="ia_field_outcome_neighbour_generic" text="your neighbour"/>
+            <text name="ia_field_outcome_task_done" text="Done"/>
+            <text name="ia_field_outcome_task_open" text="Open"/>
+            <text name="ia_field_outcome_task_fieldwork" text="Fieldwork: %s"/>
+            <text name="ia_field_outcome_task_delivery" text="Delivery"/>
+            <text name="ia_field_outcome_task_return" text="Return equipment"/>
+            <text name="ia_field_outcome_task_delivery_progress" text="%s / %s delivered"/>
+            <text name="ia_field_outcome_task_delivery_not_started" text="Not started"/>
+            <text name="ia_field_outcome_task_return_after_fieldwork" text="After fieldwork"/>
+            <text name="ia_fieldwork_label_harvest_corn" text="Harvest corn"/>
+            <text name="ia_force_complete_button" text="Force Complete"/>
+            <text name="ia_force_complete_no_mission" text="No active Fields of Stories contract selected."/>
             <text name="ia_field_outcome_target_fertilizer" text="Target: mineral fertilizer stage %d on the field."/>
             <text name="ia_field_outcome_target_slurry" text="Target: slurry (liquid manure) or fermentation residues (digestate) application to fertilization stage %d."/>
             <text name="ia_field_outcome_target_manure" text="Target: solid manure spreading to fertilization stage %d."/>
             <text name="ia_field_outcome_target_lime" text="Target: lime application (fertilization stage %d)."/>
+            <text name="ia_field_outcome_target_lime_deliver" text="Target: apply lime evenly across the field."/>
+            <text name="ia_field_outcome_target_stone_picking" text="Target: remove all stones from the field."/>
+            <text name="ia_field_outcome_target_grass_mowing" text="Target: mow the grass and deliver it to the farm."/>
+            <text name="ia_field_outcome_target_harvest_deliver_corn" text="Target: harvest the corn and deliver the grain to the farm."/>
             <text name="ia_field_outcome_target_herbicide" text="Target: spray herbicide until weeds match the agreed state."/>
             <text name="ia_field_outcome_target_seed" text="Target: %s established on the whole field."/>
             <text name="ia_fieldwork_equip_cultivate" text="cultivator"/>
@@ -216,6 +310,9 @@
             <text name="ia_fieldwork_equip_slurry" text="slurry tanker"/>
             <text name="ia_fieldwork_equip_manure" text="manure spreader"/>
             <text name="ia_fieldwork_equip_lime" text="lime spreader"/>
+            <text name="ia_fieldwork_equip_stone_picker" text="stone picker"/>
+            <text name="ia_fieldwork_equip_grass_mower" text="mower and forage wagon or baler"/>
+            <text name="ia_fieldwork_equip_harvest_deliver_corn" text="harvester and grain trailer"/>
             <text name="ia_fieldwork_equip_herbicide" text="field sprayer with herbicide"/>
             <text name="ia_fieldwork_equip_seed" text="seeder"/>
             <text name="ia_fieldwork_equip_plow" text="plow"/>
@@ -228,6 +325,11 @@
             <text name="ia_fieldwork_label_slurry" text="Slurry spreading"/>
             <text name="ia_fieldwork_label_manure" text="Manure spreading"/>
             <text name="ia_fieldwork_label_lime" text="Liming"/>
+            <text name="ia_fieldwork_label_stone_picking" text="Stone picking"/>
+            <text name="ia_fieldwork_label_grass_mowing" text="Mow grass and deliver"/>
+            <text name="ia_fieldwork_label_grass_mowing_short" text="Mow grass"/>
+            <text name="ia_fieldwork_label_harvest_deliver_corn" text="Harvest corn and deliver"/>
+            <text name="ia_fieldwork_label_harvest_deliver_with_crop" text="Harvest %s and deliver"/>
             <text name="ia_fieldwork_label_spray" text="Spray"/>
             <text name="ia_fieldwork_label_seed" text="Seed"/>
             <text name="ia_fieldwork_label_seed_with_crop" text="%s seeding"/>
@@ -235,6 +337,10 @@
             <text name="ia_fieldwork_label_condition" text="Field condition"/>
             <text name="ia_field_outcome_mission_finished" text="Fields of Stories field contract completed."/>
             <text name="ia_field_outcome_mission_failed" text="Fields of Stories field contract ended without success."/>
+            <text name="ia_field_outcome_deliver_wrong_location" text="You must deliver the harvest to the farm, not sell it elsewhere!"/>
+            <text name="ia_delivery_marker_label" text="Farm delivery point"/>
+            <text name="ia_field_outcome_mission_deliver_note" text="Deliver the harvest to the farm (marked on the map)."/>
+            <text name="ia_field_outcome_delivery_complete" text="Delivery complete! The goods have arrived at the farm."/>
             <text name="ia_mission_borrow_refill_at_farm" text="Borrowed equipment is empty — refill it at %s's farm."/>
             <text name="ia_mission_borrow_return_to_farm" text="Field work is done — return the borrowed equipment to %s's farm (detach it at the yard)."/>
             <text name="ia_mission_borrow_pickup_marker" text="Borrowed equipment pickup"/>
@@ -271,6 +377,18 @@
             <text name="ia_settings_fieldworkCompletionThreshold_90" text="90%"/>
             <text name="ia_settings_fieldworkCompletionThreshold_95" text="95%"/>
             <text name="ia_settings_fieldworkCompletionThreshold_100" text="100%"/>
+            <text name="ia_settings_voiceVolume_title" text="Voice volume"/>
+            <text name="ia_settings_voiceVolume_info" text="Volume of the spoken neighbour dialogue lines."/>
+            <text name="ia_settings_voiceVolume_10" text="10%"/>
+            <text name="ia_settings_voiceVolume_20" text="20%"/>
+            <text name="ia_settings_voiceVolume_30" text="30%"/>
+            <text name="ia_settings_voiceVolume_40" text="40%"/>
+            <text name="ia_settings_voiceVolume_50" text="50%"/>
+            <text name="ia_settings_voiceVolume_60" text="60%"/>
+            <text name="ia_settings_voiceVolume_70" text="70%"/>
+            <text name="ia_settings_voiceVolume_80" text="80%"/>
+            <text name="ia_settings_voiceVolume_90" text="90%"/>
+            <text name="ia_settings_voiceVolume_100" text="100%"/>
             <text name="ia_npc_unavailable"          text=" (Unavailable)"/>
             <text name="gui_language"                text="en"/>
 	</texts>

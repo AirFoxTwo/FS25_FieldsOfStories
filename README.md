@@ -1,6 +1,6 @@
 # Fields of Stories – Roleplay
 
-**Living Characters in Farming Simulator 25** — Version 1.0.0.3
+**Living Characters in Farming Simulator 25** — Version 1.0.0.5
 
 Fields of Stories expands Farming Simulator with a dynamic neighborhood of currently **13 virtual characters** who live and work independently in your world and interact with you. Each character has an individual daily routine and tasks. You meet characters randomly at the gas station, in the field, at the dealer, or anywhere across the map. Have conversations, build relationships, and support them when they need help.
 
@@ -52,10 +52,12 @@ Website: [https://fields-of-stories.com](https://fields-of-stories.com)
 ## Controls
 
 
-| Shortcut       | Action                                                                                   |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| **SHIFT + R**  | Start a conversation with a nearby person. If nobody is close, your phone opens instead. |
-| **SHIFT + F3** | Open the story and settings menu for Fields of Stories.                                  |
+| Shortcut            | Action                                                                                   |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| **SHIFT + R**       | Start a conversation with a nearby person. If nobody is close, your phone opens instead. |
+| **SHIFT + F3**      | Open the story and settings menu for Fields of Stories.                                  |
+| **SHIFT + Q**       | In the construction menu while placing a Fields of Stories marker: switch the place size. |
+| **SHIFT + DELETE**  | In the construction menu: remove all places of the selected type (with confirmation).     |
 
 
 ---
@@ -177,7 +179,45 @@ Farmers sometimes have more fieldwork than they can manage and will call you for
 
 > **Important:** a contract with borrowed equipment stays at 99 percent until you drive every borrowed machine back to the neighbour's farm and detach it there. Only then is the contract considered complete. If you borrow the equipment, you will find a marker on the map showing where the machines can be picked up and returned.
 
-**Reward and reputation:** a completed contract pays you out and improves your relationship with the farmer. Failing, cancelling or expiry do the opposite.
+**Reward and reputation:** when the fieldwork is done the contract is marked as finished. Collect it from the mission menu to receive your payment — the relationship bonus with the farmer is applied immediately on completion. Failing, cancelling or expiry do the opposite.
+
+### Harvest and delivery contracts
+
+Some fieldwork contracts also require you to deliver the harvest to the farmer's silo:
+
+- **Harvest delivery:** harvest a crop (such as corn, wheat, or canola) and deliver the grain to the farmer's silo. The game tracks how much your combine collects on the field and compares it with what you deliver.
+- **Grass mowing delivery:** mow grass and deliver it — either as bales or loose — to the farmer's silo.
+
+**Pickup and delivery:**
+
+Harvest or mow the crop and bring it to the farmer's silo, which is marked on the map with a green circle. The silo is temporarily accessible to you for the duration of the contract — unloading anywhere else (e.g. selling the crop) does not count.
+
+**Consumable jobs:**
+
+For lime, fertilizer, slurry, spray, seed and manure contracts the farmer's silo is stocked with the required consumable, so you can refill your implement there instead of buying it.
+
+**How it works:**
+
+You must deliver at least 99 % of what you harvested (grass mowing allows 90 % or one partial bale). If several delivery contracts share the same silo and crop type, deliveries are split proportionally across them based on how much each field produced.
+
+**Task list:**
+
+The mission details show **Fieldwork**, **Delivery** and (if you borrowed machines) **Return equipment** as separate tasks with the current delivery progress.
+
+**Force complete:**
+
+A **Force Complete** button in the contracts menu finishes a nearly completed contract (over 70 %), for example when only a small amount of crop is left on the field.
+
+**Progress display:**
+
+Delivery contracts show progress in two stages:
+- **0–80 %:** fieldwork progress — how much of the field already matches the target state.
+- **80–99 %:** fieldwork is finished, but the delivery is not yet complete.
+- **100 %:** both fieldwork and delivery are finished. The contract is marked as completed — collect it from the mission menu to get your payment.
+
+**Extra delivery bonus:**
+
+The farmer expects the entire harvest to be delivered — nothing should be kept for yourself. You can keep delivering even after the contract reaches 100 %. When you collect the contract, any surplus you delivered beyond the amount that was in the silo at completion time earns you a +50 relationship bonus.
 
 ---
 
@@ -253,9 +293,19 @@ If you want to publish/share a map configuration you created, you can upload the
 
 ## Setting Up Your Own Map
 
-If you play a map that is not yet optimized, you can build the configuration yourself. Open the menu with **SHIFT + F3** and go to the **Settings** tab.
+If you play a map that is not yet optimized, you can build the configuration yourself. The recommended way is the construction menu (see below); alternatively, open the menu with **SHIFT + F3** and go to the **Settings** tab for the classic workflow.
 
 ### Creating map places
+
+**Construction menu (recommended):**
+
+1. Open the construction menu (build tool) and select the **Fields of Stories** category.
+2. Open the **General Places** tab and pick a place marker (e.g. Public Place, Shop, Gas station, ...).
+3. Move the marker to the desired spot, rotate it and click to place it. The marker is converted into a real place and removed again automatically.
+4. While placing, press **SHIFT + Q** to switch the place size. A green outline shows the footprint and an on-screen panel lists the sizes and how many places are still required.
+5. To remove places, place the **Remove Place** tool near an existing place (removes the nearest within 5 m), or press **SHIFT + DELETE** to remove all places of the selected type at once.
+
+**Classic way (driving around):**
 
 1. Open the menu with **SHIFT + F3** and go to the Settings tab.
 2. Pick a place size at the top.
@@ -269,6 +319,7 @@ If you play a map that is not yet optimized, you can build the configuration you
 - **Vehicle with implement:** a vehicle plus a trailer or implement (optional).
 - **Oversize vehicle** (homebase only): an extra-wide parking spot for combines and self-propelled harvesters.
 - **Large area:** a wide, open area for situations that need space, such as homebase machine preparation, markets or events.
+- **Silo:** marks the spot for the farmer's silo (homebase farms only). The silo building spawns here and is used as delivery and refill point.
 
 **Common place types and their purpose:**
 
@@ -287,6 +338,10 @@ A homebase is a character's home: the place where they live, return to in the ev
 **Two spawn points per character:** each character should have at least two home places — one with the place size "Character" (on foot; this is where the person stands and sleeps) and one with the place size "Vehicle" (where their car parks).
 
 **Creating home places:**
+
+Construction menu (recommended): open the construction menu (build tool), select the **Fields of Stories** category and open the **Character Home** tab. Pick the placeable for the desired character (e.g. "Mary Carter") and place it at the residence. Use **SHIFT + Q** to switch the size ("Character" for the person, "Vehicle" for their car, "Oversize" for Harvesters and oversize machines, "Large area" for the farm, "Silo" for the silo).
+
+Classic way:
 
 1. Open the menu with **SHIFT + F3** and go to the Settings tab.
 2. Choose the matching place size at the top ("Character" or "Vehicle").
@@ -308,6 +363,7 @@ For a farmer, the homebase is also his farm: when the machines are not in use or
 - **Oversize vehicle:** for combines and self-propelled harvesters.
 - **Vehicle + implement:** for implements and trailers.
 - **Large area:** for spacious situations at the farm, such as machine preparation.
+- **Silo:** for the farmer's silo, which serves as delivery and refill point for harvest and grass-mowing contracts.
 
 If you cannot find a spot for every machine, that is not a problem — depending on use they are parked or hidden.
 
@@ -356,6 +412,25 @@ If you cannot find a spot for every machine, that is not a problem — depending
 ---
 
 ## Changelog
+
+### 1.0.0.5
+- New: Create map places directly in the construction menu ("Fields of Stories" category with "General Places" and "Character Home" tabs). Placing a marker converts it into a real place and removes the temporary marker again.
+- New: Live placement preview with a green outline and an on-screen setup HUD showing the selected tool, the place size and required vs. existing places.
+- New: SHIFT + Q switches the place size while placing; SHIFT + DELETE removes all places of the selected type (with confirmation).
+- New: "Remove Place" item in the construction menu deletes the nearest place within 5 m, including farmer silos.
+- New: Character homebases and farmer silos can be placed via the construction menu. The silo spawns at a dedicated place size and serves as delivery and refill point.
+- New: Harvest and grass-mowing contracts are now available and require delivering the crop to the farmer's silo (pickup from the field, delivery to the marked silo). Mission details show Fieldwork, Delivery and Return equipment as separate tasks with the remaining delivery amount.
+- New: "Force Complete" button in the contracts menu finishes a nearly completed (over 70 %) Fields of Stories contract. This should only be used when contract cannot be fully completed.
+- New: The farmer's silo is topped up with lime, fertilizer, slurry, spray, seed and manure so borrowed equipment can be refilled there.
+- New: Map hotspot at the delivery/refill silo.
+- Bugfix: Farmers now auto-complete their scheduled fieldwork at day end, including fast-forwarding fields to the seeded state when the seed month is reached.
+- Bugfix: Fixed the daily schedule rebuild so all fields are captured across day changes.
+- Performance: Optimized field probing for missions.
+
+### 1.0.0.4
+
+- Vehicles no longer remain on fields the following day if fieldwork was only recently started (real-time timer).
+- Corrected roadside spawns on Zielonka.
 
 ### 1.0.0.3 (July 15, 2026)
 

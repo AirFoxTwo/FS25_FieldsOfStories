@@ -30,13 +30,24 @@ IATestRegistry = {
 
 --- Load the active test name from iaTestActive.xml.
 --- Called once at source time (mod load). Gracefully handles missing/empty file.
+--- Uses fileExists() guard to avoid engine-level error log when the file is
+--- excluded from production builds.
 function IATestRegistry.loadFromXML()
     local filePath = IANeighbours.dir .. "lib/testFramework/iaTestActive.xml"
+
+    if fileExists == nil or not fileExists(filePath) then
+        if IATestRegistry.verbose then
+            IAprintDebug("IATestRegistry", "iaTestActive.xml not found — no test active (production build or file missing)")
+        end
+        IATestRegistry._testName = nil
+        return
+    end
+
     local xmlFile = loadXMLFile("IATestActive", filePath)
 
     if xmlFile == nil or xmlFile == 0 then
         if IATestRegistry.verbose then
-            IAprintDebug("IATestRegistry", "iaTestActive.xml not found or failed to load — no test active")
+            IAprintDebug("IATestRegistry", "iaTestActive.xml failed to load — no test active")
         end
         IATestRegistry._testName = nil
         return

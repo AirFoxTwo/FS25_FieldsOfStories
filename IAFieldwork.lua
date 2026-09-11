@@ -24,6 +24,11 @@ IAFieldwork.JobType = {
 	PLOW = "plow",
 	-- Phone contract: success when sampled field state matches situation fieldStateOutcome.
 	IA_FIELD_OUTCOME = "ia_field_outcome",
+	-- Additional field outcome missions: fieldwork + delivery to farm.
+	LIME = "lime",
+	STONE_PICKING = "stone_picking",
+	GRASS_MOWING = "grass_mowing",
+	HARVEST_DELIVER_CORN = "harvest_deliver_corn",
 }
 
 --- Hard list of crops a Farmer neighbour is allowed to grow / harvest on their assigned farmlands.
@@ -180,7 +185,19 @@ function IAFieldwork.normalizeFieldworkJobType(fieldworkStr)
 	if s == "ia_field_outcome" then
 		ret = IAFieldwork.JobType.IA_FIELD_OUTCOME
 	end
-	IAprintDebug("normalizeFieldworkJobType", ("ret: "..s.." -> "..(ret ~= nil and tostring(ret) or "nil")), nil, nil, nil)
+	if s == "lime" or s == "liming" or s == "lime_spreading" then
+		ret = IAFieldwork.JobType.LIME
+	end
+	if s == "stone_picking" or s == "stonepicking" or s == "stone_pick" or s == "stones" then
+		ret = IAFieldwork.JobType.STONE_PICKING
+	end
+	if s == "grass_mowing" or s == "grassmowing" or s == "mowing" or s == "mow" or s == "grass_mow" then
+		ret = IAFieldwork.JobType.GRASS_MOWING
+	end
+	if s == "harvest_deliver_corn" or s == "harvestdelivercorn" or s == "harvest_corn_deliver" or s == "corn_deliver" then
+		ret = IAFieldwork.JobType.HARVEST_DELIVER_CORN
+	end
+	--IAprintDebug("normalizeFieldworkJobType", ("ret: "..s.." -> "..(ret ~= nil and tostring(ret) or "nil")), nil, nil, nil)
 	return ret
 end
 
@@ -222,6 +239,18 @@ function IAFieldwork.getLocalizedFieldworkJobTypeLabel(rawFieldwork, nextCropFru
 	end
 	if jt == IAFieldwork.JobType.FERTILIZEDSPREADING then
 		return g_i18n:getText(prefix.."ia_fieldwork_label_fertilize_mineral")
+	end
+	if jt == IAFieldwork.JobType.LIME then
+		return g_i18n:getText(prefix.."ia_fieldwork_label_lime")
+	end
+	if jt == IAFieldwork.JobType.STONE_PICKING then
+		return g_i18n:getText(prefix.."ia_fieldwork_label_stone_picking")
+	end
+	if jt == IAFieldwork.JobType.GRASS_MOWING then
+		return g_i18n:getText(prefix.."ia_fieldwork_label_grass_mowing")
+	end
+	if jt == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
+		return g_i18n:getText(prefix.."ia_fieldwork_label_harvest_deliver_corn")
 	end
 	if jt == IAFieldwork.JobType.IA_FIELD_OUTCOME then
 		IAprintDebug("getLocalizedFieldworkJobTypeLabel", "ia_field_outcome: "..g_i18n:getText("ia_fieldwork_label_condition"), nil, nil, nil)
@@ -271,6 +300,18 @@ function IAFieldwork.getLocalizedFieldworkImplementLabel(rawFieldwork)
 	if jt == IAFieldwork.JobType.FERTILIZEDSPREADING then
 		return g_i18n:getText("ia_fieldwork_equip_mineral_fertilizer")
 	end
+	if jt == IAFieldwork.JobType.LIME then
+		return g_i18n:getText("ia_fieldwork_equip_lime")
+	end
+	if jt == IAFieldwork.JobType.STONE_PICKING then
+		return g_i18n:getText("ia_fieldwork_equip_stone_picker")
+	end
+	if jt == IAFieldwork.JobType.GRASS_MOWING then
+		return g_i18n:getText("ia_fieldwork_equip_grass_mower")
+	end
+	if jt == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
+		return g_i18n:getText("ia_fieldwork_equip_harvest_deliver_corn")
+	end
 	if jt == IAFieldwork.JobType.IA_FIELD_OUTCOME then
 		return g_i18n:getText("ia_fieldwork_equip_generic")
 	end
@@ -304,6 +345,7 @@ function IAFieldwork.fieldworkImplementUsesRefillableConsumable(rawFieldwork)
 	return jt == IAFieldwork.JobType.SEED
 		or IAFieldwork.isFertilizeJobType(jt)
 		or jt == IAFieldwork.JobType.SPRAY
+		or jt == IAFieldwork.JobType.LIME
 end
 
 --- Canonical `IASituation.jobType` / AI fieldwork enum (`IAFieldwork.JobType.*`) for Fieldwork situations.
@@ -450,7 +492,8 @@ function IAFieldwork.getFertilizeSprayTypeIndexForJobType(jobType)
 	return nil
 end
 
---- Post-herbicide weed density targets (from WeedSystem herbicide replacements; includes legacy 7).
+--- Post-herbicide "withered" weed states (from WeedSystem herbicide replacements):
+-- vanilla FS25: 7 = small withered, 8 = medium withered, 9 = large withered (PF may also target 9).
 function IAFieldwork.collectPostHerbicideWeedStates()
 	local states = { [7] = true, [8] = true }
 	if g_currentMission ~= nil and g_currentMission.weedSystem ~= nil then
@@ -479,16 +522,22 @@ function IAFieldwork.isPostHerbicideWeedState(weedState)
 end
 
 --- Expected weedState after herbicide spray (phone contracts / NPC field-update tasks).
+--- Vanilla maps small weeds (3) -> 7 ("small withered") and larger weeds -> 8/9, but a whole-field
+--- completion only sets one state. Prefer the small withered state (7) so a field that only had
+--- small weeds is never inflated into the larger withered states.
 function IAFieldwork.getExpectedPostHerbicideWeedState()
 	local states = IAFieldwork.collectPostHerbicideWeedStates()
-	local best = 8
+	if states[7] then
+		return 7
+	end
+	local best = nil
 	for s in pairs(states) do
 		local n = tonumber(s)
-		if n ~= nil and n > best then
+		if n ~= nil and (best == nil or n < best) then
 			best = n
 		end
 	end
-	return best
+	return best or 7
 end
 
 --- FieldState keys after NPC fieldwork completes (same semantics as enqueueCompleteFieldworkFieldUpdate / IASituation:completeFieldwork).
@@ -515,6 +564,7 @@ function IAFieldwork.getExpectedFieldStateAfterJob(jobType, field, seedFruitType
 		end
 		out.fruitTypeIndex = seedFruitTypeIndex
 		out.growthState = 1
+		out.weedState = 1
 		out.groundType = FieldGroundType.SOWN
 	elseif IAFieldwork.isFertilizeJobType(jobType) then
 		local sl = 0
@@ -525,7 +575,8 @@ function IAFieldwork.getExpectedFieldStateAfterJob(jobType, field, seedFruitType
 		-- sprayType intentionally not asserted on the contract: FS25 may write FERTILIZER/MANURE
 		-- interchangeably (see IAFieldOutcomeMissionProbeEvaluator.fertilizeSprayTypeKeyMatches).
 	elseif jobType == IAFieldwork.JobType.SPRAY then
-		-- FS25: herbicide on crop sets weed map to a post-spray state (typically 8; legacy 7).
+		-- FS25: herbicide leaves the weed map in a post-spray "withered" state; use the small
+		-- withered state (7) so small-weed fields aren't inflated to the larger withered states.
 		out.weedState = IAFieldwork.getExpectedPostHerbicideWeedState()
 	elseif jobType == IAFieldwork.JobType.HARVEST then
 		local fruitTypeIndex = field.fieldState ~= nil and field.fieldState.fruitTypeIndex or nil
@@ -548,6 +599,33 @@ function IAFieldwork.getExpectedFieldStateAfterJob(jobType, field, seedFruitType
 		out.weedState = 0
 		out.groundType = FieldGroundType.PLOWED
 		out.stubbleShredLevel = 0
+	elseif jobType == IAFieldwork.JobType.LIME then
+		out.limeLevel = 0
+		if g_fieldManager ~= nil and g_fieldManager.limeLevelMaxValue ~= nil then
+			out.limeLevel = g_fieldManager.limeLevelMaxValue
+		end
+	elseif jobType == IAFieldwork.JobType.STONE_PICKING then
+		out.stoneLevel = 0
+	elseif jobType == IAFieldwork.JobType.GRASS_MOWING then
+		local fruitTypeIndex = field.fieldState ~= nil and field.fieldState.fruitTypeIndex or nil
+		local mowedGrowthState = IAFieldwork.getPostHarvestGrowthStateForFieldCrop(field)
+		if fruitTypeIndex == nil or mowedGrowthState == nil then
+			return out
+		end
+		out.fruitTypeIndex = fruitTypeIndex
+		out.growthState = mowedGrowthState
+		out.clearHeightTypes = true
+	elseif jobType == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
+		local fruitTypeIndex = field.fieldState ~= nil and field.fieldState.fruitTypeIndex or nil
+		local harvestedGrowthState = IAFieldwork.getPostHarvestGrowthStateForFieldCrop(field)
+		if fruitTypeIndex == nil or harvestedGrowthState == nil then
+			return out
+		end
+		out.weedState = 0
+		out.fruitTypeIndex = fruitTypeIndex
+		out.growthState = harvestedGrowthState
+		out.sprayLevel = 0
+		out.clearHeightTypes = true
 	end
 	return out
 end
@@ -573,6 +651,14 @@ function IAFieldwork.getValidationKeySetForOutcomeJob(jobEnum)
 		return { groundType = true, stubbleShredLevel = true }
 	elseif jobEnum == IAFieldwork.JobType.PLOW then
 		return { groundType = true }
+	elseif jobEnum == IAFieldwork.JobType.LIME then
+		return { limeLevel = true }
+	elseif jobEnum == IAFieldwork.JobType.STONE_PICKING then
+		return { stoneLevel = true }
+	elseif jobEnum == IAFieldwork.JobType.GRASS_MOWING then
+		return { fruitTypeIndex = true, growthState = true }
+	elseif jobEnum == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
+		return { fruitTypeIndex = true, growthState = true }
 	elseif jobEnum == IAFieldwork.JobType.IA_FIELD_OUTCOME then
 		return nil
 	end
@@ -752,6 +838,173 @@ function IAFieldwork.enqueueCompleteFieldworkFieldUpdateForDayEnd(field, jobType
 		return true
 	end
 	return false
+end
+
+--- True when the job requires delivering harvest to the farm after fieldwork is done.
+--- GRASS_MOWING: mow grass, then deliver it (bales or loose) to the farm.
+--- HARVEST / HARVEST_DELIVER_CORN: harvest crop, then deliver grain to the farm.
+--- @param string|nil jobType IAFieldwork.JobType.* after normalize
+--- @return boolean
+function IAFieldwork.isDeliveryRequiredJobType(jobType)
+	if IAFieldwork.JobType == nil then
+		return false
+	end
+	return jobType == IAFieldwork.JobType.GRASS_MOWING
+		or jobType == IAFieldwork.JobType.HARVEST
+		or jobType == IAFieldwork.JobType.HARVEST_DELIVER_CORN
+end
+
+--- True when the job type is only fieldwork (no delivery), using the existing probe system.
+--- @param string|nil jobType IAFieldwork.JobType.* after normalize
+--- @return boolean
+function IAFieldwork.isFieldworkOnlyJobType(jobType)
+	return jobType ~= nil
+		and not IAFieldwork.isDeliveryRequiredJobType(jobType)
+end
+
+--------------------------------------------------------------------------------
+-- Equipment availability checks for fieldwork scheduling
+--------------------------------------------------------------------------------
+
+--- Required vehicle types for a job type (used to check if a neighbour has the equipment).
+--- Returns a table { vehicleTypes = {...}, attachmentCategories = {...} } or nil.
+--- @param string|nil jobType IAFieldwork.JobType.* after normalize
+--- @return table|nil
+function IAFieldwork.getRequiredEquipmentForJob(jobType)
+	if jobType == nil or IAFieldwork.JobType == nil then
+		return nil
+	end
+
+	if jobType == IAFieldwork.JobType.CULTIVATE then
+		return { vehicleTypes = { "tractor" }, attachmentCategories = { "cultivator" } }
+	elseif jobType == IAFieldwork.JobType.HARROW then
+		return { vehicleTypes = { "tractor" }, attachmentCategories = { "harrow", "cultivator" } }
+	elseif jobType == IAFieldwork.JobType.PLOW then
+		return { vehicleTypes = { "tractor" }, attachmentCategories = { "plow" } }
+	elseif jobType == IAFieldwork.JobType.SEED then
+		return { vehicleTypes = { "tractor" }, attachmentCategories = { "seeder", "sowingMachine", "sower", "planter" } }
+	elseif jobType == IAFieldwork.JobType.HARVEST then
+		return { vehicleTypes = { "harvester", "combine" }, attachmentCategories = { "cutter", "header", "grainHeader", "cornHeader" } }
+	elseif jobType == IAFieldwork.JobType.SPRAY then
+		return { vehicleTypes = { "tractor" }, attachmentCategories = { "sprayer", "fieldSprayer" } }
+	elseif IAFieldwork.isFertilizeJobType(jobType) then
+		return { vehicleTypes = { "tractor" }, attachmentCategories = { "spreader", "sprayer", "fertilizer" } }
+	elseif jobType == IAFieldwork.JobType.LIME then
+		return { vehicleTypes = { "tractor" }, attachmentCategories = { "spreader", "limeSpreader", "fertilizer" } }
+	elseif jobType == IAFieldwork.JobType.STONE_PICKING then
+		return { vehicleTypes = { "tractor" }, attachmentCategories = { "stonePicker", "stoneCollector" } }
+	elseif jobType == IAFieldwork.JobType.GRASS_MOWING then
+		return { vehicleTypes = { "tractor" }, attachmentCategories = { "mower", "forageWagon", "baler", "loaderWagon" } }
+	elseif jobType == IAFieldwork.JobType.HARVEST_DELIVER_CORN then
+		return { vehicleTypes = { "harvester", "combine" }, attachmentCategories = { "cutter", "header", "cornHeader", "grainHeader" } }
+	elseif jobType == IAFieldwork.JobType.IA_FIELD_OUTCOME then
+		return nil -- Generic; equipment varies.
+	end
+	return nil
+end
+
+--- True when the neighbour's fleet contains at least one vehicle/attachment matching the required equipment.
+--- @param table|nil neighbour IANeighbour instance (must have .vehicles table)
+--- @param string|nil jobType IAFieldwork.JobType.* after normalize
+--- @return boolean
+function IAFieldwork.neighbourHasFleetEquipmentForJobType(neighbour, jobType)
+	if neighbour == nil or neighbour.vehicles == nil or jobType == nil then
+		return false
+	end
+	local req = IAFieldwork.getRequiredEquipmentForJob(jobType)
+	if req == nil then
+		-- No specific equipment required (e.g. IA_FIELD_OUTCOME); treat as always available.
+		return true
+	end
+
+	local hasVehicleType = false
+	local hasAttachmentCategory = false
+
+	for _, ia in pairs(neighbour.vehicles) do
+		if ia ~= nil then
+			-- Skip borrowed vehicles.
+			if ia.isBorrowedByPlayer == true then
+				-- Not counted as available fleet.
+			else
+				local vType = (ia.type ~= nil) and string.lower(tostring(ia.type)) or nil
+				local vCat = (ia.category ~= nil) and string.lower(tostring(ia.category)) or nil
+
+				-- Check vehicle type match.
+				if not hasVehicleType and req.vehicleTypes ~= nil then
+					for _, vt in ipairs(req.vehicleTypes) do
+						local vtLower = string.lower(tostring(vt))
+						if vType == vtLower then
+							hasVehicleType = true
+							break
+						end
+					end
+				end
+
+				-- Check attachment category match (both type="attachment" and main vehicles count).
+				if not hasAttachmentCategory and req.attachmentCategories ~= nil and #req.attachmentCategories > 0 then
+					for _, ac in ipairs(req.attachmentCategories) do
+						local acLower = string.lower(tostring(ac))
+						if vCat == acLower or vType == acLower then
+							hasAttachmentCategory = true
+							break
+						end
+					end
+				end
+			end
+		end
+	end
+
+	-- A job needs at minimum the main vehicle type.
+	-- Attachment is optional for some jobs (e.g. the neighbour might have a harvester without header).
+	if not hasVehicleType then
+		return false
+	end
+	-- For attachment-required jobs: also check attachment availability.
+	if req.attachmentCategories ~= nil and #req.attachmentCategories > 0 and not hasAttachmentCategory then
+		return false
+	end
+	return true
+end
+
+--- True when a job type can ONLY be offered as a player contract (equipment missing).
+--- @param table|nil neighbour
+--- @param string|nil jobType
+--- @return boolean
+function IAFieldwork.isJobTypeContractOnlyForNeighbour(neighbour, jobType)
+	if not IAFieldwork.isDeliveryRequiredJobType(jobType) then
+		-- Non-delivery jobs: contract-only if no equipment.
+		return not IAFieldwork.neighbourHasFleetEquipmentForJobType(neighbour, jobType)
+	end
+	-- Delivery jobs: contract-only if missing the fieldwork implement.
+	if not IAFieldwork.neighbourHasFleetEquipmentForJobType(neighbour, jobType) then
+		return true
+	end
+	return false
+end
+
+--- Resolve the windrow fill type index for GRASS (cut grass swath on the ground).
+--- Uses FillType.GRASS_WINDROW or falls back to fruitTypeManager mapping.
+--- @return number|nil windrowFillTypeIndex, or nil if unresolvable
+function IAFieldwork.getGrassWindrowFillTypeIndex()
+	-- Primary: FillType.GRASS_WINDROW
+	if FillType ~= nil and FillType.GRASS_WINDROW ~= nil then
+		local idx = tonumber(FillType.GRASS_WINDROW)
+		if idx ~= nil then
+			return idx
+		end
+	end
+	-- Fallback: resolve via fruit type manager windrow mapping
+	local grassIndex = IAFieldwork.resolveFruitTypeNameOrIndex("GRASS")
+	if grassIndex ~= nil
+		and g_fruitTypeManager ~= nil
+		and g_fruitTypeManager.fruitTypeIndexToWindrowFillTypeIndex ~= nil
+	then
+		local wfIdx = g_fruitTypeManager.fruitTypeIndexToWindrowFillTypeIndex[grassIndex]
+		if wfIdx ~= nil then
+			return tonumber(wfIdx)
+		end
+	end
+	return nil
 end
 
 return IAFieldwork

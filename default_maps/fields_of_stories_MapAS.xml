@@ -21363,6 +21363,270 @@
             <withVehicle>true</withVehicle>
             <withAttachment>true</withAttachment>
         </place>
+        <place id="1697">
+            <name>Place 1697</name>
+            <type>shop</type>
+            <x>434.631653</x>
+            <y>17.417419</y>
+            <z>469.291138</z>
+            <rotation>0.000000</rotation>
+            <sizeType>character</sizeType>
+            <withVehicle>false</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1698">
+            <name>Place 1698</name>
+            <type>shop</type>
+            <x>262.058380</x>
+            <y>17.493456</y>
+            <z>469.915802</z>
+            <rotation>0.000000</rotation>
+            <sizeType>character</sizeType>
+            <withVehicle>false</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1699">
+            <name>Place 1699</name>
+            <type>shop</type>
+            <x>254.178177</x>
+            <y>17.493603</y>
+            <z>464.244171</z>
+            <rotation>0.000000</rotation>
+            <sizeType>character</sizeType>
+            <withVehicle>false</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1700">
+            <name>Place 1700</name>
+            <type>shop</type>
+            <x>261.657257</x>
+            <y>17.417408</y>
+            <z>552.446167</z>
+            <rotation>0.000000</rotation>
+            <sizeType>character</sizeType>
+            <withVehicle>false</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1701">
+            <name>Place 1701</name>
+            <type>shop</type>
+            <x>-112.683113</x>
+            <y>20.140078</y>
+            <z>88.722183</z>
+            <rotation>0.000000</rotation>
+            <sizeType>character</sizeType>
+            <withVehicle>false</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1702">
+            <name>Place 1702</name>
+            <type>shop</type>
+            <x>-130.843658</x>
+            <y>20.140076</y>
+            <z>89.991661</z>
+            <rotation>0.780095</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1703">
+            <name>Place 1703</name>
+            <type>church</type>
+            <x>828.559875</x>
+            <y>43.073448</y>
+            <z>-700.277100</z>
+            <rotation>0.780095</rotation>
+            <sizeType>character</sizeType>
+            <withVehicle>false</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1704">
+            <name>Place 1704</name>
+            <type>player_farm</type>
+            <x>-583.195801</x>
+            <y>44.175964</y>
+            <z>565.771606</z>
+            <rotation>0.419872</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="1705">
+            <name>Place 1705</name>
+            <type>player_farm</type>
+            <x>-587.867920</x>
+            <y>46.311279</y>
+            <z>624.343811</z>
+            <rotation>1.597995</rotation>
+            <sizeType>vehicle_attachment</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="1706">
+            <name>Place 1706</name>
+            <type>character_homebase</type>
+            <x>-111.532166</x>
+            <y>23.470818</y>
+            <z>-610.367249</z>
+            <rotation>-0.783424</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1707">
+            <name>Place 1707</name>
+            <type>character_homebase</type>
+            <x>-565.030090</x>
+            <y>48.487083</y>
+            <z>-320.499725</z>
+            <rotation>2.049252</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1708">
+            <name>Place 1708</name>
+            <type>character_homebase</type>
+            <x>630.891602</x>
+            <y>17.494160</y>
+            <z>717.533875</z>
+            <rotation>-0.003481</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1709">
+            <name>Place 1709</name>
+            <type>character_homebase</type>
+            <x>719.030396</x>
+            <y>17.494164</y>
+            <z>694.698914</z>
+            <rotation>0.592881</rotation>
+            <sizeType>oversize_vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="1710">
+            <name>Place 1710</name>
+            <type>character_homebase</type>
+            <x>668.532593</x>
+            <y>17.494162</y>
+            <z>686.906616</z>
+            <rotation>3.137327</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="1711">
+            <name>Place 1711</name>
+            <type>character_homebase</type>
+            <x>216.851013</x>
+            <y>45.061768</y>
+            <z>-906.224792</z>
+            <rotation>0.001881</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="1712">
+            <name>Place 1712</name>
+            <type>character_homebase</type>
+            <x>277.586792</x>
+            <y>52.745731</y>
+            <z>-855.333191</z>
+            <rotation>0.001881</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1713">
+            <name>Place 1713</name>
+            <type>character_homebase</type>
+            <x>287.583282</x>
+            <y>52.715954</y>
+            <z>-855.629761</z>
+            <rotation>0.001881</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1714">
+            <name>Place 1714</name>
+            <type>character_homebase</type>
+            <x>-490.002960</x>
+            <y>40.941635</y>
+            <z>-743.044250</z>
+            <rotation>-0.809955</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1715">
+            <name>Place 1715</name>
+            <type>character_homebase</type>
+            <x>-453.694763</x>
+            <y>40.941639</y>
+            <z>-706.288330</z>
+            <rotation>-2.364119</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="1716">
+            <name>Place 1716</name>
+            <type>character_homebase</type>
+            <x>-332.092163</x>
+            <y>34.296074</y>
+            <z>-508.049652</z>
+            <rotation>2.328946</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1717">
+            <name>Place 1717</name>
+            <type>character_homebase</type>
+            <x>-340.022522</x>
+            <y>34.382092</y>
+            <z>-539.940674</z>
+            <rotation>-0.778922</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
+        <place id="1718">
+            <name>Place 1718</name>
+            <type>character_homebase</type>
+            <x>-73.026588</x>
+            <y>19.245134</y>
+            <z>-55.491585</z>
+            <rotation>0.766826</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1719">
+            <name>Place 1719</name>
+            <type>character_homebase</type>
+            <x>-38.289833</x>
+            <y>19.245136</y>
+            <z>-30.286894</z>
+            <rotation>-0.773387</rotation>
+            <sizeType>vehicle</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>false</withAttachment>
+        </place>
+        <place id="1720">
+            <name>Place 1720</name>
+            <type>character_homebase</type>
+            <x>-99.712639</x>
+            <y>19.245134</y>
+            <z>-112.010384</z>
+            <rotation>-0.748851</rotation>
+            <sizeType>silo</sizeType>
+            <withVehicle>true</withVehicle>
+            <withAttachment>true</withAttachment>
+        </place>
     </places>
     <neighbourHomebaseAssignments>
         <neighbour id="21">
@@ -21390,6 +21654,9 @@
             <placeId id="621"/>
             <placeId id="1677"/>
             <placeId id="1678"/>
+            <placeId id="1718"/>
+            <placeId id="1719"/>
+            <placeId id="1720"/>
         </neighbour>
         <neighbour id="20">
             <placeId id="1535"/>
@@ -21415,6 +21682,8 @@
             <placeId id="1555"/>
             <placeId id="1679"/>
             <placeId id="1682"/>
+            <placeId id="1716"/>
+            <placeId id="1717"/>
         </neighbour>
         <neighbour id="19">
             <placeId id="1556"/>
@@ -21436,6 +21705,8 @@
             <placeId id="451"/>
             <placeId id="1680"/>
             <placeId id="1681"/>
+            <placeId id="1714"/>
+            <placeId id="1715"/>
         </neighbour>
         <neighbour id="18">
             <placeId id="1518"/>
@@ -21459,6 +21730,9 @@
             <placeId id="618"/>
             <placeId id="1683"/>
             <placeId id="1684"/>
+            <placeId id="1711"/>
+            <placeId id="1712"/>
+            <placeId id="1713"/>
         </neighbour>
         <neighbour id="17">
             <placeId id="1592"/>
@@ -21502,6 +21776,9 @@
             <placeId id="1689"/>
             <placeId id="1690"/>
             <placeId id="1691"/>
+            <placeId id="1708"/>
+            <placeId id="1709"/>
+            <placeId id="1710"/>
         </neighbour>
         <neighbour id="16">
             <placeId id="461"/>
@@ -21514,6 +21791,8 @@
             <placeId id="1626"/>
             <placeId id="1627"/>
             <placeId id="1667"/>
+            <placeId id="1706"/>
+            <placeId id="1707"/>
         </neighbour>
         <neighbour id="14">
             <placeId id="1006"/>

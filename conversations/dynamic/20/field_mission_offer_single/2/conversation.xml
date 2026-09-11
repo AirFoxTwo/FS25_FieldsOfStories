@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<conversation>
+	<entry id="1" previousId="0" speaker="npc"
+		text_en="Hey, I need to ask you a favor. I could use some help with {jobType} on about {totalHectares} hectares. I'm a bit behind schedule and won't be able to manage it on my own. Could you give me a hand?"
+		text_de="Hey, ich muss dich um einen gefallen bitten. Ich bräuchte Hilfe beim {jobType} auf etwa {totalHectares} Hektar. Ich bin etwas im Rückstand und schaffe das nicht. könntest du mir aushelfen?">
+		<voiceSegments>
+			<segment type="named" id="dm2_1_1"/>
+			<segment type="variable" name="jobType"/>
+			<segment type="named" id="dm2_1_2"/>
+			<segment type="variable" name="totalHectares"/>
+			<segment type="named" id="dm2_1_3"/>
+		</voiceSegments>
+	</entry>
+	<entry id="2" previousId="1" speaker="player"
+		text_en="Sure thing, I'll take care of it."
+		text_de="Klar, ich kümmere mich darum."
+		callbackOnSelectImmediate="accept">
+		<voiceSegments>
+			<segment type="named" id="dm2_2_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="3" previousId="1" speaker="player"
+		text_en="Yes, I can help you, but I would need to borrow {vehicleNameWithArticle}. Is that okay?"
+		text_de="Ja, ich kann dir helfen, aber ich müsste {vehicleNameWithArticle} leihen. Passt das?"
+		callbackOnSelectImmediate="accept_with_equipment">
+		<voiceSegments>
+			<segment type="named" id="dm2_3_1"/>
+			<segment type="variable" name="vehicleNameWithArticle"/>
+			<segment type="named" id="dm2_3_2"/>
+		</voiceSegments>
+	</entry>
+	<entry id="6" previousId="1" speaker="player"
+		text_en="Sorry, I'd love to help, but I'm tied up with my own work right now."
+		text_de="Tut mir leid, ich würde gerne helfen, aber ich bin gerade mit meiner eigenen Arbeit beschäftigt."
+		callbackOnSelectImmediate="decline">
+		<voiceSegments>
+			<segment type="named" id="dm2_6_1"/>
+		</voiceSegments>
+	</entry>
+	<entry id="7" previousId="2" speaker="npc"
+		text_en="That's a huge help, thanks. I'll send the field locations over. {extraRefillNote}"
+		text_de="Das ist eine riesige Hilfe, danke. Ich schick dir die Feldstandorte rüber. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm2_7_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="8" previousId="3" speaker="npc"
+		text_en="Of course. It's all set up at the farm and ready to go. {extraRefillNote}"
+		text_de="Natürlich. Es steht alles bereit auf dem Hof und kann losgehen. {extraRefillNote}"
+		callbackOnPlaybackEnd="after_accept">
+		<voiceSegments>
+			<segment type="named" id="dm2_8_1"/>
+			<segment type="variable" name="extraRefillNote"/>
+		</voiceSegments>
+	</entry>
+	<entry id="10" previousId="6" speaker="npc"
+		text_en="No problem, I thought I'd ask. I'll manage it somehow."
+		text_de="Kein Problem, ich dachte, ich frag mal. Ich krieg das schon irgendwie hin."
+		callbackOnPlaybackEnd="after_decline">
+		<voiceSegments>
+			<segment type="named" id="dm2_10_1"/>
+		</voiceSegments>
+	</entry>
+</conversation>
